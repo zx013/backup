@@ -191,6 +191,8 @@ class Backup_Windows:
 		for key, value in self.active_windows.items():
 			#print key, value
 			self.send_key(key, win32con.VK_CONTROL, ord('S'))
+			write_log('info', 'save file %s' % value['text'])
+		time.sleep(0.2) #保存文件需要一定时间
 
 
 class Backup_File(Backup_Config, Backup_Windows):
@@ -225,7 +227,7 @@ class Backup_File(Backup_Config, Backup_Windows):
 
 			#删除超出范围和无关文件
 			for number, file_name in enumerate(os.listdir(file_setting['path'])[::-1]):
-				if number >= self.get_basic('number') or in_encode_file not in file_name:
+				if in_encode_file not in file_name:
 					os.remove('%s%s' % (file_setting['path'], file_name))
 				else:
 					file_list.append(file_name)
@@ -239,8 +241,11 @@ class Backup_File(Backup_Config, Backup_Windows):
 				if self.compare_file(in_file, last_file): continue
 
 			#in_file->out_file
-			#print 'copy /Y %s %s' % (in_file, out_file)
 			os.system('copy /Y %s %s 1>nul' % (in_file, out_file))
+			write_log('info', 'copy /Y %s %s' % (in_file, out_file))
+			for number, file_name in enumerate(os.listdir(file_setting['path'])[::-1]):
+				if number >= self.get_basic('number'):
+					os.remove('%s%s' % (file_setting['path'], file_name))
 
 	#备份文件
 	def file_backup(self):
@@ -258,6 +263,7 @@ class Backup:
 	def exit_backup(self):
 		self.drives.delete_drives(self.drive)
 		thread.exit_thread()
+		write_log('info', 'exit %s thread' % drive)
 
 	#开启备份
 	def start_backup(self):
