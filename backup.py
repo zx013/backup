@@ -19,6 +19,7 @@ from log import debug_log, write_log, error_log, sync
 
 #备份的基本配置
 scan_time = 5 #扫描时间
+save_time = 10 #保存间隔
 basic_time = 10 #备份间隔
 basic_number = 10 #备份数量
 
@@ -186,16 +187,17 @@ class Backup_Windows:
 
 	#向当前激活的窗口发送Ctrl+S
 	def save_file(self):
-		self.get_window()
-		self.check_window()
-		for key, value in self.active_windows.items():
-			#print key, value
-			self.send_key(key, win32con.VK_CONTROL, ord('S'))
-			write_log('info', 'save file %s' % value['text'])
-		time.sleep(0.2) #保存文件需要一定时间
+		while 1:
+			self.get_window()
+			self.check_window()
+			for key, value in self.active_windows.items():
+				#print key, value
+				self.send_key(key, win32con.VK_CONTROL, ord('S'))
+				write_log('info', 'save file %s' % value['text'])
+			time.sleep(save_time) #保存文件需要一定时间
 
 
-class Backup_File(Backup_Config, Backup_Windows):
+class Backup_File(Backup_Config):
 	def __init__(self, drive):
 		self.drive = drive
 
@@ -247,11 +249,6 @@ class Backup_File(Backup_Config, Backup_Windows):
 				if number >= self.get_basic('number'):
 					os.remove('%s%s' % (file_setting['path'], file_name))
 
-	#备份文件
-	def file_backup(self):
-		self.save_file()
-		self.copy_file()
-
 
 class Backup:
 	def __init__(self, drives, drive):
@@ -270,12 +267,14 @@ class Backup:
 		backup_file = Backup_File(self.drive)
 		if not backup_file.inspect_config(): self.exit_backup()
 		while 1:
-			backup_file.file_backup()
+			backup_file.copy_file()
 			time.sleep(backup_file.get_basic('time'))
 
 		self.exit_backup()
 
 def run_backup():
+	backup_windows = Backup_Windows()
+	thread.start_new_thread(backup_windows.save_file, ())
 	drives = Backup_Drives()
 	while 1:
 		for drive in drives.get_unactive_drives():
