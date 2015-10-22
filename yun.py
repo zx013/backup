@@ -66,8 +66,7 @@ class BaiduDisk:
 	#https://pcs.baidu.com/rest/2.0/pcs/{object_name}?{query_string}
 	def post_disk(self, object_name, query_string):
 		url = 'http://pan.baidu.com/api/%s' % object_name
-		self.post(url, urllib.urlencode(query_string))
-		return self.post(url)
+		return self.post(url, urllib.urlencode(query_string))
 
 	#获得配额信息
 	def quota(self):
