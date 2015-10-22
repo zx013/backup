@@ -72,9 +72,14 @@ class BaiduDisk:
 	def quota(self):
 		return self.post_disk('quota', {'method': 'info'})
 
+
 	#查看目录下的文件
 	def show(self, path='/'):
 		return self.post_disk('list', {'dir': path})
+
+	#比较文件
+	def compare(self):
+		pass
 
 	#创建目录
 	def mkdir(self, path):
