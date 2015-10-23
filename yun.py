@@ -95,13 +95,13 @@ class BaiduDisk:
 		data = {'method': 'upload', 'dir': 'a.txt', 'ondup': 'newcopy', 'filename': 'a.txt'}
 
 	#获取文件或目录的元信息
-	def get_metas(self, file_list):
-		return self.post_pan('filemetas', {'dlink': 1, 'target': json.dumps(file_list)})
+	def get_metas(self, path):
+		return self.post_pan('filemetas', {'dlink': 1, 'target': json.dumps([path])})
 	
 	#获取下载链接
 	def get_link(self, path):
-		metas = json.loads(get_metas(path))
-		return metas['info'][1]['dlink']
+		metas = json.loads(self.get_metas(path))
+		return metas['info'][0]['dlink']
 
 	#下载文件
 	def download(self):
