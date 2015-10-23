@@ -20,8 +20,8 @@ class BaiduDisk:
 		self.username = username
 		self.password = password
 
-	def post(self, url, data=None):
-		req = urllib2.Request(url=url, data=data)
+	def post(self, url, **kvargv):
+		req = urllib2.Request(url=url, **kvargv)
 		#res = urllib2.urlopen(req).read()
 		res = self.opener.open(req).read()
 		return res
@@ -33,16 +33,16 @@ class BaiduDisk:
 
 		#获取token
 		url = 'https://passport.baidu.com/v2/api/?getapi&tpl=mn&apiver=v3&class=login&tt=%s&logintype=dialogLogin&callback=%s' % (int(time.time()), 0)
-		token = json.loads(self.post(url).replace("'", '"'))['data']['token']
+		self.token = json.loads(self.post(url).replace("'", '"'))['data']['token']
 
-		url = 'https://passport.baidu.com/v2/api/?logincheck&token=%stpl=mn&apiver=v3&tt=%s&username=%s&isphone=false&callback=%s' % (token, int(time.time()), '', 0)
+		url = 'https://passport.baidu.com/v2/api/?logincheck&token=%stpl=mn&apiver=v3&tt=%s&username=%s&isphone=false&callback=%s' % (self.token, int(time.time()), '', 0)
 		self.post(url)
 
 		url = 'https://passport.baidu.com/v2/api/?login'
 		data = {
 			'staticpage': 'http://www.baidu.com/cache/user/html/v3Jump.html',
 			'charset': 'UTF-8',
-			'token': token,
+			'token': self.token,
 			'tpl': 'mn',
 			'apiver': 'v3',
 			'tt': int(time.time()),
@@ -60,13 +60,13 @@ class BaiduDisk:
 			'ppui_logintime': '5000',
 			'callback': 'parent.bd__pcbs__oa36qm'
 		}
-		ret = self.post(url, urllib.urlencode(data))
+		ret = self.post(url, data=urllib.urlencode(data))
 		return ret.split('err_no=')[1].split('&')[0]
 
 	#https://pcs.baidu.com/rest/2.0/pcs/{object_name}?{query_string}
 	def post_disk(self, object_name, query_string):
 		url = 'http://pan.baidu.com/api/%s' % object_name
-		return self.post(url, urllib.urlencode(query_string))
+		return self.post(url, data=urllib.urlencode(query_string))
 
 	#获得配额信息
 	def quota(self):
@@ -86,8 +86,8 @@ class BaiduDisk:
 		return self.post_disk('create', {'path': path, 'isdir': 1})
 	
 	#删除文件
-	def delete(self):
-		pass
+	def delete(self, files):
+		return self.post_disk('filemanager?opera=delete', {'filelist': json.dumps(files)})
 
 	#上传文件
 	def upload(self):
