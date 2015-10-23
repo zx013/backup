@@ -63,19 +63,20 @@ class BaiduDisk:
 		ret = self.post(url, data=urllib.urlencode(data))
 		return ret.split('err_no=')[1].split('&')[0]
 
-	#https://pcs.baidu.com/rest/2.0/pcs/{object_name}?{query_string}
-	def post_disk(self, object_name, query_string):
-		url = 'http://pan.baidu.com/api/%s' % object_name
-		return self.post(url, data=urllib.urlencode(query_string))
+	def post_pan(self, method, params):
+		url = 'http://pan.baidu.com/api/%s' % method
+		return self.post(url, data=urllib.urlencode(params))
+
+	def post_pcs(self, method, params, data):
+		url = 'http://c.pcs.baidu.com/rest/2.0/pcs/%s?%s' % (method, urllib.urlencode(params))
 
 	#获得配额信息
 	def quota(self):
-		return self.post_disk('quota', {'method': 'info'})
-
+		return self.post_pan('quota', {'method': 'info'})
 
 	#查看目录下的文件
 	def show(self, path='/'):
-		return self.post_disk('list', {'dir': path})
+		return self.post_pan('list', {'dir': path})
 
 	#比较文件
 	def compare(self):
@@ -83,15 +84,24 @@ class BaiduDisk:
 
 	#创建目录
 	def mkdir(self, path):
-		return self.post_disk('create', {'path': path, 'isdir': 1})
-	
+		return self.post_pan('create', {'path': path, 'isdir': 1})
+
 	#删除文件
-	def delete(self, files):
-		return self.post_disk('filemanager?opera=delete', {'filelist': json.dumps(files)})
+	def delete(self, file_list):
+		return self.post_pan('filemanager?opera=delete', {'filelist': json.dumps(file_list)})
 
 	#上传文件
-	def upload(self):
-		pass
+	def upload(self, file_name):
+		data = {'method': 'upload', 'dir': 'a.txt', 'ondup': 'newcopy', 'filename': 'a.txt'}
+
+	#获取文件或目录的元信息
+	def get_metas(self, file_list):
+		return self.post_pan('filemetas', {'dlink': 1, 'target': json.dumps(file_list)})
+	
+	#获取下载链接
+	def get_link(self, path):
+		metas = json.loads(get_metas(path))
+		return metas['info'][1]['dlink']
 
 	#下载文件
 	def download(self):
