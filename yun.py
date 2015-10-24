@@ -3,15 +3,13 @@
 #参考文章及内容：
 #https://github.com/Yangff/node_pcsapi/blob/master/baidulogin.md
 #python库baidupcsapi-0.3.5
+import os
 import json
 import cookielib
 import urllib
 import urllib2
 import time
 
-#根据文件完整路径获取文件名
-def get_filename(path):
-	return path.split('/')[-1].split('\\')[-1]
 
 #短时间内多次登陆百度账号会导致需要输入验证码，以致无法登陆
 class BaiduDisk:
@@ -69,7 +67,7 @@ class BaiduDisk:
 		return self.post(url, data=urllib.urlencode(params))
 
 	def post_pcs(self, method, params, data):
-		url = 'http://c.pcs.baidu.com/rest/2.0/pcs/%s?%s' % (method, urllib.urlencode(params))
+		url = 'http://c.pcs.baidu.com/rest/2.0/pcs/%s?app_id=250528%s' % (method, urllib.urlencode(params))
 
 	#获得配额信息
 	def quota(self):
@@ -102,7 +100,7 @@ class BaiduDisk:
 	#获取下载链接
 	def get_link(self, file_list):
 		metas = json.loads(self.get_metas(file_list))
-		return [(get_filename(path), info['dlink']) for info, path in zip(metas['info'], file_list) if info.has_key('dlink')]
+		return [(os.path.split(path)[1], info['dlink']) for info, path in zip(metas['info'], file_list) if info.has_key('dlink')]
 
 	#下载文件
 	def download(self, file_list, path):
