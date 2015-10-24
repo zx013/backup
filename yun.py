@@ -3,14 +3,15 @@
 #参考文章及内容：
 #https://github.com/Yangff/node_pcsapi/blob/master/baidulogin.md
 #python库baidupcsapi-0.3.5
-try:
-	import simplejson as json
-except:
-	import json
+import json
 import cookielib
 import urllib
 import urllib2
 import time
+
+#根据文件完整路径获取文件名
+def get_filename(path):
+	return path.split('/')[-1].split('\\')[-1]
 
 #短时间内多次登陆百度账号会导致需要输入验证码，以致无法登陆
 class BaiduDisk:
@@ -95,17 +96,20 @@ class BaiduDisk:
 		data = {'method': 'upload', 'dir': 'a.txt', 'ondup': 'newcopy', 'filename': 'a.txt'}
 
 	#获取文件或目录的元信息
-	def get_metas(self, path):
-		return self.post_pan('filemetas', {'dlink': 1, 'target': json.dumps([path])})
+	def get_metas(self, file_list):
+		return self.post_pan('filemetas', {'dlink': 1, 'target': json.dumps(file_list)})
 	
 	#获取下载链接
-	def get_link(self, path):
-		metas = json.loads(self.get_metas(path))
-		return metas['info'][0]['dlink']
+	def get_link(self, file_list):
+		metas = json.loads(self.get_metas(file_list))
+		return [(get_filename(path), info['dlink']) for info, path in zip(metas['info'], file_list) if info.has_key('dlink')]
 
 	#下载文件
-	def download(self):
-		pass
+	def download(self, file_list, path):
+		dlink_list = self.get_link(file_list)
+		for file_name, dlink in dlink_list:
+			data = self.post(dlink)
+			print data
 
 
 if __name__ == '__main__':
