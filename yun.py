@@ -8,8 +8,14 @@ import json
 import cookielib
 import urllib
 import urllib2
+import hashlib
 import time
 
+
+def get_md5(data):
+	md5 = hashlib.md5()
+	md5.update(data)
+	return md5.hexdigest()
 
 #短时间内多次登陆百度账号会导致需要输入验证码，以致无法登陆
 class BaiduDisk:
@@ -90,8 +96,18 @@ class BaiduDisk:
 		return self.post_pan('filemanager?opera=delete', {'filelist': json.dumps(file_list)})
 
 	#上传文件
-	def upload(self, file_name):
-		data = {'method': 'upload', 'dir': 'a.txt', 'ondup': 'newcopy', 'filename': 'a.txt'}
+	def upload(self, file_list, path):
+		for file_full in file_list:
+			file_path, file_name = os.path.split(file_full)
+			with open(file_full, 'rb') as fp:
+				file_data = fp.read()
+			#文件内容有相同md5才能用以下方式传输
+			data = {'block_list': json.dumps([get_md5(file_data)]),
+			'isdir': 0,
+			'path': '%s/%s' % (path, file_name),
+			'size': len(file_data)}
+			self.post_pan('create', data)
+		#data = {'method': 'upload', 'dir': 'a.txt', 'ondup': 'newcopy', 'filename': 'a.txt'}
 
 	#获取文件或目录的元信息
 	def get_metas(self, file_list):
@@ -100,10 +116,14 @@ class BaiduDisk:
 	#获取下载链接
 	def get_link(self, file_list):
 		metas = json.loads(self.get_metas(file_list))
-		return [(os.path.split(path)[1], info['dlink']) for info, path in zip(metas['info'], file_list) if info.has_key('dlink')]
+		return [(os.path.split(file_full)[1], info['dlink']) for info, file_full in zip(metas['info'], file_list) if info.has_key('dlink')]
 
 	#下载文件
 	def download(self, file_list, path):
+		#sign=o08XNMVaHT6kDjQcUATO9wF0r2enb2%2FWfkO1jJEBsnoxE8%2BneS2G3w%3D%3D
+		#timestamp=1445735092
+		#fidlist=%5B606701548807476%5D
+		#type=dlink
 		dlink_list = self.get_link(file_list)
 		for file_name, dlink in dlink_list:
 			data = self.post(dlink)
