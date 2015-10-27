@@ -12,16 +12,56 @@ import hashlib
 import time
 
 
+default_headers = {
+	'User-agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:31.0) Gecko/20100101 Firefox/31.0 Iceweasel/31.2.0',
+	'Referer': 'http://pan.baidu.com/disk/home',
+	#'x-requested-with': 'XMLHttpRequest',
+	'Accept': 'application/json, text/javascript, */*; q=0.8',
+	'Accept-language': 'zh-cn, zh;q=0.5',
+	'Accept-encoding': 'gzip, deflate',
+	'Pragma': 'no-cache',
+	'Cache-control': 'no-cache',
+}
+
+default_params = {
+	'app_id': '250528'
+}
+
+default_url = {
+	'pan': 'http://pan.baidu.com/api/',
+	'pcs': 'http://c.pcs.baidu.com/rest/2.0/pcs/'
+}
+
+
 def get_md5(data):
 	md5 = hashlib.md5()
 	md5.update(data)
 	return md5.hexdigest()
 
+def encode_multipart_formdata(files):
+	BOUNDARY = b'----------ThIs_Is_tHe_bouNdaRY_$'
+	S_BOUNDARY = b'--' + BOUNDARY
+	E_BOUNARY = S_BOUNDARY + b'--'
+	CRLF = b'\r\n'
+	BLANK = b''
+	l = []
+	for (key, filename, content) in files:
+		l.append(S_BOUNDARY)
+		l.append('Content-Disposition: form-data; name="{0}"; filename="{1}"'.format(key, filename).encode())
+		l.append(BLANK)
+		l.append(content)
+	l.append(E_BOUNARY)
+	l.append(BLANK)
+	body = CRLF.join(l)
+	content_type = 'multipart/form-data; boundary={0}'.format(BOUNDARY.decode())
+	return content_type, body
+
+
 #短时间内多次登陆百度账号会导致需要输入验证码，以致无法登陆
 class BaiduDisk:
 	def __init__(self, username, password):
-		cookie = cookielib.LWPCookieJar()
-		self.opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookie))
+		self.cookie = cookielib.CookieJar()
+		self.opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(self.cookie))
 		self.username = username
 		self.password = password
 
@@ -68,20 +108,25 @@ class BaiduDisk:
 		ret = self.post(url, data=urllib.urlencode(data))
 		return ret.split('err_no=')[1].split('&')[0]
 
-	def post_pan(self, method, params):
-		url = 'http://pan.baidu.com/api/%s' % method
-		return self.post(url, data=urllib.urlencode(params))
-
-	def post_pcs(self, method, params, data):
-		url = 'http://c.pcs.baidu.com/rest/2.0/pcs/%s?app_id=250528%s' % (method, urllib.urlencode(params))
+	#url_type: 'pan'或'pcs'
+	#method: 'list, 'file'等
+	#params: ?之后的参数
+	def post_disk(self, url_type, method, params={}, **kwargv):
+		#添加默认参数
+		params.update(default_params)
+		kwargv.setdefault('headers', {}).update(default_headers)
+		if isinstance(kwargv.get(data), dict): #数据为字典时进行编码
+			kwargv['data'] = urllib.urlencode(kwargv['data'])
+		url = '%s%s?%s' % (default_url[url_type], method, urllib.urlencode(params))
+		return self.post(url, **kwargv)
 
 	#获得配额信息
 	def quota(self):
-		return self.post_pan('quota', {'method': 'info'})
+		return self.post_disk('pan', 'quota', {'method': 'info'})
 
 	#查看目录下的文件
 	def show(self, path='/'):
-		return self.post_pan('list', {'dir': path})
+		return self.post_disk('pan', 'list', {'dir': '/'})
 
 	#比较文件
 	def compare(self):
@@ -89,11 +134,11 @@ class BaiduDisk:
 
 	#创建目录
 	def mkdir(self, path):
-		return self.post_pan('create', {'path': path, 'isdir': 1})
+		return self.post_disk('pan', 'create', data={'path': path, 'isdir': 1})
 
 	#删除文件
 	def delete(self, file_list):
-		return self.post_pan('filemanager?opera=delete', {'filelist': json.dumps(file_list)})
+		return self.post_disk('pan', 'filemanager', {'opera': 'delete'}, data={'filelist': json.dumps(file_list)})
 
 	#上传文件
 	def upload(self, file_list, path):
@@ -101,17 +146,14 @@ class BaiduDisk:
 			file_path, file_name = os.path.split(file_full)
 			with open(file_full, 'rb') as fp:
 				file_data = fp.read()
-			#文件内容有相同md5才能用以下方式传输
-			data = {'block_list': json.dumps([get_md5(file_data)]),
-			'isdir': 0,
-			'path': '%s/%s' % (path, file_name),
-			'size': len(file_data)}
-			self.post_pan('create', data)
-		#data = {'method': 'upload', 'dir': 'a.txt', 'ondup': 'newcopy', 'filename': 'a.txt'}
+			content_type, body = encode_multipart_formdata([('file', file_name, file_data)])
+			headers = {'Content-Type': content_type, 'Content-length': str(len(body))}
+			data = {'method': 'upload', 'dir': 'a.txt', 'ondup': 'newcopy', 'filename': 'a.txt'}
+			self.post_disk('pcs', 'file', headers=headers, data=data)
 
 	#获取文件或目录的元信息
 	def get_metas(self, file_list):
-		return self.post_pan('filemetas', {'dlink': 1, 'target': json.dumps(file_list)})
+		return self.post_disk('pan', 'filemetas', data={'dlink': 1, 'target': json.dumps(file_list)})
 	
 	#获取下载链接
 	def get_link(self, file_list):
