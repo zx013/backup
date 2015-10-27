@@ -141,6 +141,7 @@ class BaiduDisk:
 		return self.post('pan', 'filemanager', {'opera': 'delete'}, data={'filelist': json.dumps(file_list)})
 
 	#上传文件，传入参数为绝对路径
+	#dk.upload(['C:/Users/zzy/Desktop/adf.txt'], '/')
 	def upload(self, file_list, path):
 		for file_full in file_list:
 			file_path, file_name = os.path.split(file_full)
@@ -162,15 +163,11 @@ class BaiduDisk:
 
 	#下载文件
 	def download(self, file_list, path):
-		#sign=o08XNMVaHT6kDjQcUATO9wF0r2enb2%2FWfkO1jJEBsnoxE8%2BneS2G3w%3D%3D
-		#timestamp=1445735092
-		#fidlist=%5B606701548807476%5D
-		#type=dlink
 		dlink_list = self.get_link(file_list)
 		for file_name, dlink in dlink_list:
-			data = self.post(dlink)
-			print data
-
+			data = self.request(dlink)
+			with open('%s/%s' % (path, file_name), 'wb') as fp:
+				fp.write(data)
 
 if __name__ == '__main__':
 	disk = BaiduDisk('baidu_yun_test@sina.com', 'test123456')
