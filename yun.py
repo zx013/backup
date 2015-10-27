@@ -65,23 +65,22 @@ class BaiduDisk:
 		self.username = username
 		self.password = password
 
-	def post(self, url, **kvargv):
+	def request(self, url, **kvargv):
 		req = urllib2.Request(url=url, **kvargv)
-		#res = urllib2.urlopen(req).read()
 		res = self.opener.open(req).read()
 		return res
 
 	def login(self):
 		#获取cookie
 		url = 'http://www.baidu.com'
-		self.post(url)
+		self.request(url)
 
 		#获取token
 		url = 'https://passport.baidu.com/v2/api/?getapi&tpl=mn&apiver=v3&class=login&tt=%s&logintype=dialogLogin&callback=%s' % (int(time.time()), 0)
-		self.token = json.loads(self.post(url).replace("'", '"'))['data']['token']
+		self.token = json.loads(self.request(url).replace("'", '"'))['data']['token']
 
 		url = 'https://passport.baidu.com/v2/api/?logincheck&token=%stpl=mn&apiver=v3&tt=%s&username=%s&isphone=false&callback=%s' % (self.token, int(time.time()), '', 0)
-		self.post(url)
+		self.request(url)
 
 		url = 'https://passport.baidu.com/v2/api/?login'
 		data = {
@@ -105,28 +104,29 @@ class BaiduDisk:
 			'ppui_logintime': '5000',
 			'callback': 'parent.bd__pcbs__oa36qm'
 		}
-		ret = self.post(url, data=urllib.urlencode(data))
+		ret = self.request(url, data=urllib.urlencode(data))
 		return ret.split('err_no=')[1].split('&')[0]
 
 	#url_type: 'pan'或'pcs'
 	#method: 'list, 'file'等
 	#params: ?之后的参数
-	def post_disk(self, url_type, method, params={}, **kwargv):
+	def post(self, url_type, method, params={}, **kwargv):
 		#添加默认参数
 		params.update(default_params)
 		kwargv.setdefault('headers', {}).update(default_headers)
-		if isinstance(kwargv.get(data), dict): #数据为字典时进行编码
+		if isinstance(kwargv.get('data'), dict): #数据为字典时进行编码
 			kwargv['data'] = urllib.urlencode(kwargv['data'])
 		url = '%s%s?%s' % (default_url[url_type], method, urllib.urlencode(params))
-		return self.post(url, **kwargv)
+		print url
+		return self.request(url, **kwargv)
 
 	#获得配额信息
 	def quota(self):
-		return self.post_disk('pan', 'quota', {'method': 'info'})
+		return self.post('pan', 'quota', {'method': 'info'})
 
 	#查看目录下的文件
 	def show(self, path='/'):
-		return self.post_disk('pan', 'list', {'dir': '/'})
+		return self.post('pan', 'list', {'dir': '/'})
 
 	#比较文件
 	def compare(self):
@@ -134,26 +134,26 @@ class BaiduDisk:
 
 	#创建目录
 	def mkdir(self, path):
-		return self.post_disk('pan', 'create', data={'path': path, 'isdir': 1})
+		return self.post('pan', 'create', data={'path': path, 'isdir': 1})
 
 	#删除文件
 	def delete(self, file_list):
-		return self.post_disk('pan', 'filemanager', {'opera': 'delete'}, data={'filelist': json.dumps(file_list)})
+		return self.post('pan', 'filemanager', {'opera': 'delete'}, data={'filelist': json.dumps(file_list)})
 
-	#上传文件
+	#上传文件，传入参数为绝对路径
 	def upload(self, file_list, path):
 		for file_full in file_list:
 			file_path, file_name = os.path.split(file_full)
 			with open(file_full, 'rb') as fp:
 				file_data = fp.read()
-			content_type, body = encode_multipart_formdata([('file', file_name, file_data)])
-			headers = {'Content-Type': content_type, 'Content-length': str(len(body))}
-			data = {'method': 'upload', 'dir': 'a.txt', 'ondup': 'newcopy', 'filename': 'a.txt'}
-			self.post_disk('pcs', 'file', headers=headers, data=data)
+			content_type, data = encode_multipart_formdata([('file', file_name, file_data)])
+			headers = {'Content-Type': content_type, 'Content-length': str(len(data))}
+			params = {'method': 'upload', 'dir': path, 'ondup': 'overwrite', 'filename': file_name}
+			print self.post('pcs', 'file', params, headers=headers, data=data)
 
 	#获取文件或目录的元信息
 	def get_metas(self, file_list):
-		return self.post_disk('pan', 'filemetas', data={'dlink': 1, 'target': json.dumps(file_list)})
+		return self.post('pan', 'filemetas', data={'dlink': 1, 'target': json.dumps(file_list)})
 	
 	#获取下载链接
 	def get_link(self, file_list):
