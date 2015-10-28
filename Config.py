@@ -1,37 +1,37 @@
 #-*- coding:utf-8 -*-
 
 class Config:
-	config = {}
+	def __init__(self):
+		self.config = {'basic': {'base': {'save': 10}, 'disk': {'path': 'backup', 'time': 10, 'number': 5}, 'baidu': {'username': '', 'password': '', 'time': 60, 'number': 5}, 'backup': {}}
 
 	def get_basic(self, key):
 		return self.config['basic'].get(key)
 
 	#读取配置文件
+	#{'backup': {'C:\\Users\\zzy\\Desktop\\a.doc': {'dir': 'a'}, 'C:\\Users\\zzy\\Desktop\\\xb2\xe2\xca\xd4.txt': {'dir': 'freeime'}}, 'drive': 'a', 'basic': {'disk': {'path': 'backup', 'number': '5', 'time': '10'}, 'baidu': {'username': 'baidu_yun_test@sina.com', 'password': 'test123456', 'number': '5', 'time': '10'}, 'base': {'save': '10'}}}
 	def get_config(self):
-		config_file = '%sbackup\\backup.conf' % self.drive
-		with open(config_file, 'r') as fp:
+		with open('backup.conf', 'r') as fp:
 			file_data = fp.readlines()
 
-		self.config = {'drive': self.drive, 'basic': {}, 'file': {}}
-		config_type = '' #配置类型
+		type1 = '' #一级目录
+		type2 = '' #二级目录
 		for line in file_data:
 			if line[0] == '#': continue
 			line = line.replace('\r', '').replace('\n', '')
 			if line.replace(' ', '') == '': continue
 			if line[0] == '[' and line[-1] == ']':
-				config_type = line[1:-1]
+				type1 = line[1:-1]
+				continue
+			if line[0] == '(' and line[-1] == ')':
+				type2 = line[1:-1]
 				continue
 
 			data = line.split('=')
-			if config_type in ('drive', 'basic'):
-				self.config.setdefault(config_type)[data[0]] = data[1]
-			else:
-				self.config['file'].setdefault(config_type, {})[data[0]] = data[1]
+			self.config.setdefault(type1, {}).setdefault(type2, {})[data[0]] = data[1]
 
 		return self.config
 
 	#检查配置文件的正确性，并设置参数默认值
-	#{'drive': 'E:\\', 'file': {'C:\\Users\\zzy\\Desktop\\free%_ime.txt': {'path': 'E:\\backup\\freeime\\', 'dir': 'freeime'}}, 'basic': {'number': 10, 'time': 1}}
 	def check_config(self):
 		#判断目标路径是否相同
 		if len({val.get('dir') for key, val in self.config['file'].items()}) != len(self.config['file']):
