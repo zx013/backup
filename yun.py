@@ -47,13 +47,13 @@ def encode_multipart_formdata(files):
 	l = []
 	for (key, filename, content) in files:
 		l.append(S_BOUNDARY)
-		l.append('Content-Disposition: form-data; name="{0}"; filename="{1}"'.format(key, filename).encode())
+		l.append('Content-Disposition: form-data; name="%s"; filename="%s"' % (key, filename))
 		l.append(BLANK)
 		l.append(content)
 	l.append(E_BOUNARY)
 	l.append(BLANK)
 	body = CRLF.join(l)
-	content_type = 'multipart/form-data; boundary={0}'.format(BOUNDARY.decode())
+	content_type = 'multipart/form-data; boundary=%s' % BOUNDARY.decode()
 	return content_type, body
 
 
@@ -145,7 +145,7 @@ class BaiduDisk:
 	def upload(self, file_list, path):
 		for file_full in file_list:
 			file_path, file_name = os.path.split(file_full)
-			with open(file_full, 'rb') as fp:
+			with open(file_full.decode('utf-8'), 'rb') as fp:
 				file_data = fp.read()
 			content_type, data = encode_multipart_formdata([('file', file_name, file_data)])
 			headers = {'Content-Type': content_type, 'Content-length': str(len(data))}
