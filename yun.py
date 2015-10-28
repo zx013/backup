@@ -34,9 +34,17 @@ default_url = {
 	'pcs': 'http://c.pcs.baidu.com/rest/2.0/pcs/'
 }
 
+def loads(data):
+	try: return convert(json.loads(data), False)
+	except: return data
+
 #编码前先将数据转换为str(utf-8)类型
 def urlencode(data):
 	return urllib.urlencode(convert(data, False))
+
+def make_list(file_list):
+	if isinstance(file_list, list): return file_list
+	else: return [file_list]
 
 def encode_multipart_formdata(files):
 	BOUNDARY = b'----------ThIs_Is_tHe_bouNdaRY_$'
@@ -65,6 +73,7 @@ class BaiduDisk:
 		self.username = username
 		self.password = password
 
+	@error_log('')
 	def request(self, url, **kvargv):
 		req = urllib2.Request(url=url, **kvargv)
 		res = self.opener.open(req).read()
@@ -77,10 +86,10 @@ class BaiduDisk:
 
 		#获取token
 		url = 'https://passport.baidu.com/v2/api/?getapi&tpl=mn&apiver=v3&class=login&tt=%s&logintype=dialogLogin&callback=%s' % (int(time.time()), 0)
-		self.token = json.loads(self.request(url).replace("'", '"'))['data']['token']
+		self.token = loads(self.request(url).replace("'", '"'))['data']['token']
 
-		url = 'https://passport.baidu.com/v2/api/?logincheck&token=%stpl=mn&apiver=v3&tt=%s&username=%s&isphone=false&callback=%s' % (self.token, int(time.time()), '', 0)
-		self.request(url)
+		#url = 'https://passport.baidu.com/v2/api/?logincheck&token=%stpl=mn&apiver=v3&tt=%s&username=%s&isphone=false&callback=%s' % (self.token, int(time.time()), '', 0)
+		#self.request(url)
 
 		url = 'https://passport.baidu.com/v2/api/?login'
 		data = {
@@ -118,7 +127,7 @@ class BaiduDisk:
 			kwargv['data'] = urlencode(kwargv['data'])
 		url = '%s%s?%s' % (default_url[url_type], method, urlencode(params))
 		print url
-		return self.request(url, **kwargv)
+		return loads(self.request(url, **kwargv))
 
 	#获得配额信息
 	def quota(self):
@@ -127,9 +136,8 @@ class BaiduDisk:
 	#查看目录下的文件
 	@error_log([])
 	def show(self, path):
-		ret = self.post('pan', 'list', {'dir': path})
-		ret = json.loads(ret)
-		file_list = [val['path'].encode('utf-8') for val in ret['list']]
+		res = self.post('pan', 'list', {'dir': path})
+		file_list = [val['path'] for val in res['list']]
 		return file_list
 
 	#比较文件
@@ -142,11 +150,13 @@ class BaiduDisk:
 
 	#删除文件
 	def delete(self, file_list):
+		file_list = make_list(file_list)
 		return self.post('pan', 'filemanager', {'opera': 'delete'}, data={'filelist': json.dumps(file_list)})
 
 	#上传文件，传入参数为绝对路径
 	#dk.upload(['C:/Users/zzy/Desktop/测试-.－。', 'C:/Users/zzy/Desktop/baidupcsapi-0.3.5.tar.gz'], '/')
 	def upload(self, file_list, path):
+		file_list = make_list(file_list)
 		for file_full in file_list:
 			file_path, file_name = os.path.split(file_full)
 			with open(convert(file_full), 'rb') as fp:
@@ -160,13 +170,13 @@ class BaiduDisk:
 	#传入参数无论为utf-8或unicode，均返回unicode
 	@error_log({})
 	def get_metas(self, file_list, dlink=0):
-		ret = self.post('pan', 'filemetas', data={'dlink': dlink, 'target': json.dumps(file_list)})
-		ret = json.loads(ret)
-		return ret
+		file_list = make_list(file_list)
+		return self.post('pan', 'filemetas', data={'dlink': dlink, 'target': json.dumps(file_list)})
 	
 	#获取下载链接
 	#dk.get_link(['/测试-.－。', '/ab'])
 	def get_link(self, file_list):
+		file_list = make_list(file_list)
 		metas = []
 		for file_full in file_list:
 			try:
@@ -179,6 +189,7 @@ class BaiduDisk:
 	#下载文件
 	#dk.download(['/测试-.－。', '/ab'], 'F:/')
 	def download(self, file_list, path):
+		file_list = make_list(file_list)
 		dlink_list = self.get_link(file_list)
 		for file_name, dlink in dlink_list:
 			data = self.request(dlink)
