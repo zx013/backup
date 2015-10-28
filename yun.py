@@ -141,7 +141,7 @@ class BaiduDisk:
 		return self.post('pan', 'filemanager', {'opera': 'delete'}, data={'filelist': json.dumps(file_list)})
 
 	#上传文件，传入参数为绝对路径
-	#dk.upload(['C:/Users/zzy/Desktop/adf.txt'], '/')
+	#dk.upload(['C:/Users/zzy/Desktop/测试-.－。', 'C:/Users/zzy/Desktop/baidupcsapi-0.3.5.tar.gz'], '/')
 	def upload(self, file_list, path):
 		for file_full in file_list:
 			file_path, file_name = os.path.split(file_full)
@@ -152,21 +152,29 @@ class BaiduDisk:
 			params = {'method': 'upload', 'dir': path, 'ondup': 'overwrite', 'filename': file_name}
 			print self.post('pcs', 'file', params, headers=headers, data=data)
 
-	#获取文件或目录的元信息
-	def get_metas(self, file_list):
-		return self.post('pan', 'filemetas', data={'dlink': 1, 'target': json.dumps(file_list)})
+	#获取文件或目录的元信息，dlink=1则包含下载链接
+	def get_metas(self, file_list, dlink):
+		return self.post('pan', 'filemetas', data={'dlink': dlink, 'target': json.dumps(file_list)})
 	
 	#获取下载链接
+	#dk.get_link(['/测试-.－。', '/ab'])
 	def get_link(self, file_list):
-		metas = json.loads(self.get_metas(file_list))
-		return [(os.path.split(file_full)[1], info['dlink']) for info, file_full in zip(metas['info'], file_list) if info.has_key('dlink')]
+		metas = []
+		for file_full in file_list:
+			try:
+				file_path, file_name = os.path.split(file_full)
+				meta = json.loads(self.get_metas([file_full], 1))
+				metas.append((file_name, meta['info'][0]['dlink']))
+			except: pass
+		return metas
 
 	#下载文件
+	#dk.download(['/测试-.－。', '/ab'], 'F:/')
 	def download(self, file_list, path):
 		dlink_list = self.get_link(file_list)
 		for file_name, dlink in dlink_list:
 			data = self.request(dlink)
-			with open('%s/%s' % (path, file_name), 'wb') as fp:
+			with open(('%s/%s' % (path, file_name)).decode('utf-8'), 'wb') as fp:
 				fp.write(data)
 
 if __name__ == '__main__':
