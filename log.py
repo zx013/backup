@@ -3,7 +3,6 @@
 #set_log设置日志参数
 #debug_log打印日志
 #write_log将日志写入文件
-#check_input检查输入参数的装饰器
 #error_log捕获异常的装饰器，出现异常时返回默认值
 import os
 import sys
@@ -55,44 +54,6 @@ def write_log(name, log):
 	log = '[%s -> %s] %s [%s] - %s' % (f.f_code.co_filename, f.f_code.co_name, time.strftime('%Y-%m-%d %X', time.localtime()), str(f.f_lineno), str(log))
 	write_log_inside(name, log)
 
-#检查传入值是否在一定范围内
-#@check_input(min=1, max=10, inside=(1, 2), outside=(0,))
-#input_data = {'min': 1, 'max': 10, 'inside': (1, 2), 'outside': (0,)}
-#base, 存在时超出范围则返回base，不存在时超出范围则默认执行
-#min, 值最小为1
-#max, 值最大为10
-#inside, 值在(1, 2)之中
-#outside, 值不在(0,)之中
-def check_input(**input_data):
-	def run_func(func):
-		base_check = input_data.has_key('base')
-		base_data = input_data.get('base')
-		min_data = input_data.get('min')
-		max_data = input_data.get('max')
-		inside_data = input_data.get('inside')
-		outside_data = input_data.get('outside')
-		def run(*argv, **kwargv):
-			write_msg = []
-			val = set(argv) | set([val for key, val in kwargv.items()])
-			if min_data is not None and min(val) < min_data:
-				write_msg.append('min=%s' % str(min_data))
-			if max_data is not None and max(val) > max_data:
-				write_msg.append('max=%s' % str(max_data))
-			if inside_data is not None and val | set(inside_data) != set(inside_data):
-				write_msg.append('inside=%s' % str(inside_data))
-			if outside_data is not None and val & set(outside_data) != set():
-				write_msg.append('outside=%s' % str(outside_data))
-			if len(write_msg) > 0:
-				try: raise Exception
-				except: f = sys.exc_info()[2].tb_frame.f_back
-				log = '[%s -> %s] %s [%s] - parameter warning, argv=%s, kwargv=%s: ' % (f.f_code.co_filename, func.__name__, time.strftime('%Y-%m-%d %X', time.localtime()), str(f.f_lineno), str(argv), str(kwargv))
-				for msg in write_msg: write_log_inside('info', '%s%s' % (log, msg))
-				if base_check: return base_data
-			return func(*argv, **kwargv)
-		run.__name__ = func.__name__
-		return run
-	return run_func
-
 #tp为True时，将列表，字典等出现的字符串全部转换为unicode
 def convert(data, tp=True):
 	if isinstance(data, str):
@@ -139,12 +100,3 @@ def sync(lock):
 		run.__name__ = func.__name__
 		return run
 	return run_func
-
-@error_log()
-@check_input(base='abc', min=2, max=0, inside=(2, 3), outside=(1, 2))
-def fun1(*argv, **kwargv):
-	print argv, kwargv
-	raise
-
-if __name__ == '__main__':
-	print fun1(1)
