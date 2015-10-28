@@ -1,6 +1,6 @@
 #-*- coding:utf-8 -*-
 
-class Backup_Config:
+class Config:
 	config = {}
 
 	def get_basic(self, key):
