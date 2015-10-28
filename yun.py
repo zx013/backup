@@ -3,6 +3,7 @@
 #参考文章及内容：
 #https://github.com/Yangff/node_pcsapi/blob/master/baidulogin.md
 #python库baidupcsapi-0.3.5
+#文件处理一律用utf-8，只有在打开文件时转换成unicode
 import os
 import json
 import cookielib
@@ -10,6 +11,7 @@ import urllib
 import urllib2
 import hashlib
 import time
+from log import error_log, convert
 
 
 default_headers = {
@@ -32,11 +34,9 @@ default_url = {
 	'pcs': 'http://c.pcs.baidu.com/rest/2.0/pcs/'
 }
 
-
-def get_md5(data):
-	md5 = hashlib.md5()
-	md5.update(data)
-	return md5.hexdigest()
+#编码前先将数据转换为str(utf-8)类型
+def urlencode(data):
+	return urllib.urlencode(convert(data, False))
 
 def encode_multipart_formdata(files):
 	BOUNDARY = b'----------ThIs_Is_tHe_bouNdaRY_$'
@@ -104,7 +104,7 @@ class BaiduDisk:
 			'ppui_logintime': '5000',
 			'callback': 'parent.bd__pcbs__oa36qm'
 		}
-		ret = self.request(url, data=urllib.urlencode(data))
+		ret = self.request(url, data=urlencode(data))
 		return ret.split('err_no=')[1].split('&')[0]
 
 	#url_type: 'pan'或'pcs'
@@ -115,8 +115,8 @@ class BaiduDisk:
 		params.update(default_params)
 		kwargv.setdefault('headers', {}).update(default_headers)
 		if isinstance(kwargv.get('data'), dict): #数据为字典时进行编码
-			kwargv['data'] = urllib.urlencode(kwargv['data'])
-		url = '%s%s?%s' % (default_url[url_type], method, urllib.urlencode(params))
+			kwargv['data'] = urlencode(kwargv['data'])
+		url = '%s%s?%s' % (default_url[url_type], method, urlencode(params))
 		print url
 		return self.request(url, **kwargv)
 
@@ -125,8 +125,12 @@ class BaiduDisk:
 		return self.post('pan', 'quota', {'method': 'info'})
 
 	#查看目录下的文件
-	def show(self, path='/'):
-		return self.post('pan', 'list', {'dir': '/'})
+	@error_log([])
+	def show(self, path):
+		ret = self.post('pan', 'list', {'dir': path})
+		ret = json.loads(ret)
+		file_list = [val['path'].encode('utf-8') for val in ret['list']]
+		return file_list
 
 	#比较文件
 	def compare(self):
@@ -145,7 +149,7 @@ class BaiduDisk:
 	def upload(self, file_list, path):
 		for file_full in file_list:
 			file_path, file_name = os.path.split(file_full)
-			with open(file_full.decode('utf-8'), 'rb') as fp:
+			with open(convert(file_full), 'rb') as fp:
 				file_data = fp.read()
 			content_type, data = encode_multipart_formdata([('file', file_name, file_data)])
 			headers = {'Content-Type': content_type, 'Content-length': str(len(data))}
@@ -153,8 +157,12 @@ class BaiduDisk:
 			print self.post('pcs', 'file', params, headers=headers, data=data)
 
 	#获取文件或目录的元信息，dlink=1则包含下载链接
-	def get_metas(self, file_list, dlink):
-		return self.post('pan', 'filemetas', data={'dlink': dlink, 'target': json.dumps(file_list)})
+	#传入参数无论为utf-8或unicode，均返回unicode
+	@error_log({})
+	def get_metas(self, file_list, dlink=0):
+		ret = self.post('pan', 'filemetas', data={'dlink': dlink, 'target': json.dumps(file_list)})
+		ret = json.loads(ret)
+		return ret
 	
 	#获取下载链接
 	#dk.get_link(['/测试-.－。', '/ab'])
@@ -163,7 +171,7 @@ class BaiduDisk:
 		for file_full in file_list:
 			try:
 				file_path, file_name = os.path.split(file_full)
-				meta = json.loads(self.get_metas([file_full], 1))
+				meta = self.get_metas([file_full], 1)
 				metas.append((file_name, meta['info'][0]['dlink']))
 			except: pass
 		return metas
@@ -174,7 +182,7 @@ class BaiduDisk:
 		dlink_list = self.get_link(file_list)
 		for file_name, dlink in dlink_list:
 			data = self.request(dlink)
-			with open(('%s/%s' % (path, file_name)).decode('utf-8'), 'wb') as fp:
+			with open(convert('%s/%s' % (path, file_name)), 'wb') as fp:
 				fp.write(data)
 
 if __name__ == '__main__':

@@ -93,6 +93,21 @@ def check_input(**input_data):
 		return run
 	return run_func
 
+#tp为True时，将列表，字典等出现的字符串全部转换为unicode
+def convert(data, tp=True):
+	if isinstance(data, str):
+		if tp: data = data.decode('utf-8')
+	elif isinstance(data, unicode):
+		if not tp: data = data.encode('utf-8')
+	elif isinstance(data, list):
+		for n, v in enumerate(data):
+			data[n] = convert(v, tp)
+	elif isinstance(data, dict):
+		for k, v in data.items():
+			del data[k]
+			data[convert(k, tp)] = convert(v, tp)
+	return data
+
 def error_log(base=None):
 	def run_func(func):
 		def run(*argv, **kwargv):
