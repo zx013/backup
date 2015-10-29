@@ -4,7 +4,7 @@ from log import debug_log, convert_unicode, convert_int, encode_file
 
 class Config:
 	def __init__(self):
-		self.config = {'basic': {'base': {'save': 10}, 'disk': {'path': 'backup', 'time': 10, 'number': 5}, 'baidu': {'username': '', 'password': '', 'time': 60, 'number': 5}, 'backup': {}}}
+		self.config = {'basic': {'base': {'save': 10}, 'disk': {'enable': 'on', 'path': 'backup', 'time': 10, 'number': 5}, 'baidu': {'enable': 'on', 'username': '', 'password': '', 'time': 60, 'number': 5}, 'backup': {}}}
 
 	#读取配置文件
 	#{'backup': {'C:\\Users\\zzy\\Desktop\\a.doc': {}, 'C:\\Users\\zzy\\Desktop\\\xb2\xe2\xca\xd4.txt': {}}, 'drive': 'a', 'basic': {'disk': {'path': 'backup', 'number': '5', 'time': '10'}, 'baidu': {'username': 'baidu_yun_test@sina.com', 'password': 'test123456', 'number': '5', 'time': '10'}, 'base': {'save': '10'}}}
@@ -30,7 +30,7 @@ class Config:
 			data = line.split('=')
 			self.config[type1][type2][data[0]] = data[1]
 
-	#检查配置文件的正确性，并设置参数默认值
+	#检查配置文件的正确性
 	def check_config(self):
 		#转换为整数
 		convert_int(self.config)
@@ -48,6 +48,8 @@ class Config:
 			else:
 				del self.config['backup'][path]
 				debug_log('path %s type not support.' % unicode_path)
+				continue
+			self.config['backup'][path]['dir'] = encode_file(path)
 
 		#判断是否存在可备份文件
 		if not len(self.config['backup']): return False

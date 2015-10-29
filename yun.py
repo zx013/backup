@@ -42,9 +42,20 @@ def loads(data):
 def urlencode(data):
 	return urllib.urlencode(convert_utf8(data))
 
-def make_list(file_list):
-	if isinstance(file_list, list): return file_list
-	else: return [file_list]
+def make_list(source_file):
+	if isinstance(source_file, list): return source_file
+	else: return [source_file]
+
+#'/root/ab' -> '/root/ab/', '/root', 'ab', 'ab'
+#['/root/ab', 'cd'] -> '/root/ab/', '/root', 'ab', 'cd'
+def split_file(source_file):
+	if isinstance(source_file, list):
+		source_file, target_name = source_file
+		source_path, source_name = os.path.split(source_file)
+	else:
+		source_path, source_name = os.path.split(source_file)
+		target_name = source_name
+	return source_file, source_path, source_name, target_name
 
 def encode_multipart_formdata(files):
 	BOUNDARY = b'----------ThIs_Is_tHe_bouNdaRY_$'
@@ -137,8 +148,8 @@ class BaiduDisk:
 	@error_log([])
 	def show(self, path):
 		res = self.post('pan', 'list', {'dir': path})
-		file_list = [val['path'] for val in res['list']]
-		return file_list
+		target_list = [val['path'] for val in res['list']]
+		return target_list
 
 	#比较文件
 	def compare(self):
@@ -149,53 +160,53 @@ class BaiduDisk:
 		return self.post('pan', 'create', data={'path': path, 'isdir': 1})
 
 	#删除文件
-	def delete(self, file_list):
-		file_list = make_list(file_list)
-		return self.post('pan', 'filemanager', {'opera': 'delete'}, data={'filelist': json.dumps(file_list)})
+	def delete(self, target_list):
+		target_list = make_list(target_list)
+		return self.post('pan', 'filemanager', {'opera': 'delete'}, data={'filelist': json.dumps(target_list)})
 
 	#上传文件，传入参数为绝对路径
 	#dk.upload(['C:/Users/zzy/Desktop/测试-.－。', 'C:/Users/zzy/Desktop/baidupcsapi-0.3.5.tar.gz'], '/')
-	def upload(self, file_list, path):
-		file_list = make_list(file_list)
-		for file_full in file_list:
+	def upload(self, source_list, target_path):
+		source_list = make_list(source_list)
+		for source_file in source_list:
 			try:
-				file_path, file_name = os.path.split(file_full)
-				with open(convert_unicode(file_full), 'rb') as fp:
-					file_data = fp.read()
-				content_type, data = encode_multipart_formdata([('file', file_name, file_data)])
+				source_file, source_path, source_name, target_name = split_file(source_file)
+				with open(convert_unicode(source_file), 'rb') as fp:
+					source_data = fp.read()
+				content_type, data = encode_multipart_formdata([('file', source_name, source_data)])
 				headers = {'Content-Type': content_type, 'Content-length': str(len(data))}
-				params = {'method': 'upload', 'dir': path, 'ondup': 'overwrite', 'filename': file_name}
+				params = {'method': 'upload', 'dir': target_path, 'ondup': 'overwrite', 'filename': target_name}
 				print self.post('pcs', 'file', params, headers=headers, data=data)
 			except: pass
 
 	#获取文件或目录的元信息，dlink=1则包含下载链接
 	#传入参数无论为utf-8或unicode，均返回unicode
 	@error_log({})
-	def get_metas(self, file_list, dlink=0):
-		file_list = make_list(file_list)
-		return self.post('pan', 'filemetas', data={'dlink': dlink, 'target': json.dumps(file_list)})
+	def get_metas(self, target_list, dlink=0):
+		target_list = make_list(target_list)
+		return self.post('pan', 'filemetas', data={'dlink': dlink, 'target': json.dumps(target_list)})
 
 	#获取下载链接
 	#dk.get_link(['/测试-.－。', '/ab'])
-	def get_link(self, file_list):
-		file_list = make_list(file_list)
+	def get_link(self, target_list):
+		target_list = make_list(target_list)
 		metas = []
-		for file_full in file_list:
+		for target_file in target_list:
 			try:
-				file_path, file_name = os.path.split(file_full)
-				meta = self.get_metas([file_full], 1)
-				metas.append((file_name, meta['info'][0]['dlink']))
+				target_file, target_path, target_name, source_name = split_file(target_file)
+				meta = self.get_metas([target_file], 1)
+				metas.append((source_name, meta['info'][0]['dlink']))
 			except: pass
 		return metas
 
 	#下载文件
 	#dk.download(['/测试-.－。', '/ab'], 'F:/')
-	def download(self, file_list, path):
-		file_list = make_list(file_list)
-		dlink_list = self.get_link(file_list)
-		for file_name, dlink in dlink_list:
+	def download(self, target_list, source_path):
+		target_list = make_list(target_list)
+		dlink_list = self.get_link(target_list)
+		for source_name, dlink in dlink_list:
 			data = self.request(dlink)
-			with open(convert_unicode('%s/%s' % (path, file_name)), 'wb') as fp:
+			with open(convert_unicode('%s/%s' % (source_path, source_name)), 'wb') as fp:
 				fp.write(data)
 
 if __name__ == '__main__':
