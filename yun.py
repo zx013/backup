@@ -148,7 +148,7 @@ class BaiduDisk:
 	@error_log([])
 	def show(self, path):
 		res = self.post('pan', 'list', {'dir': path})
-		target_list = [val['path'] for val in res['list']]
+		target_list = [val['path'] for val in res['list'] if !val['isdir']]
 		return target_list
 
 	#比较文件
