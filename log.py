@@ -54,20 +54,40 @@ def write_log(name, log):
 	log = '[%s -> %s] %s [%s] - %s' % (f.f_code.co_filename, f.f_code.co_name, time.strftime('%Y-%m-%d %X', time.localtime()), str(f.f_lineno), str(log))
 	write_log_inside(name, log)
 
-#tp为True时，将列表，字典等出现的字符串全部转换为unicode
-def convert(data, tp=True):
-	if isinstance(data, str):
-		if tp: data = data.decode('utf-8')
-	elif isinstance(data, unicode):
-		if not tp: data = data.encode('utf-8')
+#f1结果为真时，将data经过f2进行转换
+#lambda x: isinstance(x, str), lambda x: x.decode('utf-8')
+#lambda x: isinstance(x, unicode), lambda x: x.encode('utf-8')
+def convert(data, f1, f2):
+	if f1(data):
+		data = f2(data)
 	elif isinstance(data, list):
 		for n, v in enumerate(data):
-			data[n] = convert(v, tp)
+			data[n] = convert(v, f1, f2)
 	elif isinstance(data, dict):
 		for k, v in data.items():
 			del data[k]
-			data[convert(k, tp)] = convert(v, tp)
+			data[convert(k, f1, f2)] = convert(v, f1, f2)
 	return data
+
+#转换为utf-8编码
+def convert_utf8(data):
+	return convert(data, lambda x: isinstance(x, unicode), lambda x: x.encode('utf-8'))
+
+#转换为unicode编码
+def convert_unicode(data):
+	return convert(data, lambda x: isinstance(x, str), lambda x: x.decode('utf-8'))
+
+#将为数字的字符串转换为数字
+def convert_int(data):
+	return convert(data, lambda x: 'isdigit' in dir(x) and x.isdigit(), int)
+	
+#将文件名中字符进行转义，输入为unicode则转换为utf-8再转义
+def encode_file(s):
+	return ''.join(map(lambda x: x if 'a' <= x <= 'z' or 'A' <= x <= 'Z' else hex(ord(x)).replace('0x', '%'), s))
+
+#根据文件转义字符串恢复文件名，输出为utf-8则转换为unicode
+def decode_file(s):
+	return ''.join([s[0]] + map(lambda x: '%s%s' % (chr(int(x[:2], 16)), x[2:]), s.split('%')[1:]))
 
 def error_log(base=None):
 	def run_func(func):

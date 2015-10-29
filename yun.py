@@ -11,7 +11,7 @@ import urllib
 import urllib2
 import hashlib
 import time
-from log import error_log, convert
+from log import error_log, convert_utf8, convert_unicode
 
 
 default_headers = {
@@ -35,12 +35,12 @@ default_url = {
 }
 
 def loads(data):
-	try: return convert(json.loads(data), False)
+	try: return convert_utf8(json.loads(data))
 	except: return data
 
 #编码前先将数据转换为str(utf-8)类型
 def urlencode(data):
-	return urllib.urlencode(convert(data, False))
+	return urllib.urlencode(convert_utf8(data))
 
 def make_list(file_list):
 	if isinstance(file_list, list): return file_list
@@ -158,13 +158,15 @@ class BaiduDisk:
 	def upload(self, file_list, path):
 		file_list = make_list(file_list)
 		for file_full in file_list:
-			file_path, file_name = os.path.split(file_full)
-			with open(convert(file_full), 'rb') as fp:
-				file_data = fp.read()
-			content_type, data = encode_multipart_formdata([('file', file_name, file_data)])
-			headers = {'Content-Type': content_type, 'Content-length': str(len(data))}
-			params = {'method': 'upload', 'dir': path, 'ondup': 'overwrite', 'filename': file_name}
-			print self.post('pcs', 'file', params, headers=headers, data=data)
+			try:
+				file_path, file_name = os.path.split(file_full)
+				with open(convert_unicode(file_full), 'rb') as fp:
+					file_data = fp.read()
+				content_type, data = encode_multipart_formdata([('file', file_name, file_data)])
+				headers = {'Content-Type': content_type, 'Content-length': str(len(data))}
+				params = {'method': 'upload', 'dir': path, 'ondup': 'overwrite', 'filename': file_name}
+				print self.post('pcs', 'file', params, headers=headers, data=data)
+			except: pass
 
 	#获取文件或目录的元信息，dlink=1则包含下载链接
 	#传入参数无论为utf-8或unicode，均返回unicode
@@ -193,7 +195,7 @@ class BaiduDisk:
 		dlink_list = self.get_link(file_list)
 		for file_name, dlink in dlink_list:
 			data = self.request(dlink)
-			with open(convert('%s/%s' % (path, file_name)), 'wb') as fp:
+			with open(convert_unicode('%s/%s' % (path, file_name)), 'wb') as fp:
 				fp.write(data)
 
 if __name__ == '__main__':
