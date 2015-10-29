@@ -172,7 +172,7 @@ class BaiduDisk:
 	def get_metas(self, file_list, dlink=0):
 		file_list = make_list(file_list)
 		return self.post('pan', 'filemetas', data={'dlink': dlink, 'target': json.dumps(file_list)})
-	
+
 	#获取下载链接
 	#dk.get_link(['/测试-.－。', '/ab'])
 	def get_link(self, file_list):
