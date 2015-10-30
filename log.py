@@ -102,7 +102,7 @@ def get_md5(source_file):
 
 #获取文件名称，名称#时间#md5#大小
 @error_log('')
-def get_file_name(source_file):
+def get_target_name(source_file):
 	source_file = convert_unicode(source_file)
 	size = os.path.getsize(source_file)
 	md5 = get_md5(source_file)
