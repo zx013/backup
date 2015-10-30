@@ -136,8 +136,8 @@ def get_md5(source_file):
 #获取文件名称，名称#时间#md5#大小
 @error_log('')
 def get_target_name(source_file):
-	source_file = convert_unicode(source_file)
-	size = os.path.getsize(source_file)
-	md5 = get_md5(source_file)
+	source_encode = convert_unicode(source_file)
+	size = os.path.getsize(source_encode)
+	md5 = get_md5(source_encode)
 	clock = time.strftime('%Y-%m-%d@%H-%M-%S', time.localtime())
 	return '%s#%s#%s#%s' % (encode_file(source_file), clock, md5, size)

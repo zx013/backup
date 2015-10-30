@@ -168,6 +168,9 @@ class BaiduDisk:
 	def delete(self, target_list):
 		target_list = make_list(target_list)
 		return self.post('pan', 'filemanager', {'opera': 'delete'}, data={'filelist': json.dumps(target_list)})
+	
+	def check_path(self, target_path):
+		return not self.get_metas(target_path)['errno']
 
 	#上传文件，传入参数为绝对路径
 	#dk.upload(['C:/Users/zzy/Desktop/测试-.－。', 'C:/Users/zzy/Desktop/baidupcsapi-0.3.5.tar.gz'], '/')
