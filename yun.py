@@ -20,7 +20,7 @@ default_headers = {
 	#'x-requested-with': 'XMLHttpRequest',
 	'Accept': 'application/json, text/javascript, */*; q=0.8',
 	'Accept-language': 'zh-cn, zh;q=0.5',
-	'Accept-encoding': 'gzip, deflate',
+	#'Accept-encoding': 'gzip, deflate',
 	'Pragma': 'no-cache',
 	'Cache-control': 'no-cache',
 }
@@ -42,14 +42,20 @@ def loads(data):
 def urlencode(data):
 	return urllib.urlencode(convert_utf8(data))
 
+#()
+#[(), (), ()]
+#x
+#[x, x, ()]
+#整个输入列表为list，内部指定名称用tuple
+#将单个元素或元组打包成列表
 def make_list(source_file):
 	if isinstance(source_file, list): return source_file
 	else: return [source_file]
 
 #'/root/ab' -> '/root/ab/', '/root', 'ab', 'ab'
-#['/root/ab', 'cd'] -> '/root/ab/', '/root', 'ab', 'cd'
+#('/root/ab', 'cd') -> '/root/ab/', '/root', 'ab', 'cd'
 def split_file(source_file):
-	if isinstance(source_file, list):
+	if isinstance(source_file, tuple):
 		source_file, target_name = source_file
 		source_path, source_name = os.path.split(source_file)
 	else:
@@ -140,6 +146,9 @@ class BaiduDisk:
 		print url
 		return loads(self.request(url, **kwargv))
 
+	def get_config_type(self):
+		return 'baidu'
+
 	#获得配额信息
 	def quota(self):
 		return self.post('pan', 'quota', {'method': 'info'})
@@ -148,7 +157,7 @@ class BaiduDisk:
 	@error_log([])
 	def show(self, path):
 		res = self.post('pan', 'list', {'dir': path})
-		target_list = [val['path'] for val in res['list'] if not val['isdir']]
+		target_list = [val['path'] for val in res['list'] if not val['isdir']][::-1] #默认是从小到大排列
 		return target_list
 
 	#创建目录

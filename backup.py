@@ -9,14 +9,14 @@ import thread
 
 from Config import Config
 from Windows import Windows
-from log import debug_log, write_log, error_log, sync, get_target_name
+from log import debug_log, write_log, get_target_name
 
 class Backup():
 	def backup(self, handle, source_file, target_path):
 		target_name = get_target_name(source_file)
-		handle.upload([source_file, target_name], target_path)
-		file_list = handle.show(target_path) #按时间顺序排列
-		handle.delete(file_list[self.config['basic'][handle.get_config_type()]['number']:])
+		handle.upload((source_file, target_name), target_path)
+		target_list = handle.show(target_path) #按时间顺序排列
+		handle.delete(target_list[self.config.get('basic', handle.get_config_type(), 'number'):])
 	
 	def backup_file(self, handle, source_file, target_path):
 		#检查备份的目标路径
