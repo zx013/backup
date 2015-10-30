@@ -1,4 +1,5 @@
 #-*- coding:utf-8 -*-
+import thread
 import time
 import win32api
 import win32gui

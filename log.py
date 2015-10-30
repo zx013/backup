@@ -55,6 +55,39 @@ def write_log(name, log):
 	log = '[%s -> %s] %s [%s] - %s' % (f.f_code.co_filename, f.f_code.co_name, time.strftime('%Y-%m-%d %X', time.localtime()), str(f.f_lineno), str(log))
 	write_log_inside(name, log)
 
+def error_log(base=None):
+	def run_func(func):
+		def run(*argv, **kwargv):
+			try:
+				return func(*argv, **kwargv)
+			except Exception, ex:
+				try: raise Exception
+				except: f = sys.exc_info()[2].tb_frame.f_back
+				#logging模块2.4版本无法获取函数名称
+				#获取的函数名称为func的函数名称，行号为调用func所在的位置，用logging模块获取的行号为调用debug等函数所在的位置，多个装饰器时第一个装饰器获取的行号正确，其它的为装饰器中调用函数的行号
+				log = '[%s -> %s] %s [%s] - %s' % (f.f_code.co_filename, func.__name__, time.strftime('%Y-%m-%d %X', time.localtime()), str(f.f_lineno), str(ex))
+
+				write_log_inside('error', log)
+				debug_log(func.__name__ + ' : ERROR')
+				debug_log('Exception : ' + str(ex))
+				return base
+		run.__name__ = func.__name__
+		return run
+	return run_func
+	
+def sync(lock):
+	def run_func(func):
+		def run(*argv, **kwargv):
+			lock.acquire()
+			try:
+				return func(*argv,**kwargv)
+			finally:
+				lock.release()
+		run.__name__ = func.__name__
+		return run
+	return run_func
+
+
 #f1结果为真时，将data经过f2进行转换
 #lambda x: isinstance(x, str), lambda x: x.decode('utf-8')
 #lambda x: isinstance(x, unicode), lambda x: x.encode('utf-8')
@@ -108,35 +141,3 @@ def get_target_name(source_file):
 	md5 = get_md5(source_file)
 	clock = time.strftime('%Y-%m-%d@%H-%M-%S', time.localtime())
 	return '%s#%s#%s#%s' % (encode_file(source_file), clock, md5, size)
-
-def error_log(base=None):
-	def run_func(func):
-		def run(*argv, **kwargv):
-			try:
-				return func(*argv, **kwargv)
-			except Exception, ex:
-				try: raise Exception
-				except: f = sys.exc_info()[2].tb_frame.f_back
-				#logging模块2.4版本无法获取函数名称
-				#获取的函数名称为func的函数名称，行号为调用func所在的位置，用logging模块获取的行号为调用debug等函数所在的位置，多个装饰器时第一个装饰器获取的行号正确，其它的为装饰器中调用函数的行号
-				log = '[%s -> %s] %s [%s] - %s' % (f.f_code.co_filename, func.__name__, time.strftime('%Y-%m-%d %X', time.localtime()), str(f.f_lineno), str(ex))
-
-				write_log_inside('error', log)
-				debug_log(func.__name__ + ' : ERROR')
-				debug_log('Exception : ' + str(ex))
-				return base
-		run.__name__ = func.__name__
-		return run
-	return run_func
-	
-def sync(lock):
-	def run_func(func):
-		def run(*argv, **kwargv):
-			lock.acquire()
-			try:
-				return func(*argv,**kwargv)
-			finally:
-				lock.release()
-		run.__name__ = func.__name__
-		return run
-	return run_func

@@ -11,7 +11,7 @@ from Config import Config
 from Windows import Windows
 from log import debug_log, write_log, error_log, sync, get_target_name
 
-def Backup():
+class Backup():
 	def backup(self, handle, source_file, target_path):
 		target_name = get_target_name(source_file)
 		handle.upload([source_file, target_name], target_path)
@@ -52,17 +52,20 @@ def Backup():
 		#读取配置
 		self.config = Config()
 		self.config.read_config()
+		if not self.config.check_config(): return
+		
+		print self.config.config
 		
 		#自动保存文档
-		windows = Windows(self.config['basic']['base']['save'])
+		windows = Windows(self.config.get('basic', 'base', 'save'))
 		thread.start_new_thread(windows.save_file, ())
 		
 		#硬盘备份
-		if self.config['basic']['disk']['enable'] == 'on':
+		if self.config.get('basic', 'disk', 'enable') == 'on':
 			pass
 	
 		#百度云备份
-		if self.config['basic']['baidu']['enable'] == 'on':
+		if self.config.get('basic', 'baidu', 'enable') == 'on':
 			pass
 
 if __name__ == '__main__':

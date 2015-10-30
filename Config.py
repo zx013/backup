@@ -6,6 +6,13 @@ class Config:
 	def __init__(self):
 		self.config = {'basic': {'base': {'save': 10}, 'disk': {'enable': 'on', 'path': 'backup', 'time': 10, 'number': 5}, 'baidu': {'enable': 'on', 'username': '', 'password': '', 'time': 60, 'number': 5}, 'backup': {}}}
 
+	def get(self, *argvs):
+		data = self.config
+		for argv in argvs:
+			data = data.get(argv)
+			if data is None: return
+		return data
+		
 	#读取配置文件
 	#{'backup': {'C:\\Users\\zzy\\Desktop\\a.doc': {}, 'C:\\Users\\zzy\\Desktop\\\xb2\xe2\xca\xd4.txt': {}}, 'drive': 'a', 'basic': {'disk': {'path': 'backup', 'number': '5', 'time': '10'}, 'baidu': {'username': 'baidu_yun_test@sina.com', 'password': 'test123456', 'number': '5', 'time': '10'}, 'base': {'save': '10'}}}
 	def read_config(self):
@@ -55,7 +62,3 @@ class Config:
 		if not len(self.config['backup']): return False
 
 		return True
-
-	def inspect_config(self):
-		self.get_config()
-		return self.check_config()
