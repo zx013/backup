@@ -13,6 +13,7 @@ from log import debug_log, write_log, error_log, sync
 
 def Backup():
 	def backup(self, handle, source_file, target_path):
+		target_name
 		handle.upload([source_file, target_name], target_path)
 		file_list = handle.show(target_path) #按时间顺序排列
 		handle.delete(file_list[self.config['basic'][handle.get_config_type()]['number']:])

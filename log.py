@@ -6,6 +6,7 @@
 #error_log捕获异常的装饰器，出现异常时返回默认值
 import os
 import sys
+import hashlib
 import time
 
 global log_list
@@ -88,6 +89,25 @@ def encode_file(s):
 #根据文件转义字符串恢复文件名，输出为utf-8则转换为unicode
 def decode_file(s):
 	return ''.join([s[0]] + map(lambda x: '%s%s' % (chr(int(x[:2], 16)), x[2:]), s.split('%')[1:]))
+
+#计算文件md5
+def get_md5(source_file):
+	md5 = hashlib.md5()
+	with open(convert_unicode(source_file), 'rb') as fp:
+		while 1:
+			data = fp.read(1024 * 1024)
+			md5.update(data)
+			if not data: break	
+	return md5.hexdigest()
+
+#获取文件名称，名称#时间#md5#大小
+@error_log('')
+def get_file_name(source_file):
+	source_file = convert_unicode(source_file)
+	size = os.path.getsize(source_file)
+	md5 = get_md5(source_file)
+	clock = time.strftime('%Y-%m-%d@%H-%M-%S', time.localtime())
+	return '%s#%s#%s#%s' % (encode_file(source_file), clock, md5, size)
 
 def error_log(base=None):
 	def run_func(func):
