@@ -1,6 +1,7 @@
 #-*- coding:utf-8 -*-
 import os
-from log import debug_log, write_log, error_log, make_list, split_file
+import shutil
+from log import debug_log, write_log, error_log, make_list, split_file, convert_unicode
 
 #write_log('info', 'delete %s' % file_name)
 #class_name, func_name, *argv
@@ -31,11 +32,13 @@ class Disk:
 		source_list = make_list(source_list)
 		for source_file in source_list:
 			source_file, source_path, source_name, target_name = split_file(source_file)
-			os.system('copy /Y %s %s/% 1>nul' % (source_file, target_path, target_name))
+			shutil.copy(convert_unicode(source_file), '%s/%s' % (target_path, target_name))
+			#os.system('copy /Y %s %s/%s' % (source_file, target_path, target_name))
 
 	#恢复文件
 	def download(self, target_list, source_path):
 		target_list = make_list(target_list)
 		for target_file in target_list:
 			target_file, target_path, target_name, source_name = split_file(target_file)
-			os.system('copy /Y %s %s/% 1>nul' % (target_file, source_path, source_name))
+			shutil.copy(convert_unicode(target_file), '%s/%s' % (source_path, source_name))
+			#os.system('copy /Y %s %s/%s 1>nul' % (target_file, source_path, source_name))

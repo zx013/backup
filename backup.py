@@ -10,6 +10,7 @@ import thread
 
 from Config import Config
 from Windows import Windows
+from Disk import Disk
 from log import debug_log, write_log, encode_file, get_target_name
 
 class Backup():
@@ -61,12 +62,13 @@ class Backup():
 		print self.config.config
 		
 		#自动保存文档
-		windows = Windows(self.config.get('basic', 'base', 'save'))
-		thread.start_new_thread(windows.save_file, ())
+		#windows = Windows(self.config.get('basic', 'base', 'save'))
+		#thread.start_new_thread(windows.save_file, ())
 		
 		#硬盘备份
 		if self.config.get('basic', 'disk', 'enable') == 'on':
-			pass
+			dk = Disk()
+			self.backup_file(dk, 'C:/Users/zzy/Desktop/测试-.－。', 'F:/b')
 	
 		#百度云备份
 		if self.config.get('basic', 'baidu', 'enable') == 'on':
