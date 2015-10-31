@@ -88,6 +88,27 @@ def sync(lock):
 	return run_func
 
 
+#()
+#[(), (), ()]
+#x
+#[x, x, ()]
+#整个输入列表为list，内部指定名称用tuple
+#将单个元素或元组打包成列表
+def make_list(source_file):
+	if isinstance(source_file, list): return source_file
+	else: return [source_file]
+
+#'/root/ab' -> '/root/ab/', '/root', 'ab', 'ab'
+#('/root/ab', 'cd') -> '/root/ab/', '/root', 'ab', 'cd'
+def split_file(source_file):
+	if isinstance(source_file, tuple):
+		source_file, target_name = source_file
+		source_path, source_name = os.path.split(source_file)
+	else:
+		source_path, source_name = os.path.split(source_file)
+		target_name = source_name
+	return source_file, source_path, source_name, target_name
+
 #f1结果为真时，将data经过f2进行转换
 #lambda x: isinstance(x, str), lambda x: x.decode('utf-8')
 #lambda x: isinstance(x, unicode), lambda x: x.encode('utf-8')

@@ -11,7 +11,7 @@ import urllib
 import urllib2
 import hashlib
 import time
-from log import error_log, convert_utf8, convert_unicode
+from log import error_log, make_list, split_file, convert_utf8, convert_unicode
 
 
 default_headers = {
@@ -42,26 +42,6 @@ def loads(data):
 def urlencode(data):
 	return urllib.urlencode(convert_utf8(data))
 
-#()
-#[(), (), ()]
-#x
-#[x, x, ()]
-#整个输入列表为list，内部指定名称用tuple
-#将单个元素或元组打包成列表
-def make_list(source_file):
-	if isinstance(source_file, list): return source_file
-	else: return [source_file]
-
-#'/root/ab' -> '/root/ab/', '/root', 'ab', 'ab'
-#('/root/ab', 'cd') -> '/root/ab/', '/root', 'ab', 'cd'
-def split_file(source_file):
-	if isinstance(source_file, tuple):
-		source_file, target_name = source_file
-		source_path, source_name = os.path.split(source_file)
-	else:
-		source_path, source_name = os.path.split(source_file)
-		target_name = source_name
-	return source_file, source_path, source_name, target_name
 
 def encode_multipart_formdata(files):
 	BOUNDARY = b'----------ThIs_Is_tHe_bouNdaRY_$'
@@ -83,7 +63,7 @@ def encode_multipart_formdata(files):
 
 
 #短时间内多次登陆百度账号会导致需要输入验证码，以致无法登陆
-class BaiduDisk:
+class Baidu:
 	def __init__(self, username, password):
 		self.cookie = cookielib.CookieJar()
 		self.opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(self.cookie))
@@ -155,14 +135,14 @@ class BaiduDisk:
 
 	#查看目录下的文件
 	@error_log([])
-	def show(self, path):
-		res = self.post('pan', 'list', {'dir': path})
+	def show(self, target_path):
+		res = self.post('pan', 'list', {'dir': target_path})
 		target_list = [val['path'] for val in res['list'] if not val['isdir']][::-1] #默认是从小到大排列
 		return target_list
 
 	#创建目录
-	def mkdir(self, path):
-		return self.post('pan', 'create', data={'path': path, 'isdir': 1})
+	def mkdir(self, target_path):
+		return self.post('pan', 'create', data={'path': target_path, 'isdir': 1})
 
 	#删除文件
 	def delete(self, target_list):
@@ -218,7 +198,7 @@ class BaiduDisk:
 				fp.write(data)
 
 if __name__ == '__main__':
-	disk = BaiduDisk('baidu_yun_test@sina.com', 'test123456')
+	disk = Baidu('baidu_yun_test@sina.com', 'test123456')
 	disk.login()
 	disk.quota()
 	disk.show('/')
