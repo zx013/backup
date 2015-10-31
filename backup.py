@@ -50,7 +50,7 @@ class Backup():
 		self.backup(handle, source_file, target_path)
 
 	
-	def backup_dir(self, handle):
+	def backup_dir(self, handle, source_path, target_path):
 		pass
 
 	def run(self):
@@ -59,7 +59,7 @@ class Backup():
 		self.config.read_config()
 		if not self.config.check_config(): return
 		
-		print self.config.config
+		#print self.config.config
 		
 		#自动保存文档
 		#windows = Windows(self.config.get('basic', 'base', 'save'))
@@ -68,7 +68,7 @@ class Backup():
 		#硬盘备份
 		if self.config.get('basic', 'disk', 'enable') == 'on':
 			dk = Disk()
-			self.backup_file(dk, 'C:/Users/zzy/Desktop/测试-.－。', 'F:/b')
+			self.backup_file(dk, 'C:/Users/zzy/Desktop/测试-.－。', 'F:/好')
 	
 		#百度云备份
 		if self.config.get('basic', 'baidu', 'enable') == 'on':

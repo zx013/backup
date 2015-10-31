@@ -115,6 +115,11 @@ def split_file(source_file):
 def convert(data, f1, f2):
 	if f1(data):
 		data = f2(data)
+	elif isinstance(data, tuple):
+		data = list(data)
+		for n, v in enumerate(data):
+			data[n] = convert(v, f1, f2)
+		data = tuple(data)
 	elif isinstance(data, list):
 		for n, v in enumerate(data):
 			data[n] = convert(v, f1, f2)
@@ -131,6 +136,16 @@ def convert_utf8(data):
 #转换为unicode编码
 def convert_unicode(data):
 	return convert(data, lambda x: isinstance(x, str), lambda x: x.decode('utf-8'))
+		
+def code(method):
+	def run_func(func):
+		def run(*argv, **kwargv):
+			if method: convert = convert_utf8
+			else: convert = convert_unicode
+			return func(*convert(list(argv)), **convert(kwargv)) #不用list新建就不会编解码
+		run.__name__ = func.__name__
+		return run
+	return run_func
 
 #将为数字的字符串转换为数字
 def convert_int(data):
