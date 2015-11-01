@@ -11,7 +11,7 @@ import urllib
 import urllib2
 import hashlib
 import time
-from log import error_log, make_list, split_file, convert_utf8, convert_unicode
+from log import error_log, make_list, split_file, convert_encode, convert_decode
 
 
 default_headers = {
@@ -35,12 +35,12 @@ default_url = {
 }
 
 def loads(data):
-	try: return convert_utf8(json.loads(data))
+	try: return convert_encode(json.loads(data), 'utf-8')
 	except: return data
 
 #编码前先将数据转换为str(utf-8)类型
 def urlencode(data):
-	return urllib.urlencode(convert_utf8(data))
+	return urllib.urlencode(convert_encode(data, 'utf-8'))
 
 
 def encode_multipart_formdata(files):
@@ -152,13 +152,17 @@ class Baidu:
 
 	#创建目录
 	def mkdir(self, target_path):
-		return self.post('pan', 'create', data={'path': target_path, 'isdir': 1})
+		ret = self.post('pan', 'create', data={'path': target_path, 'isdir': 1})
+		if target_path != ret['path']:
+			self.delete([ret['path']])
+		return ret
 
 	#删除文件
 	def delete(self, target_list):
 		target_list = make_list(target_list)
 		return self.post('pan', 'filemanager', {'opera': 'delete'}, data={'filelist': json.dumps(target_list)})
 	
+	@error_log(False)
 	def check_path(self, target_path):
 		return not self.get_metas(target_path)['errno']
 
@@ -169,7 +173,7 @@ class Baidu:
 		for source_file in source_list:
 			try:
 				source_file, source_path, source_name, target_name = split_file(source_file)
-				with open(convert_unicode(source_file), 'rb') as fp:
+				with open(convert_decode(source_file, 'utf-8'), 'rb') as fp:
 					source_data = fp.read()
 				content_type, data = encode_multipart_formdata([('file', source_name, source_data)])
 				headers = {'Content-Type': content_type, 'Content-length': str(len(data))}
@@ -204,7 +208,7 @@ class Baidu:
 		dlink_list = self.get_link(target_list)
 		for source_name, dlink in dlink_list:
 			data = self.request(dlink)
-			with open(convert_unicode('%s/%s' % (source_path, source_name)), 'wb') as fp:
+			with open(convert_decode('%s/%s' % (source_path, source_name), 'utf-8'), 'wb') as fp:
 				fp.write(data)
 
 if __name__ == '__main__':

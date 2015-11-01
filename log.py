@@ -130,19 +130,19 @@ def convert(data, f1, f2):
 	return data
 
 #转换为utf-8编码
-def convert_utf8(data):
-	return convert(data, lambda x: isinstance(x, unicode), lambda x: x.encode('utf-8'))
+def convert_encode(data, code):
+	return convert(data, lambda x: isinstance(x, unicode), lambda x: x.encode(code))
 
 #转换为unicode编码
-def convert_unicode(data):
-	return convert(data, lambda x: isinstance(x, str), lambda x: x.decode('utf-8'))
+def convert_decode(data, code):
+	return convert(data, lambda x: isinstance(x, str), lambda x: x.decode(code))
 		
-def code(method):
+def code(method, enable):
 	def run_func(func):
 		def run(*argv, **kwargv):
-			if method: convert = convert_utf8
-			else: convert = convert_unicode
-			return func(*convert(list(argv)), **convert(kwargv)) #不用list新建就不会编解码
+			if enable: convert = convert_encode
+			else: convert = convert_decode
+			return func(*convert(list(argv), method), **convert(kwargv, method)) #不用list新建就不会编解码
 		run.__name__ = func.__name__
 		return run
 	return run_func
@@ -162,7 +162,7 @@ def decode_file(s):
 #计算文件md5
 def get_md5(source_file):
 	md5 = hashlib.md5()
-	with open(convert_unicode(source_file), 'rb') as fp:
+	with open(convert_decode(source_file, 'utf-8'), 'rb') as fp:
 		while 1:
 			data = fp.read(1024 * 1024)
 			md5.update(data)
@@ -172,7 +172,7 @@ def get_md5(source_file):
 #获取文件名称，名称#时间#md5#大小
 @error_log('')
 def get_target_name(source_file):
-	source_encode = convert_unicode(source_file)
+	source_encode = convert_decode(source_file, 'utf-8')
 	size = os.path.getsize(source_encode)
 	md5 = get_md5(source_encode)
 	clock = time.strftime('%Y-%m-%d@%H-%M-%S', time.localtime())

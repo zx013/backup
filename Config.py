@@ -1,6 +1,6 @@
 #-*- coding:utf-8 -*-
 import os
-from log import debug_log, convert_unicode, convert_int, encode_file
+from log import debug_log, convert_decode, convert_int, encode_file
 
 class Config:
 	def __init__(self):
@@ -43,7 +43,7 @@ class Config:
 		convert_int(self.config)
 
 		for path, value in self.config['backup'].items():
-			unicode_path = convert_unicode(path)
+			unicode_path = convert_decode(path, 'utf-8')
 			if not os.path.exists(unicode_path):
 				del self.config['backup'][path]
 				debug_log('path %s not exist.' % unicode_path)
