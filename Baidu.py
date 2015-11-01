@@ -139,6 +139,16 @@ class Baidu:
 		res = self.post('pan', 'list', {'dir': target_path})
 		target_list = [val['path'] for val in res['list'] if not val['isdir']][::-1] #默认是从小到大排列
 		return target_list
+	
+	#同os.walk
+	def walk(self, target_path):
+		res = self.post('pan', 'list', {'dir': target_path})
+		target_dir = [val['path'] for val in res['list'] if val['isdir']]
+		target_file = [val['path'] for val in res['list'] if not val['isdir']]
+		yield (target_path, target_dir, target_file)
+		for path in target_dir:
+			for g in self.walk(path):
+				yield g
 
 	#创建目录
 	def mkdir(self, target_path):

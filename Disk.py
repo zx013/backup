@@ -15,6 +15,10 @@ class Disk:
 	def show(self, target_path):
 		return os.walk(target_path).next()[2][::-1]
 	
+	@code(0)
+	def walk(self, target_path):
+		return os.walk(target_path)
+	
 	#创建目录
 	@code(0)
 	def mkdir(self, target_path):
