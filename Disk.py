@@ -22,7 +22,7 @@ class Disk:
 	#创建目录
 	@code(0)
 	def mkdir(self, target_path):
-		os.mkdir(target_path)
+		os.makedirs(target_path) #相当于linux中的mkdir -p
 
 	#删除文件
 	@code(0)
