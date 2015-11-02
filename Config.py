@@ -14,28 +14,47 @@ class Config:
 		return data
 		
 	#读取配置文件
-	#{'backup': {'C:\\Users\\zzy\\Desktop\\a.doc': {}, 'C:\\Users\\zzy\\Desktop\\\xb2\xe2\xca\xd4.txt': {}}, 'drive': 'a', 'basic': {'disk': {'path': 'backup', 'number': '5', 'time': '10'}, 'baidu': {'username': 'baidu_yun_test@sina.com', 'password': 'test123456', 'number': '5', 'time': '10'}, 'base': {'save': '10'}}}
+	#{'backup': {'C:\\Users\\zzy\\Desktop\\a.doc': {}, 'C:\\Users\\zzy\\Desktop\\zawu\\test': {'ignore': ['^.\\.pyc$', '^.\\.c$', '^event\\.py$', '^b(/|\\\\\\\\)c\\.txt$']}, 'C:\\Users\\zzy\\Desktop\\\xe6\xb5\x8b\xe8\xaf\x95-.\xef\xbc\x8d\xe3\x80\x82': {}}, 'basic': {'disk': {'path': 'backup', 'enable': 'on', 'number': '5', 'time': '10', 'scan': '5'}, 'baidu': {'username': 'baidu_yun_test@sina.com', 'enable': 'on', 'number': '5', 'time': '60', 'path': 'backup', 'password': 'test123456'}, 'base': {'save': '10'}}}
 	def read_config(self):
 		with open('backup.conf', 'r') as fp:
 			file_data = fp.readlines()
 
-		type1 = '' #一级目录
-		type2 = '' #二级目录
+		type1 = None #一级目录
+		type2 = None #二级目录
+		type3 = None
 		for line in file_data:
 			if line[0] == '#': continue
 			line = line.replace('\r', '').replace('\n', '')
 			if line.replace(' ', '') == '': continue
 			if line[0] == '[' and line[-1] == ']':
 				type1 = line[1:-1]
+				type2 = None
+				type3 = None
 				self.config[type1] = {}
 				continue
 			if line[0] == '(' and line[-1] == ')':
 				type2 = line[1:-1]
+				type3 = None
 				self.config[type1][type2] = {}
 				continue
-
-			data = line.split('=')
-			self.config[type1][type2][data[0]] = data[1]
+			if line[0] == '<' and line[-1] == '>':
+				type3 = line[1:-1]
+				self.config[type1][type2][type3] = []
+				continue
+			if not type1:
+				continue
+			elif not type2:
+				conf = self.config[type1]
+			elif not type3:
+				conf = self.config[type1][type2]
+			else:
+				conf = self.config[type1][type2][type3]
+				
+			if line[0] == '*':
+				conf.append(line[1:])
+			elif '=' in line:
+				data = line.split('=')
+				conf[data[0]] = data[1]
 
 	#检查配置文件的正确性
 	def check_config(self):
