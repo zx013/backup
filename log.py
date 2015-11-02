@@ -7,6 +7,7 @@
 import os
 import sys
 import hashlib
+import re
 import time
 
 global log_list
@@ -185,3 +186,10 @@ def walk(target_path):
 		target_file = convert_encode(convert_decode(target_file, 'gbk'), 'utf-8')
 		yield convert(target_file, lambda x: type(x) not in (tuple, list, dict), lambda x: x.replace('\\', '/'))
 
+#判断data是否匹配到re_list正则表达式中的一个
+def search(re_list, data):
+	for r in re_list:
+		try:
+			if re.search(r, data): return True
+		except: pass
+	return False
