@@ -12,7 +12,7 @@ from Config import Config
 from Windows import Windows
 from Disk import Disk
 from Baidu import Baidu
-from log import debug_log, write_log, encode_file, get_target_name, walk
+from log import debug_log, write_log, encode_file, get_target_name, walk, search
 
 
 class Backup():
@@ -65,7 +65,15 @@ class Backup():
 		for source_list in walk(source_path):
 			#遍历目录下文件
 			for source_file in source_list[2]:
-				self.backup(handle, '%s/%s' % (source_list[0], source_file), '%s/%s' % (target_path, source_list[0][len(source_path) + 1:]))
+				#跳过忽略的文件
+				source_child = source_list[0][len(source_path) + 1:] #子目录
+				if source_child:
+					source_name = '%s/%s' % (source_child, source_file)
+				else:
+					source_name = source_file
+				if search(self.config.get('backup', source_path, 'ignore'), source_name):
+					continue
+				self.backup(handle, '%s/%s' % (source_list[0], source_file), '%s/%s' % (target_path, source_child))
 
 	def run(self):
 		#读取配置
@@ -83,7 +91,7 @@ class Backup():
 		if self.config.get('basic', 'disk', 'enable') == 'on':
 			dk = Disk()
 			#self.backup_file(dk, 'C:/Users/zzy/Desktop/测试-.－。', 'F:/好')
-			self.backup_dir(dk, 'C:/Users/zzy/Desktop/zawu/test', 'F:/好')
+			self.backup_dir(dk, 'C:\\Users\\zzy\\Desktop\\zawu\\test', 'F:\\好')
 
 		#百度云备份
 		if self.config.get('basic', 'baidu', 'enable') == 'on':
