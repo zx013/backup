@@ -1,6 +1,7 @@
 #-*- coding:utf-8 -*-
 import os
-from log import debug_log, convert_decode, convert_int, encode_file
+from tools import convert_decode, convert_int, encode_file
+from log import debug_log
 
 class Config:
 	def __init__(self):

@@ -11,7 +11,8 @@ import urllib
 import urllib2
 import hashlib
 import time
-from log import error_log, make_list, split_file, convert_encode, convert_decode
+from tools import make_list, split_file, convert_encode, convert_decode
+from log import error_log
 
 
 default_headers = {

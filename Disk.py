@@ -1,7 +1,8 @@
 #-*- coding:utf-8 -*-
 import os
 import shutil
-from log import debug_log, write_log, error_log, make_list, split_file, code
+from tools import make_list, split_file, code
+from log import debug_log, write_log, error_log
 
 #write_log('info', 'delete %s' % file_name)
 #class_name, func_name, *argv
