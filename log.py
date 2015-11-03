@@ -177,19 +177,6 @@ def get_target_name(source_file):
 	size = os.path.getsize(source_encode)
 	md5 = get_md5(source_encode)
 	clock = time.strftime('%Y-%m-%d@%H-%M-%S', time.localtime())
-	return '%s#%s#%s#%s' % (encode_file(source_file), clock, md5, size)
+	#return '%s#%s#%s#%s' % (encode_file(source_file), clock, md5, size)
+	return '%s#%s#%s' % (clock, md5, size)
 
-#重新封装系统的walk
-def walk(target_path):
-	target_list = os.walk(target_path)
-	for target_file in target_list:
-		target_file = convert_encode(convert_decode(target_file, 'gbk'), 'utf-8')
-		yield convert(target_file, lambda x: type(x) not in (tuple, list, dict), lambda x: x.replace('\\', '/'))
-
-#判断data是否匹配到re_list正则表达式中的一个
-def search(re_list, data):
-	for r in re_list:
-		try:
-			if re.search(r, data): return True
-		except: pass
-	return False
