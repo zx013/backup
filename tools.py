@@ -97,8 +97,12 @@ def get_target_name(source_file):
 	#return '%s#%s#%s#%s' % (encode_file(source_file), clock, md5, size)
 	return '%s#%s#%s' % (clock, md5, size)
 
+
 def split(source_file):
 	return os.path.split(source_file)
+
+def exists(source_file):
+	return os.path.exists(convert_decode(source_file, 'utf-8'))
 
 def isdir(source_file):
 	return os.path.isdir(convert_decode(source_file, 'utf-8'))
@@ -106,10 +110,23 @@ def isdir(source_file):
 #重新封装系统的walk
 def walk(target_path):
 	target_path = convert_decode(target_path, 'utf-8')
+	#传入参数为utf-8，中文字符才会是gbk，传入参数为unicode，中文字符也为unicode
+	#walk中next返回的数据有中文字符时使用encode
 	target_list = os.walk(target_path)
 	for target_file in target_list:
-		target_file = convert_encode(convert_decode(target_file, 'gbk'), 'utf-8')
-		yield convert(target_file, lambda x: type(x) not in (tuple, list, dict), lambda x: x.replace('\\', '/'))
+		tmp = [None, [], []]
+		tmp[0] = target_file[0].encode('utf-8')
+		for m in target_file[1]:
+			tmp[1].append(convert_encode(m, 'utf-8'))
+		for m in target_file[2]:
+			tmp[2].append(convert_encode(m, 'utf-8'))
+		print tmp
+		#i = convert_encode(target_file, 'utf-8')
+		#target_file = convert_encode(convert_decode(target_file, 'gbk'), 'utf-8')
+		#target_file = convert(target_file, lambda x: isinstance(x, str), lambda x: x.decode('gbk').encode('utf-8'))
+		
+		#print [target_file]
+		#yield convert_encode(convert(target_file, lambda x: type(x) not in (tuple, list, dict), lambda x: x.replace('\\', '/')) , 'utf-8')
 
 #判断data是否匹配到re_list正则表达式中的一个
 def search(re_list, data):
