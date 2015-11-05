@@ -12,33 +12,27 @@ class Disk:
 		return 'disk'
 
 	#查看文件，按文件名排序
-	@code('utf-8', 0)
 	def show(self, target_path):
 		return os.walk(target_path).next()[2][::-1]
-	
-	@code('utf-8', 0)
+
 	def walk(self, target_path):
 		return os.walk(target_path)
-	
+
 	#创建目录
-	@code('utf-8', 0)
 	def mkdir(self, target_path):
 		os.makedirs(target_path) #相当于linux中的mkdir -p
 
 	#删除文件
-	@code('utf-8', 0)
 	def delete(self, target_list):
 		target_list = make_list(target_list)
 		for target_file in target_list:
 			if os.path.exists(target_file):
 				os.remove(target_file)
-	
-	@code('utf-8', 0)
+
 	def check_path(self, target_path):
 		return os.path.exists(target_path)
-		
+
 	#备份文件
-	@code('utf-8', 0)
 	def upload(self, source_list, target_path):
 		source_list = make_list(source_list)
 		for source_file in source_list:
@@ -47,7 +41,6 @@ class Disk:
 			#os.system('copy /Y %s %s/%s' % (source_file, target_path, target_name))
 
 	#恢复文件
-	@code('utf-8', 0)
 	def download(self, target_list, source_path):
 		target_list = make_list(target_list)
 		for target_file in target_list:

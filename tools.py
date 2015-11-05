@@ -54,13 +54,12 @@ def convert_encode(data, code):
 #转换为unicode编码
 def convert_decode(data, code):
 	return convert(data, lambda x: isinstance(x, str), lambda x: x.decode(code))
-		
-def code(method, enable):
+
+#用method方法对输入参数编码	
+def code(method):
 	def run_func(func):
 		def run(*argv, **kwargv):
-			if enable: convert = convert_encode
-			else: convert = convert_decode
-			return func(*convert(list(argv), method), **convert(kwargv, method)) #不用list新建就不会编解码
+			return func(*convert_encode(list(argv), method), **convert_encode(kwargv, method)) #不用list新建就不会编解码
 		run.__name__ = func.__name__
 		return run
 	return run_func
@@ -68,14 +67,7 @@ def code(method, enable):
 #将为数字的字符串转换为数字
 def convert_int(data):
 	return convert(data, lambda x: 'isdigit' in dir(x) and x.isdigit(), int)
-	
-#将文件名中字符进行转义，输入为unicode则转换为utf-8再转义
-def encode_file(s):
-	return ''.join(map(lambda x: x if 'a' <= x <= 'z' or 'A' <= x <= 'Z' else hex(ord(x)).replace('0x', '%'), s))
 
-#根据文件转义字符串恢复文件名，输出为utf-8则转换为unicode
-def decode_file(s):
-	return ''.join([s[0]] + map(lambda x: '%s%s' % (chr(int(x[:2], 16)), x[2:]), s.split('%')[1:]))
 
 #计算文件md5
 def get_md5(source_file):
@@ -90,43 +82,19 @@ def get_md5(source_file):
 #获取文件名称，名称#时间#md5#大小
 @error_log('')
 def get_target_name(source_file):
-	source_encode = convert_decode(source_file, 'utf-8')
-	size = os.path.getsize(source_encode)
-	md5 = get_md5(source_encode)
+	size = os.path.getsize(source_file)
+	md5 = get_md5(source_file)
 	clock = time.strftime('%Y-%m-%d@%H-%M-%S', time.localtime())
 	#return '%s#%s#%s#%s' % (encode_file(source_file), clock, md5, size)
 	return '%s#%s#%s' % (clock, md5, size)
 
 
-def split(source_file):
-	return os.path.split(source_file)
-
-def exists(source_file):
-	return os.path.exists(convert_decode(source_file, 'utf-8'))
-
-def isdir(source_file):
-	return os.path.isdir(convert_decode(source_file, 'utf-8'))
-
 #重新封装系统的walk
 def walk(target_path):
-	target_path = convert_decode(target_path, 'utf-8')
 	#传入参数为utf-8，中文字符才会是gbk，传入参数为unicode，中文字符也为unicode
-	#walk中next返回的数据有中文字符时使用encode
 	target_list = os.walk(target_path)
 	for target_file in target_list:
-		tmp = [None, [], []]
-		tmp[0] = target_file[0].encode('utf-8')
-		for m in target_file[1]:
-			tmp[1].append(convert_encode(m, 'utf-8'))
-		for m in target_file[2]:
-			tmp[2].append(convert_encode(m, 'utf-8'))
-		print tmp
-		#i = convert_encode(target_file, 'utf-8')
-		#target_file = convert_encode(convert_decode(target_file, 'gbk'), 'utf-8')
-		#target_file = convert(target_file, lambda x: isinstance(x, str), lambda x: x.decode('gbk').encode('utf-8'))
-		
-		#print [target_file]
-		#yield convert_encode(convert(target_file, lambda x: type(x) not in (tuple, list, dict), lambda x: x.replace('\\', '/')) , 'utf-8')
+		yield convert(target_file, lambda x: type(x) not in (tuple, list, dict), lambda x: x.replace('\\', '/'))
 
 #判断data是否匹配到re_list正则表达式中的一个
 def search(re_list, data):

@@ -1,6 +1,6 @@
 #-*- coding:utf-8 -*-
 import os
-from tools import convert_decode, convert_int, encode_file
+from tools import convert_decode, convert_int
 from log import debug_log
 
 class Config:
@@ -76,7 +76,7 @@ class Config:
 				del self.config['backup'][path]
 				debug_log('path %s type not support.' % unicode_path)
 				continue
-			self.config['backup'][path]['dir'] = encode_file(path)
+			self.config['backup'][path]['dir'] = path
 
 		#判断是否存在可备份文件
 		if not len(self.config['backup']): return False

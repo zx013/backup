@@ -5,6 +5,7 @@
 #微软office支持
 #目录备份
 #备份恢复
+import os
 import thread
 
 from Config import Config
@@ -20,7 +21,7 @@ class Backup():
 	#b.backup_file(dk, 'C:/Users/zzy/Desktop/测试-.－。', '/b')
 	def backup_file(self, handle, source_file, target_path):
 		#备份文件则创建对应目录
-		target_path = '%s/%s' % (target_path, split(source_file)[1])
+		target_path = '%s/%s' % (target_path, os.path.split(source_file)[1])
 		#检查备份的目标路径
 		if not handle.check_path(target_path):
 			handle.mkdir(target_path)
@@ -42,7 +43,6 @@ class Backup():
 	def backup_dir(self, handle, source_path, target_path):
 		#遍历目录
 		for source_list in walk(source_path):
-			print source_list
 			#遍历目录下文件
 			for source_file in source_list[2]:
 				#跳过忽略的文件
@@ -57,8 +57,8 @@ class Backup():
 
 	#将source备份到target目录
 	def backup(self, handle, source, target):
-		if isdir(source):
-			target_path = '%s/%s' % (target, split(source)[1])
+		if os.path.isdir(source):
+			target_path = '%s/%s' % (target, os.path.split(source)[1])
 			self.backup_dir(handle, source, target_path)
 		else:
 			self.backup_file(handle, source, target)
@@ -69,10 +69,10 @@ class Backup():
 		#备份目录无文件则不恢复
 		if not len(target_list): return
 
-		source_name = split(target_file)[1]
-		if exists('%s/%s' % (source_path, source_name)):
+		source_name = os.path.split(target_file)[1]
+		if os.path.exists('%s/%s' % (source_path, source_name)):
 			i = 0
-			while exists('%s/%s-restore-%s' % (source_path, source_name, i)):
+			while os.path.exists('%s/%s-restore-%s' % (source_path, source_name, i)):
 				i += 1
 			source_name = '%s-restore-%s' % (source_name, i)
 
@@ -101,15 +101,15 @@ class Backup():
 		#硬盘备份
 		if self.config.get('basic', 'disk', 'enable') == 'on':
 			dk1 = Disk()
-			self.backup(dk1, 'C:\\Users\\zzy\\Desktop\\zawu\\server.c', 'E:/backup好')
-			self.backup(dk1, 'C:\\Users\\zzy\\Desktop\\zawu\\Windows程序设计', 'E:/backup好')
+			self.backup(dk1, u'C:\\Users\\zzy\\Desktop\\zawu\\server.c', u'E:/backup好')
+			self.backup(dk1, u'C:\\Users\\zzy\\Desktop\\zawu\\Windows程序设计', u'E:/backup好')
 
 		#百度云备份
 		if self.config.get('basic', 'baidu', 'enable') == 'on':
 			dk2 = Baidu(self.config.get('basic', 'baidu', 'username'), self.config.get('basic', 'baidu', 'password'))
-			#print dk2.login()
-			#self.backup(dk2, 'C:\\Users\\zzy\\Desktop\\zawu\\server.c', '/b')
-			#self.backup(dk2, 'C:\\Users\\zzy\\Desktop\\zawu\\Windows程序设计', '/b')
+			print dk2.login()
+			self.backup(dk2, u'C:\\Users\\zzy\\Desktop\\zawu\\server.c', u'/b安')
+			self.backup(dk2, u'C:\\Users\\zzy\\Desktop\\zawu\\Windows程序设计', u'/b安')
 		return (dk1, dk2)
 
 if __name__ == '__main__':

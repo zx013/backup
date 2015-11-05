@@ -3,7 +3,6 @@
 #参考文章及内容：
 #https://github.com/Yangff/node_pcsapi/blob/master/baidulogin.md
 #python库baidupcsapi-0.3.5
-#文件处理一律用utf-8，只有在打开文件时转换成unicode
 import os
 import json
 import cookielib
@@ -11,7 +10,7 @@ import urllib
 import urllib2
 import hashlib
 import time
-from tools import make_list, split_file, convert_encode, convert_decode
+from tools import make_list, split_file, code
 from log import error_log
 
 
@@ -36,14 +35,15 @@ default_url = {
 }
 
 def loads(data):
-	try: return convert_encode(json.loads(data), 'utf-8')
-	except: return data
+	try: return json.loads(data)
+	except: return {'data': data}
 
 #编码前先将数据转换为str(utf-8)类型
+@code('utf-8')
 def urlencode(data):
-	return urllib.urlencode(convert_encode(data, 'utf-8'))
+	return urllib.urlencode(data)
 
-
+@code('utf-8')
 def encode_multipart_formdata(files):
 	BOUNDARY = b'----------ThIs_Is_tHe_bouNdaRY_$'
 	S_BOUNDARY = b'--' + BOUNDARY
@@ -138,14 +138,14 @@ class Baidu:
 	@error_log([])
 	def show(self, target_path):
 		res = self.post('pan', 'list', {'dir': target_path})
-		target_list = [val['path'] for val in res['list'] if not val['isdir']][::-1] #默认是从小到大排列
+		target_list = [val['path'] for val in res.get('list', []) if val.get('isdir') == 0][::-1] #默认是从小到大排列
 		return target_list
 	
 	#同os.walk
 	def walk(self, target_path):
 		res = self.post('pan', 'list', {'dir': target_path})
-		target_dir = [val['path'] for val in res['list'] if val['isdir']]
-		target_file = [val['path'] for val in res['list'] if not val['isdir']]
+		target_dir = [val['path'] for val in res.get('list', []) if val.get('isdir') != 0]
+		target_file = [val['path'] for val in res.get('list', []) if val.get('isdir') == 0]
 		yield (target_path, target_dir, target_file)
 		for path in target_dir:
 			for g in self.walk(path):
@@ -153,13 +153,11 @@ class Baidu:
 
 	#创建目录
 	def mkdir(self, target_path):
-		ret = self.post('pan', 'create', data={'path': target_path, 'isdir': 1})
-		if target_path != ret['path']:
-			self.delete([ret['path']])
-		return ret
+		return self.post('pan', 'create', data={'path': target_path, 'isdir': 1})
 
 	#删除文件
 	def delete(self, target_list):
+		if not target_list: return
 		target_list = make_list(target_list)
 		return self.post('pan', 'filemanager', {'opera': 'delete'}, data={'filelist': json.dumps(target_list)})
 	
@@ -174,13 +172,14 @@ class Baidu:
 		for source_file in source_list:
 			try:
 				source_file, source_path, source_name, target_name = split_file(source_file)
-				with open(convert_decode(source_file, 'utf-8'), 'rb') as fp:
+				with open(source_file, 'rb') as fp:
 					source_data = fp.read()
 				content_type, data = encode_multipart_formdata([('file', source_name, source_data)])
 				headers = {'Content-Type': content_type, 'Content-length': str(len(data))}
 				params = {'method': 'upload', 'dir': target_path, 'ondup': 'overwrite', 'filename': target_name}
 				print self.post('pcs', 'file', params, headers=headers, data=data)
-			except: pass
+			except Exception, ex:
+				print ex
 
 	#获取文件或目录的元信息，dlink=1则包含下载链接
 	#传入参数无论为utf-8或unicode，均返回unicode
@@ -209,7 +208,7 @@ class Baidu:
 		dlink_list = self.get_link(target_list)
 		for source_name, dlink in dlink_list:
 			data = self.request(dlink)
-			with open(convert_decode('%s/%s' % (source_path, source_name), 'utf-8'), 'wb') as fp:
+			with open('%s/%s' % (source_path, source_name), 'wb') as fp:
 				fp.write(data)
 
 if __name__ == '__main__':
