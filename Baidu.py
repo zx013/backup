@@ -153,7 +153,8 @@ class Baidu:
 
 	#创建目录
 	def mkdir(self, target_path):
-		return self.post('pan', 'create', data={'path': target_path, 'isdir': 1})
+		if not self.check_path(target_path):
+			return self.post('pan', 'create', data={'path': target_path, 'isdir': 1})
 
 	#删除文件
 	def delete(self, target_list):
