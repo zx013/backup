@@ -65,11 +65,17 @@ def encode_multipart_formdata(files):
 
 #短时间内多次登陆百度账号会导致需要输入验证码，以致无法登陆
 class Baidu:
-	def __init__(self, username, password):
+	#备份类型，为配置文件中的字段
+	config_type = 'baidu'
+
+	#config = {'username': 'baidu_yun_test@sina.com', 'enable': 'on', 'number': '5', 'time': '60', 'path': 'backup', 'password': 'test123456'}
+	#至少需要username, password两个参数
+	def __init__(self, config):
 		self.cookie = cookielib.CookieJar()
 		self.opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(self.cookie))
-		self.username = username
-		self.password = password
+		self.config = config
+		self.username = config['username']
+		self.password = config['password']
 
 	@error_log('')
 	def request(self, url, **kvargv):
@@ -104,8 +110,8 @@ class Baidu:
 			'quick_user': '0',
 			'usernamelogin': '1',
 			'splogin': 'rate',
-			'username': self.username,
-			'password': self.password,
+			'username': self.config['username'],
+			'password': self.config['password'],
 			'verifycode': '',
 			'mem_pass': 'on',
 			'ppui_logintime': '5000',
@@ -127,9 +133,6 @@ class Baidu:
 		print url
 		return loads(self.request(url, **kwargv))
 
-	def get_config_type(self):
-		return 'baidu'
-
 	#获得配额信息
 	def quota(self):
 		return self.post('pan', 'quota', {'method': 'info'})
@@ -140,7 +143,7 @@ class Baidu:
 		res = self.post('pan', 'list', {'dir': target_path})
 		target_list = [val['path'] for val in res.get('list', []) if val.get('isdir') == 0][::-1] #默认是从小到大排列
 		return target_list
-	
+
 	#同os.walk
 	def walk(self, target_path):
 		res = self.post('pan', 'list', {'dir': target_path})
@@ -161,7 +164,7 @@ class Baidu:
 		if not target_list: return
 		target_list = make_list(target_list)
 		return self.post('pan', 'filemanager', {'opera': 'delete'}, data={'filelist': json.dumps(target_list)})
-	
+
 	@error_log(False)
 	def check_path(self, target_path):
 		return not self.get_metas(target_path)['errno']

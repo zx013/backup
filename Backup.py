@@ -38,7 +38,7 @@ class Backup():
 		target_name = get_target_name(source_file)
 		handle.upload((source_file, target_name), target_path)
 		target_list = handle.show(target_path) #按时间顺序排列
-		handle.delete(target_list[self.config.get('basic', handle.get_config_type(), 'number'):])
+		handle.delete(target_list[self.config.get('basic', handle.config_type, 'number'):])
 
 	def backup_dir(self, handle, source_path, target_path):
 		#遍历目录
@@ -100,15 +100,16 @@ class Backup():
 
 		#硬盘备份
 		if self.config.get('basic', 'disk', 'enable') == 'on':
-			dk1 = Disk()
-			self.backup(dk1, u'C:\\Users\\\Administrator\\Desktop\\a.doc', u'E:/backup好')
-			#self.backup(dk1, u'C:\\Users\\zzy\\Desktop\\zawu\\Windows程序设计', u'E:/backup好')
+			dk1 = Disk(self.config.get('basic', Disk.config_type))
+			print dk1.login()
+			#self.backup(dk1, u'C:\\Users\\\Administrator\\Desktop\\a.doc', u'F:/backup好')
+			self.backup(dk1, u'C:\\Users\\zzy\\Desktop\\zawu\\test', u'F:/backup好')
 
 		#百度云备份
 		if self.config.get('basic', 'baidu', 'enable') == 'on':
-			dk2 = Baidu(self.config.get('basic', 'baidu', 'username'), self.config.get('basic', 'baidu', 'password'))
-			#print dk2.login()
-			#self.backup(dk2, u'C:\\Users\\zzy\\Desktop\\zawu\\server.c', u'/b安')
+			dk2 = Baidu(self.config.get('basic', Baidu.config_type))
+			print dk2.login()
+			self.backup(dk2, u'C:\\Users\\zzy\\Desktop\\zawu\\test', u'/b安')
 			#self.backup(dk2, u'C:\\Users\\zzy\\Desktop\\zawu\\Windows程序设计', u'/b安')
 		return (dk1, dk2)
 

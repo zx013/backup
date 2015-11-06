@@ -8,8 +8,13 @@ from log import debug_log, write_log, error_log
 #class_name, func_name, *argv
 
 class Disk:
-	def get_config_type(self):
-		return 'disk'
+	config_type = 'disk'
+
+	def __init__(self, config):
+		self.config = config
+		
+	def login(self):
+		return 0
 
 	#查看文件，按文件名排序
 	def show(self, target_path):
