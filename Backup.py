@@ -62,7 +62,7 @@ class Backup():
 			self.backup_dir(handle, source, target_path)
 		else:
 			self.backup_file(handle, source, target)
-	
+
 	#b.restore_file(dk, '/b/测试-.－。', 'C:/Users/zzy/Desktop/')
 	def restore_file(self, handle, target_file, source_path):
 		target_list = handle.show(target_file)
@@ -81,17 +81,17 @@ class Backup():
 		print (target_file, source_name), source_path
 
 		handle.download((target_file, source_name), source_path)
-	
+
 	#从target目录恢复source文件
 	def restore(self, handle, target, source):
 		pass
-	
+
 	def run(self):
 		#读取配置
 		self.config = Config()
 		self.config.read_config()
 		print self.config.config
-		
+
 		if not self.config.check_config(): return
 
 		#自动保存文档
@@ -100,16 +100,22 @@ class Backup():
 
 		#硬盘备份
 		if self.config.get('basic', 'disk', 'enable') == 'on':
-			dk1 = Disk(self.config.get('basic', Disk.config_type))
+			config = self.config.get('basic', Disk.config_type)
+			dk1 = Disk(config)
 			print dk1.login()
+			for backup_file in self.config.get('backup'):
+				self.backup(dk1, backup_file, 'F:/' + config.get('path', 'backup'))
 			#self.backup(dk1, u'C:\\Users\\\Administrator\\Desktop\\a.doc', u'F:/backup好')
-			self.backup(dk1, u'C:\\Users\\zzy\\Desktop\\zawu\\test', u'F:/backup好')
+			#self.backup(dk1, u'C:\\Users\\zzy\\Desktop\\zawu\\test', u'F:/backup好')
 
 		#百度云备份
 		if self.config.get('basic', 'baidu', 'enable') == 'on':
-			dk2 = Baidu(self.config.get('basic', Baidu.config_type))
+			config = self.config.get('basic', Baidu.config_type)
+			dk2 = Baidu(config)
 			print dk2.login()
-			self.backup(dk2, u'C:\\Users\\zzy\\Desktop\\zawu\\test', u'/b安')
+			for backup_file in self.config.get('backup'):
+				self.backup(dk2, backup_file, '/' + config.get('path', 'backup'))
+			#self.backup(dk2, u'C:\\Users\\zzy\\Desktop\\zawu\\test', u'/b安')
 			#self.backup(dk2, u'C:\\Users\\zzy\\Desktop\\zawu\\Windows程序设计', u'/b安')
 		return (dk1, dk2)
 

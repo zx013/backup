@@ -56,6 +56,7 @@ class Config:
 			elif '=' in line:
 				data = line.split('=')
 				conf[data[0]] = data[1]
+		self.config = convert_decode(self.config, 'utf-8')
 
 	#检查配置文件的正确性
 	def check_config(self):
@@ -63,18 +64,17 @@ class Config:
 		convert_int(self.config)
 
 		for path, value in self.config['backup'].items():
-			unicode_path = convert_decode(path, 'utf-8')
-			if not os.path.exists(unicode_path):
+			if not os.path.exists(path):
 				del self.config['backup'][path]
-				debug_log('path %s not exist.' % unicode_path)
+				debug_log('path %s not exist.' % path)
 				continue
-			if os.path.isfile(unicode_path):
+			if os.path.isfile(path):
 				self.config['backup'][path]['type'] = 'file'
-			elif os.path.isdir(unicode_path):
+			elif os.path.isdir(path):
 				self.config['backup'][path]['type'] = 'dir'
 			else:
 				del self.config['backup'][path]
-				debug_log('path %s type not support.' % unicode_path)
+				debug_log('path %s type not support.' % path)
 				continue
 			self.config['backup'][path]['dir'] = path
 
