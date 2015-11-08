@@ -12,9 +12,14 @@ class Disk:
 
 	def __init__(self, config):
 		self.config = config
-		
+
 	def login(self):
 		return 0
+
+	def get_device(self):
+		path = self.config.get('path', 'backup')
+		devices = map(lambda x: '%s:/%s' % (chr(x), path), range(65, 91))
+		return filter(lambda x: os.path.exists(x), devices)
 
 	#查看文件，按文件名排序
 	def show(self, target_path):

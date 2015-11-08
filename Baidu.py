@@ -133,6 +133,10 @@ class Baidu:
 		print url
 		return loads(self.request(url, **kwargv))
 
+	def get_device(self):
+		path = self.config.get('path', 'backup')
+		return ['/%s' % path]
+
 	#获得配额信息
 	def quota(self):
 		return self.post('pan', 'quota', {'method': 'info'})

@@ -7,6 +7,7 @@
 #备份恢复
 import os
 import thread
+import time
 
 from Config import Config
 from Windows import Windows
@@ -85,7 +86,24 @@ class Backup():
 	#从target目录恢复source文件
 	def restore(self, handle, target, source):
 		pass
+		
+	#运行备份
+	def run_backup(self, handle, device):
+		while 1:
+			for backup_file in self.config.get('backup'):
+				self.backup(handle, backup_file, device)
+			time.sleep(self.config.get('basic', handle.config_type, 'time'))
 
+	#开启备份
+	def start_backup(self, Drive):
+		if self.config.get('basic', Drive.config_type, 'enable') == 'on':
+			config = self.config.get('basic', Drive.config_type)
+			handle = Drive(config)
+			print handle.login()
+			devices = handle.get_device()
+			for device in devices:
+				thread.start_new_thread(self.run_backup, (handle, device))
+	
 	def run(self):
 		#读取配置
 		self.config = Config()
@@ -98,26 +116,25 @@ class Backup():
 		#windows = Windows(self.config.get('basic', 'base', 'save'))
 		#thread.start_new_thread(windows.save_file, ())
 
+		self.start_backup(Disk)
+		self.start_backup(Baidu)
+		'''
 		#硬盘备份
 		if self.config.get('basic', 'disk', 'enable') == 'on':
 			config = self.config.get('basic', Disk.config_type)
 			dk1 = Disk(config)
 			print dk1.login()
-			for backup_file in self.config.get('backup'):
+			for backup_file in self.config.get('backup', []):
 				self.backup(dk1, backup_file, 'F:/' + config.get('path', 'backup'))
-			#self.backup(dk1, u'C:\\Users\\\Administrator\\Desktop\\a.doc', u'F:/backup好')
-			#self.backup(dk1, u'C:\\Users\\zzy\\Desktop\\zawu\\test', u'F:/backup好')
 
 		#百度云备份
 		if self.config.get('basic', 'baidu', 'enable') == 'on':
 			config = self.config.get('basic', Baidu.config_type)
 			dk2 = Baidu(config)
 			print dk2.login()
-			for backup_file in self.config.get('backup'):
+			for backup_file in self.config.get('backup', []):
 				self.backup(dk2, backup_file, '/' + config.get('path', 'backup'))
-			#self.backup(dk2, u'C:\\Users\\zzy\\Desktop\\zawu\\test', u'/b安')
-			#self.backup(dk2, u'C:\\Users\\zzy\\Desktop\\zawu\\Windows程序设计', u'/b安')
-		return (dk1, dk2)
+		'''
 
 if __name__ == '__main__':
 	backup = Backup()
