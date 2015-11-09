@@ -64,8 +64,28 @@ class Backup():
 		else:
 			self.backup_file(handle, source, target)
 
+	#运行备份
+	def run_backup(self, handle, device):
+		while 1:
+			for backup_file in self.config.get('backup'):
+				self.backup(handle, backup_file, device)
+			time.sleep(self.config.get('basic', handle.config_type, 'time'))
+			thread.exit_thread() #just for test
+
+	#开启备份
+	def start_backup(self, Drive):
+		if self.config.get('basic', Drive.config_type, 'enable') == 'on':
+			config = self.config.get('basic', Drive.config_type)
+			handle = Drive(config)
+			print handle.login()
+			devices = handle.get_device()
+			for device in devices:
+				thread.start_new_thread(self.run_backup, (handle, device))
+
 	#b.restore_file(dk, '/b/测试-.－。', 'C:/Users/zzy/Desktop/')
-	def restore_file(self, handle, target_file, source_path):
+	#restore_cover: 恢复的文件存在是否覆盖
+	#restore_time: 恢复到该时间前最后的一个备份
+	def restore_file(self, handle, target_file, source_path, restore_cover=False, restore_time=9999999999):
 		target_list = handle.show(target_file)
 		#备份目录无文件则不恢复
 		if not len(target_list): return
@@ -84,26 +104,9 @@ class Backup():
 		handle.download((target_file, source_name), source_path)
 
 	#从target目录恢复source文件
-	def restore(self, handle, target, source):
+	def restore_dir(self, handle, target, source, restore_cover=False, restore_time=9999999999):
 		pass
-		
-	#运行备份
-	def run_backup(self, handle, device):
-		while 1:
-			for backup_file in self.config.get('backup'):
-				self.backup(handle, backup_file, device)
-			time.sleep(self.config.get('basic', handle.config_type, 'time'))
 
-	#开启备份
-	def start_backup(self, Drive):
-		if self.config.get('basic', Drive.config_type, 'enable') == 'on':
-			config = self.config.get('basic', Drive.config_type)
-			handle = Drive(config)
-			print handle.login()
-			devices = handle.get_device()
-			for device in devices:
-				thread.start_new_thread(self.run_backup, (handle, device))
-	
 	def run(self):
 		#读取配置
 		self.config = Config()
@@ -118,23 +121,7 @@ class Backup():
 
 		self.start_backup(Disk)
 		self.start_backup(Baidu)
-		'''
-		#硬盘备份
-		if self.config.get('basic', 'disk', 'enable') == 'on':
-			config = self.config.get('basic', Disk.config_type)
-			dk1 = Disk(config)
-			print dk1.login()
-			for backup_file in self.config.get('backup', []):
-				self.backup(dk1, backup_file, 'F:/' + config.get('path', 'backup'))
 
-		#百度云备份
-		if self.config.get('basic', 'baidu', 'enable') == 'on':
-			config = self.config.get('basic', Baidu.config_type)
-			dk2 = Baidu(config)
-			print dk2.login()
-			for backup_file in self.config.get('backup', []):
-				self.backup(dk2, backup_file, '/' + config.get('path', 'backup'))
-		'''
 
 if __name__ == '__main__':
 	backup = Backup()
