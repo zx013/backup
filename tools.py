@@ -72,7 +72,7 @@ def convert_int(data):
 #计算文件md5
 def get_md5(source_file):
 	md5 = hashlib.md5()
-	with open(convert_decode(source_file, 'utf-8'), 'rb') as fp:
+	with open(source_file, 'rb') as fp:
 		while 1:
 			data = fp.read(1024 * 1024)
 			md5.update(data)

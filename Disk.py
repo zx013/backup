@@ -1,13 +1,14 @@
 #-*- coding:utf-8 -*-
 import os
 import shutil
+from Base import Base
 from tools import make_list, split_file, code
 from log import debug_log, write_log, error_log
 
 #write_log('info', 'delete %s' % file_name)
 #class_name, func_name, *argv
 
-class Disk:
+class Disk(Base):
 	config_type = 'disk'
 
 	def __init__(self, config):
@@ -27,9 +28,6 @@ class Disk:
 		target_dir = target_list[1][::-1]
 		target_file = target_list[2][::-1]
 		return target_dir, target_file
-
-	def walk(self, target_path):
-		return os.walk(target_path)
 
 	#创建目录
 	def mkdir(self, target_path):

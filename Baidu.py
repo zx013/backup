@@ -10,6 +10,7 @@ import urllib
 import urllib2
 import hashlib
 import time
+from Base import Base
 from tools import make_list, split_file, code
 from log import error_log
 
@@ -64,7 +65,7 @@ def encode_multipart_formdata(files):
 
 
 #短时间内多次登陆百度账号会导致需要输入验证码，以致无法登陆
-class Baidu:
+class Baidu(Base):
 	#备份类型，为配置文件中的字段
 	config_type = 'baidu'
 
@@ -148,16 +149,6 @@ class Baidu:
 		target_dir = [val['path'] for val in res.get('list', []) if val.get('isdir') != 0][::-1]
 		target_file = [val['path'] for val in res.get('list', []) if val.get('isdir') == 0][::-1] #默认是从小到大排列
 		return target_dir, target_file
-
-	#同os.walk
-	def walk(self, target_path):
-		res = self.post('pan', 'list', {'dir': target_path})
-		target_dir = [val['path'] for val in res.get('list', []) if val.get('isdir') != 0]
-		target_file = [val['path'] for val in res.get('list', []) if val.get('isdir') == 0]
-		yield (target_path, target_dir, target_file)
-		for path in target_dir:
-			for g in self.walk(path):
-				yield g
 
 	#创建目录
 	def mkdir(self, target_path):
