@@ -88,17 +88,16 @@ class Backup():
 	def restore_file(self, handle, target_file, source_path, restore_cover=False, restore_time=9999999999):
 		target_list = handle.show(target_file)
 		#备份目录无文件则不恢复
-		if not len(target_list): return
-
 		source_name = os.path.split(target_file)[1]
+		for file_name in target_list:
+			clock, md5, size = os.path.split(file_name)[1].split('#')
+			if restore_time >= time.mktime(time.strptime(clock, '%Y-%m-%d@%H-%M-%S')):
+				break
+		else: return
+		target_file = '%s/%s' % (target_file, file_name)
 		if os.path.exists('%s/%s' % (source_path, source_name)):
-			i = 0
-			while os.path.exists('%s/%s-restore-%s' % (source_path, source_name, i)):
-				i += 1
-			source_name = '%s-restore-%s' % (source_name, i)
-
-		print (target_file, target_list[0])
-		target_file = '%s/%s' % (target_file, target_list[0])
+			if not restore_cover:
+				return
 		print (target_file, source_name), source_path
 
 		handle.download((target_file, source_name), source_path)
@@ -119,8 +118,12 @@ class Backup():
 		#windows = Windows(self.config.get('basic', 'base', 'save'))
 		#thread.start_new_thread(windows.save_file, ())
 
-		self.start_backup(Disk)
-		self.start_backup(Baidu)
+		#self.start_backup(Disk)
+		#self.start_backup(Baidu)
+		config = self.config.get('basic', Disk.config_type)
+		handle = Disk(config)
+		self.restore_file(handle, 'F:/backup/a.doc', 'F:/', restore_cover=True, restore_time=1447127378)
+		#self.restore_file(handle, 'F:/backup/a.doc', 'F:/', restore_cover=True, restore_time=1447127278)
 
 
 if __name__ == '__main__':
