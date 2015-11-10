@@ -1,6 +1,6 @@
 #-*- coding:utf-8 -*-
 import os
-from tools import convert_decode, convert_int
+from tools import convert_int
 from log import debug_log
 
 class Config:
@@ -13,7 +13,7 @@ class Config:
 			data = data.get(argv)
 			if data is None: return
 		return data
-		
+
 	#读取配置文件
 	#{'backup': {'C:\\Users\\zzy\\Desktop\\a.doc': {}, 'C:\\Users\\zzy\\Desktop\\zawu\\test': {'ignore': ['^.\\.pyc$', '^.\\.c$', '^event\\.py$', '^b(/|\\\\\\\\)c\\.txt$']}, 'C:\\Users\\zzy\\Desktop\\\xe6\xb5\x8b\xe8\xaf\x95-.\xef\xbc\x8d\xe3\x80\x82': {}}, 'basic': {'disk': {'path': 'backup', 'enable': 'on', 'number': '5', 'time': '10', 'scan': '5'}, 'baidu': {'username': 'baidu_yun_test@sina.com', 'enable': 'on', 'number': '5', 'time': '60', 'path': 'backup', 'password': 'test123456'}, 'base': {'save': '10'}}}
 	def read_config(self):
@@ -50,13 +50,21 @@ class Config:
 				conf = self.config[type1][type2]
 			else:
 				conf = self.config[type1][type2][type3]
-				
+
 			if line[0] == '*':
 				conf.append(line[1:])
 			elif '=' in line:
 				data = line.split('=')
 				conf[data[0]] = data[1]
-		self.config = convert_decode(self.config, 'utf-8')
+
+		backup = self.config['backup']
+		for key, value in backup.items():
+			del backup[key]
+			try:
+				key = key.replace('\\', '/')
+				if isinstance(key, str): key = key.decode('utf-8')
+			except: pass
+			backup[key] = value
 
 	#检查配置文件的正确性
 	def check_config(self):

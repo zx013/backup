@@ -88,14 +88,6 @@ def get_target_name(source_file):
 	#return '%s#%s#%s#%s' % (encode_file(source_file), clock, md5, size)
 	return '%s#%s#%s' % (clock, md5, size)
 
-
-#重新封装系统的walk
-def walk(target_path):
-	#传入参数为utf-8，中文字符才会是gbk，传入参数为unicode，中文字符也为unicode
-	target_list = os.walk(target_path)
-	for target_file in target_list:
-		yield convert(target_file, lambda x: type(x) not in (tuple, list, dict), lambda x: x.replace('\\', '/'))
-
 #判断data是否匹配到re_list正则表达式中的一个
 def search(re_list, data):
 	if not re_list: return False

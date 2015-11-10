@@ -43,7 +43,7 @@ class Backup():
 
 	def backup_dir(self, handle, source_path, target_path):
 		#遍历目录
-		for source_list in walk(source_path):
+		for source_list in os.walk(source_path):
 			#遍历目录下文件
 			for source_file in source_list[2]:
 				#跳过忽略的文件
@@ -118,11 +118,11 @@ class Backup():
 		#windows = Windows(self.config.get('basic', 'base', 'save'))
 		#thread.start_new_thread(windows.save_file, ())
 
-		#self.start_backup(Disk)
+		self.start_backup(Disk)
 		#self.start_backup(Baidu)
-		config = self.config.get('basic', Disk.config_type)
-		handle = Disk(config)
-		self.restore_file(handle, 'F:/backup/a.doc', 'F:/', restore_cover=True)
+		#config = self.config.get('basic', Disk.config_type)
+		#handle = Disk(config)
+		#self.restore_file(handle, 'F:/backup/a.doc', 'F:/', restore_cover=True)
 		#self.restore_file(handle, 'F:/backup/a.doc', 'F:/', restore_cover=True, restore_time=1447127278)
 
 
