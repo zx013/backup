@@ -145,8 +145,9 @@ class Baidu:
 	@error_log([])
 	def show(self, target_path):
 		res = self.post('pan', 'list', {'dir': target_path})
-		target_list = [val['path'] for val in res.get('list', []) if val.get('isdir') == 0][::-1] #默认是从小到大排列
-		return target_list
+		target_dir = [val['path'] for val in res.get('list', []) if val.get('isdir') != 0][::-1]
+		target_file = [val['path'] for val in res.get('list', []) if val.get('isdir') == 0][::-1] #默认是从小到大排列
+		return target_dir, target_file
 
 	#同os.walk
 	def walk(self, target_path):

@@ -23,7 +23,10 @@ class Disk:
 
 	#查看文件，按文件名排序
 	def show(self, target_path):
-		return os.walk(target_path).next()[2][::-1]
+		target_list = os.walk(target_path).next()
+		target_dir = target_list[1][::-1]
+		target_file = target_list[2][::-1]
+		return target_dir, target_file
 
 	def walk(self, target_path):
 		return os.walk(target_path)

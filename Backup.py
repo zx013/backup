@@ -27,7 +27,7 @@ class Backup():
 		if not handle.check_path(target_path):
 			handle.mkdir(target_path)
 		else:
-			target_list = handle.show(target_path)
+			target_list = handle.show(target_path)[1]
 			if len(target_list):
 				source_stat = get_target_name(source_file).split('#')
 				target_stat = target_list[0].split('#')
@@ -38,7 +38,7 @@ class Backup():
 		#备份
 		target_name = get_target_name(source_file)
 		handle.upload((source_file, target_name), target_path)
-		target_list = handle.show(target_path) #按时间顺序排列
+		target_list = handle.show(target_path)[1] #按时间顺序排列
 		handle.delete(target_list[self.config.get('basic', handle.config_type, 'number'):])
 
 	def backup_dir(self, handle, source_path, target_path):
@@ -86,7 +86,7 @@ class Backup():
 	#restore_cover: 恢复的文件存在是否覆盖
 	#restore_time: 恢复到该时间前最后的一个备份
 	def restore_file(self, handle, target_file, source_path, restore_cover=False, restore_time=9999999999):
-		target_list = handle.show(target_file)
+		target_list = handle.show(target_file)[1]
 		#备份目录无文件则不恢复
 		source_name = os.path.split(target_file)[1]
 		for file_name in target_list:
@@ -122,7 +122,7 @@ class Backup():
 		#self.start_backup(Baidu)
 		config = self.config.get('basic', Disk.config_type)
 		handle = Disk(config)
-		self.restore_file(handle, 'F:/backup/a.doc', 'F:/', restore_cover=True, restore_time=1447127378)
+		self.restore_file(handle, 'F:/backup/a.doc', 'F:/', restore_cover=True)
 		#self.restore_file(handle, 'F:/backup/a.doc', 'F:/', restore_cover=True, restore_time=1447127278)
 
 
