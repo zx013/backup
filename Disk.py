@@ -31,8 +31,10 @@ class Disk(Base):
 		return target_dir, target_file
 
 	#创建目录
+	@classmethod
 	def mkdir(self, target_path):
-		os.makedirs(target_path) #相当于linux中的mkdir -p
+		if not os.path.exists(target_path):
+			os.makedirs(target_path) #相当于linux中的mkdir -p
 
 	#删除文件
 	def delete(self, target_list):

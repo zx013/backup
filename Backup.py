@@ -86,6 +86,7 @@ class Backup():
 	#restore_cover: 恢复的文件存在是否覆盖
 	#restore_time: 恢复到该时间前最后的一个备份
 	def restore_file(self, handle, target_file, source_path, restore_cover=False, restore_time=9999999999):
+		Disk.mkdir(source_path)
 		target_list = handle.show(target_file)[1]
 		#备份目录无文件则不恢复
 		source_name = os.path.split(target_file)[1]
@@ -98,13 +99,23 @@ class Backup():
 		if os.path.exists('%s/%s' % (source_path, source_name)):
 			if not restore_cover:
 				return
-		print (target_file, source_name), source_path
+		#print (target_file, source_name), source_path
 
 		handle.download((target_file, source_name), source_path)
 
 	#从target目录恢复source文件
-	def restore_dir(self, handle, target, source, restore_cover=False, restore_time=9999999999):
-		pass
+	def restore_dir(self, handle, target_path, source_path, restore_cover=False, restore_time=9999999999):
+		for target_list in handle.restore_walk(target_path):
+			for target_file in target_list[2]:
+				target_child = target_list[0][len(target_path) + 1:] #子目录 
+				self.restore_file(handle, '%s/%s' % (target_list[0], target_file), '%s/%s' % (source_path, target_child), restore_cover, restore_time)
+
+	def restore(self, handle, target, source, restore_cover=False, restore_time=9999999999):
+		if os.path.isdir(target):
+			source_path = '%s/%s' % (source, os.path.split(target)[1])
+			self.restore_dir(handle, target, source_path, restore_cover, restore_time)
+		else:
+			self.restore_file(handle, target, source, restore_cover, restore_time)
 
 	def run(self):
 		#读取配置
@@ -118,12 +129,13 @@ class Backup():
 		#windows = Windows(self.config.get('basic', 'base', 'save'))
 		#thread.start_new_thread(windows.save_file, ())
 
-		self.start_backup(Disk)
+		#self.start_backup(Disk)
 		#self.start_backup(Baidu)
-		#config = self.config.get('basic', Disk.config_type)
-		#handle = Disk(config)
+		config = self.config.get('basic', Disk.config_type)
+		handle = Disk(config)
 		#self.restore_file(handle, 'F:/backup/a.doc', 'F:/', restore_cover=True)
 		#self.restore_file(handle, 'F:/backup/a.doc', 'F:/', restore_cover=True, restore_time=1447127278)
+		self.restore(handle, 'F:/backup/test', 'F:/', restore_cover=True)
 
 
 if __name__ == '__main__':
