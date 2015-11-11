@@ -23,6 +23,7 @@ class Disk(Base):
 		return filter(lambda x: os.path.exists(x), devices)
 
 	#查看文件，按文件名排序
+	@classmethod
 	def show(self, target_path):
 		target_list = os.walk(target_path).next()
 		target_dir = target_list[1][::-1]

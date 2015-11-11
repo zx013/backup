@@ -1,6 +1,7 @@
 #-*- coding:utf-8 -*-
 
 class Base:
+	@classmethod
 	def walk(self, target_path):
 		target_dir, target_file = self.show(target_path)
 		yield (target_path, target_dir, target_file)

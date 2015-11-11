@@ -43,7 +43,7 @@ class Backup():
 
 	def backup_dir(self, handle, source_path, target_path):
 		#遍历目录
-		for source_list in os.walk(source_path):
+		for source_list in Disk.walk(source_path):
 			#遍历目录下文件
 			for source_file in source_list[2]:
 				#跳过忽略的文件
