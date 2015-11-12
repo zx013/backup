@@ -96,20 +96,19 @@ class Backup():
 			if restore_time >= time.mktime(time.strptime(clock, '%Y-%m-%d@%H-%M-%S')):
 				break
 		else: return
-		target_file = '%s/%s' % (target_file, file_name)
 		if os.path.exists('%s/%s' % (source_path, source_name)):
 			if not restore_cover:
 				return
-		#print (target_file, source_name), source_path
+		#print (file_name, source_name), source_path
 
-		handle.download((target_file, source_name), source_path)
+		handle.download((file_name, source_name), source_path)
 
 	#从target目录恢复source文件
 	def restore_dir(self, handle, target_path, source_path, restore_cover=False, restore_time=9999999999):
 		for target_list in handle.restore_walk(target_path):
 			for target_file in target_list[2]:
-				target_child = target_list[0][len(target_path) + 1:] #子目录 
-				self.restore_file(handle, '%s/%s' % (target_list[0], target_file), '%s/%s' % (source_path, target_child), restore_cover, restore_time)
+				target_child = target_list[0][len(target_path) + 1:] #子目录
+				self.restore_file(handle, target_file, '%s/%s' % (source_path, target_child), restore_cover, restore_time)
 
 	def restore(self, handle, target, source, restore_cover=False, restore_time=9999999999):
 		if handle.restore_isdir(target):
@@ -135,6 +134,7 @@ class Backup():
 		#self.start_backup(Baidu)
 		config = self.config.get('basic', Baidu.config_type)
 		handle = Baidu(config)
+		handle.login()
 		#self.restore_file(handle, 'F:/backup/a.doc', 'F:/', restore_cover=True)
 		#self.restore_file(handle, 'F:/backup/a.doc', 'F:/', restore_cover=True, restore_time=1447127278)
 		self.restore(handle, '/backup/test', 'F:/', restore_cover=True)

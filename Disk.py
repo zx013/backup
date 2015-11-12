@@ -24,6 +24,7 @@ class Disk(Base):
 
 	#查看文件，按文件名排序
 	@classmethod
+	@error_log([[], []])
 	def show(self, target_path):
 		target_list = os.walk(target_path).next()
 		target_dir = target_list[1][::-1]
