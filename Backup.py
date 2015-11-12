@@ -117,11 +117,15 @@ class Backup():
 		else:
 			self.restore_file(handle, target, source, restore_cover, restore_time)
 
-	def run_restore(self, Drive):
-		pass
+	def run_restore(self, handle, device, restore_file, restore_cover=False, restore_time=9999999999):
+		self.restore(handle, device, restore_file, restore_cover, restore_time)
+		thread.exit_thread()
 
-	def start_restore(self, Drive):
-		pass
+	def start_restore(self, Drive, device, restore_file, restore_cover=False, restore_time=9999999999):
+		config = self.config.get('basic', Drive.config_type)
+		handle = Drive(config)
+		print handle.login()
+		thread.start_new_thread(self.run_restore, (handle, device, restore_file, restore_cover, restore_time))
 
 
 	def run(self):
@@ -138,14 +142,7 @@ class Backup():
 
 		#self.start_backup(Disk)
 		#self.start_backup(Baidu)
-		#config = self.config.get('basic', Baidu.config_type)
-		#handle = Baidu(config)
-		#handle.login()
-		config = self.config.get('basic', Disk.config_type)
-		handle = Disk(config)
-		#self.restore_file(handle, 'F:/backup/a.doc', 'F:/', restore_cover=True)
-		#self.restore_file(handle, 'F:/backup/a.doc', 'F:/', restore_cover=True, restore_time=1447127278)
-		self.restore(handle, 'F:/backup/test', 'F:/', restore_cover=True)
+		self.start_restore(Baidu, '/backup/test', 'F:/', restore_cover=True)
 
 
 if __name__ == '__main__':
