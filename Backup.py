@@ -58,7 +58,7 @@ class Backup():
 
 	#将source备份到target目录
 	def backup(self, handle, source, target):
-		if os.path.isdir(source):
+		if Disk.isdir(source):
 			target_path = '%s/%s' % (target, os.path.split(source)[1])
 			self.backup_dir(handle, source, target_path)
 		else:
@@ -81,6 +81,7 @@ class Backup():
 			devices = handle.get_device()
 			for device in devices:
 				thread.start_new_thread(self.run_backup, (handle, device))
+
 
 	#b.restore_file(dk, '/b/测试-.－。', 'C:/Users/zzy/Desktop/')
 	#restore_cover: 恢复的文件存在是否覆盖
@@ -111,11 +112,12 @@ class Backup():
 				self.restore_file(handle, '%s/%s' % (target_list[0], target_file), '%s/%s' % (source_path, target_child), restore_cover, restore_time)
 
 	def restore(self, handle, target, source, restore_cover=False, restore_time=9999999999):
-		if os.path.isdir(target):
+		if handle.restore_isdir(target):
 			source_path = '%s/%s' % (source, os.path.split(target)[1])
 			self.restore_dir(handle, target, source_path, restore_cover, restore_time)
 		else:
 			self.restore_file(handle, target, source, restore_cover, restore_time)
+
 
 	def run(self):
 		#读取配置
@@ -131,11 +133,11 @@ class Backup():
 
 		#self.start_backup(Disk)
 		#self.start_backup(Baidu)
-		config = self.config.get('basic', Disk.config_type)
-		handle = Disk(config)
+		config = self.config.get('basic', Baidu.config_type)
+		handle = Baidu(config)
 		#self.restore_file(handle, 'F:/backup/a.doc', 'F:/', restore_cover=True)
 		#self.restore_file(handle, 'F:/backup/a.doc', 'F:/', restore_cover=True, restore_time=1447127278)
-		self.restore(handle, 'F:/backup/test', 'F:/', restore_cover=True)
+		self.restore(handle, '/backup/test', 'F:/', restore_cover=True)
 
 
 if __name__ == '__main__':

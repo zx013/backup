@@ -143,7 +143,7 @@ class Baidu(Base):
 		return self.post('pan', 'quota', {'method': 'info'})
 
 	#查看目录下的文件
-	@error_log([])
+	@error_log([[], []])
 	def show(self, target_path):
 		res = self.post('pan', 'list', {'dir': target_path})
 		target_dir = [val['path'] for val in res.get('list', []) if val.get('isdir') != 0][::-1]
