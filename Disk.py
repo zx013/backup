@@ -27,8 +27,8 @@ class Disk(Base):
 	@error_log([[], []])
 	def show(self, target_path):
 		target_list = os.walk(target_path).next()
-		target_dir = target_list[1][::-1]
-		target_file = target_list[2][::-1]
+		target_dir = map(lambda x: '%s/%s' % (target_list[0], x), target_list[1][::-1])
+		target_file = map(lambda x: '%s/%s' % (target_list[0], x), target_list[2][::-1])
 		return target_dir, target_file
 
 	#创建目录

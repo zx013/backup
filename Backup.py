@@ -30,7 +30,7 @@ class Backup():
 			target_list = handle.show(target_path)[1]
 			if len(target_list):
 				source_stat = get_target_name(source_file).split('#')
-				target_stat = target_list[0].split('#')
+				target_stat = os.path.split(target_list[0])[1].split('#')
 				if source_stat[1:] == target_stat[1:]:
 					#目录不为空且最新的备份文件与源文件相同时不备份
 					return
@@ -54,7 +54,7 @@ class Backup():
 					source_name = source_file
 				if search(self.config.get('backup', source_path, 'ignore'), source_name):
 					continue
-				self.backup_file(handle, '%s/%s' % (source_list[0], source_file), '%s/%s' % (target_path, source_child))
+				self.backup_file(handle, source_file, '%s/%s' % (target_path, source_child))
 
 	#将source备份到target目录
 	def backup(self, handle, source, target):
@@ -117,6 +117,12 @@ class Backup():
 		else:
 			self.restore_file(handle, target, source, restore_cover, restore_time)
 
+	def run_restore(self, Drive):
+		pass
+
+	def start_restore(self, Drive):
+		pass
+
 
 	def run(self):
 		#读取配置
@@ -132,12 +138,14 @@ class Backup():
 
 		#self.start_backup(Disk)
 		#self.start_backup(Baidu)
-		config = self.config.get('basic', Baidu.config_type)
-		handle = Baidu(config)
-		handle.login()
+		#config = self.config.get('basic', Baidu.config_type)
+		#handle = Baidu(config)
+		#handle.login()
+		config = self.config.get('basic', Disk.config_type)
+		handle = Disk(config)
 		#self.restore_file(handle, 'F:/backup/a.doc', 'F:/', restore_cover=True)
 		#self.restore_file(handle, 'F:/backup/a.doc', 'F:/', restore_cover=True, restore_time=1447127278)
-		self.restore(handle, '/backup/test', 'F:/', restore_cover=True)
+		self.restore(handle, 'F:/backup/test', 'F:/', restore_cover=True)
 
 
 if __name__ == '__main__':
