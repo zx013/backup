@@ -1,7 +1,41 @@
 #:kivy 1.9.0
 
 <BaseLabel>:
-	color: .8,.9,0,1
-	font_size: 32
-	size_hint: .4, .3
+	color: 0, 0, 0, 1
+	font_size: 16
+	text: 'abc'
+	y: 10
+	canvas.after:
+		Color:
+			rgba: 0, 1, 1, .2
+		Rectangle:
+			pos: self.pos
+			size: self.size
+		Color:
+			rgba: .6, .7, 0, 1
+		Line:
+			rectangle: self.x, self.y, self.width, self.height
 
+<FileLabel>:
+	rows: 1
+	canvas.before:
+		Color:
+			rgba: 1, 1, 1, 1
+		Rectangle:
+			pos: self.pos
+			size: self.size
+	canvas.after:
+		Color:
+			rgba: 0, .5, 0, 1
+		Line:
+			rectangle: self.x, self.y, self.width, self.height
+
+<FileList>:
+	cols: 1
+	#size: (100, len(self.children) * 10)
+	size_hint: .6, .2
+	canvas.after:
+		Color:
+			rgba: 0, 1, 1, 1
+		Line:
+			rectangle: self.x, self.y, self.width, self.height
