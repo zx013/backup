@@ -6,6 +6,7 @@ from kivy.app import App
 from kivy.uix.label import Label
 from kivy.uix.gridlayout import GridLayout
 
+from kivy.animation import Animation
 from kivy.logger import Logger
 
 from Tools import apply_insert, apply_delete, apply_walk, insert_args, delete_args
@@ -58,12 +59,22 @@ class FileList(GridLayout):
 	def show(self):
 		pass
 
+	def on_touch_down(self, touch):
+		if touch.is_mouse_scrolling:
+			if touch.button == 'scrollup':
+				self.pos_hint['top'] += .1
+				animation = Animation(pos=(self.x, self.y + 10))
+			elif touch.button == 'scrolldown':
+				self.pos_hint['top'] -= .1
+				animation = Animation(pos=(self.x, self.y - 10))
+			animation.start(self)
+
+
 class FileListApp(App):
 	def build(self):
 		f = FileList()
-		f.insert(a=[range(4)] * 3)
+		f.insert(a=[range(4)] * 23)
 		f.update(text=[['a', 'b', 'a', 'd', 'ab']] * len(f.children))
-		#f.update(size_hint_y=[[.1, .2, .3, .4]] * len(f.children))
 		f.update(size_hint_x=[[.2, .3, .1, .4]] * len(f.children))
 		f.delete(text=[[('a', 'b'), ('a', 'c'), 'd', 'e']] * len(f.children))
 		return f
