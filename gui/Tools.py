@@ -10,7 +10,7 @@ def apply_insert(widget_class):
 		@wraps(func)
 		def run(self, *args, **kwargs):
 			ret = func(self, *args, **kwargs)
-			for kwarg in unpack(**kwargs): #根据提供的参数创建子控件
+			for kwarg in unpack(**kwargs): #根据提供的参数插入子控件
 				widget = widget_class()
 				self.add_widget(widget)
 				widget_func = getattr(widget, func.__name__, None)
@@ -26,7 +26,11 @@ def apply_walk(func):
 	@wraps(func)
 	def run(self, *args, **kwargs):
 		ret = func(self, *args, **kwargs)
-		for child, kwarg in zip(self.children[::-1], unpack(**kwargs)): #children的顺序是相反的
+		unpack_child = self.children[::-1]
+		unpack_kwargs = unpack(**kwargs)
+		if len(unpack_kwargs) > len(unpack_child):
+			apply_args(self, **unpack_kwargs[-1])
+		for child, kwarg in zip(unpack_child, unpack_kwargs): #children的顺序是相反的
 			child_func = getattr(child, func.__name__, None)
 			if child_func: #子控件中存在该方法
 				child_func(**kwarg)
@@ -34,11 +38,6 @@ def apply_walk(func):
 	return run
 
 #将**kwargs中的数据转换为类中的属性
-def apply_args(func):
-	@wraps(func)
-	def run(self, *args, **kwargs):
-		ret = func(self, *args, **kwargs)
-		for key, value in kwargs.items():
-				setattr(self, key, value)
-		return ret
-	return run
+def apply_args(self, **kwargs):
+	for key, value in kwargs.items():
+		setattr(self, key, value)
