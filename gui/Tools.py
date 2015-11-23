@@ -1,8 +1,25 @@
 #-*- coding:utf-8 -*-
 from functools import wraps
 
+
 def unpack(**kwargs):
 	return map(dict, zip(*[[(k, v) for v in vs] for k, vs in kwargs.items()]))
+
+def apply_insert(widget_class):
+	def run_func(func):
+		@wraps(func)
+		def run(self, *args, **kwargs):
+			ret = func(self, *args, **kwargs)
+			for kwarg in unpack(**kwargs): #根据提供的参数创建子控件
+				widget = widget_class()
+				self.add_widget(widget)
+				widget_func = getattr(widget, func.__name__, None)
+				if widget_func:
+					widget_func(**kwarg)
+			return ret
+		return run
+	return run_func
+
 
 #将**kwargs依次应用到children中
 def apply_walk(func):
@@ -10,8 +27,9 @@ def apply_walk(func):
 	def run(self, *args, **kwargs):
 		ret = func(self, *args, **kwargs)
 		for child, kwarg in zip(self.children[::-1], unpack(**kwargs)): #children的顺序是相反的
-			if getattr(child, func.__name__, None): #子控件中存在该方法
-				eval('child.%s' % func.__name__)(**kwarg)
+			child_func = getattr(child, func.__name__, None)
+			if child_func: #子控件中存在该方法
+				child_func(**kwarg)
 		return ret
 	return run
 

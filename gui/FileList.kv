@@ -32,8 +32,8 @@
 
 <FileList>:
 	cols: 1
-	#size: (100, len(self.children) * 10)
-	size_hint: .6, .2
+	pos_hint: {'x': .1, 'y': .1}
+	size_hint: .6, len(self.children) / 15.0
 	canvas.after:
 		Color:
 			rgba: 0, 1, 1, 1
