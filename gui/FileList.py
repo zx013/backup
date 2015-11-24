@@ -6,13 +6,25 @@ from kivy.app import App
 from kivy.uix.label import Label
 from kivy.uix.gridlayout import GridLayout
 
+from kivy.graphics import Color
+from kivy.graphics import Line
+from kivy.graphics import Rectangle
+
 from kivy.animation import Animation
 from kivy.logger import Logger
 
-from Tools import apply_insert, apply_delete, apply_update, insert_args, delete_args
+from Tools import *
 
 
-class BaseLabel(Label):
+class AttributeLabel(Label):
+	def draw(self):
+		with self.canvas:
+			Color(rgba=(.6, .7, 0, 1))
+			Line(rectangle=(self.x, self.y, self.width, self.height))
+
+	def refresh(self):
+		pass
+
 	def insert(self, **kwargs):
 		insert_args(self, **kwargs)
 
@@ -22,10 +34,32 @@ class BaseLabel(Label):
 	def update(self, **kwargs):
 		insert_args(self, **kwargs)
 
+
 class FileLabel(GridLayout):
-	@apply_insert(BaseLabel)
-	def insert(self, **kwargs):
+	@apply_walk(True)
+	def draw(self):
+		with self.canvas:
+			Color(rgba=(1, 1, 1, 1))
+			Rectangle(pos=self.pos, size=self.size)
+			Color(rgba=(0, .5, 0, 1))
+			Line(rectangle=(self.x, self.y, self.width, self.height))
+			if self.select:
+				Color(rgba=(0, 1, 1, .3))
+			else:
+				Color(rgba=(0, 1, 1, 0))
+			Rectangle(pos=self.pos, size=self.size)
+
+	@apply_canvas
+	def refresh(self):
 		pass
+
+	def update_rect(self):
+		self.rect.pos = self.pos
+		self.rect.size = self.size
+
+	@apply_insert(AttributeLabel)
+	def insert(self, **kwargs):
+		self.select = False
 
 	@apply_delete
 	def delete(self, **kwargs):
@@ -35,7 +69,30 @@ class FileLabel(GridLayout):
 	def update(self, **kwargs):
 		pass
 
-class FileList(GridLayout):
+	def on_touch_down(self, touch):
+		#如果选中则直接打开选项栏
+		#如果未选中则清空其它选项并选择该项，然后打开选项栏
+		if self.collide_point(touch.x, touch.y):
+			if touch.button == 'left':
+				self.select = not self.select
+			elif touch.button == 'right':
+				if not self.select:
+					for child in self.parent.children:
+						if child.select:
+							child.select = False
+					self.select = True
+				#open_option()
+			#if touch.button in ['left', 'right']:
+				#self.draw()
+			#self.refresh()
+
+
+class ListLabel(GridLayout):
+	@apply_walk(True)
+	def draw(self):
+		with self.canvas:
+			pass
+
 	@apply_insert(FileLabel)
 	def insert(self, **kwargs):
 		pass
@@ -49,33 +106,36 @@ class FileList(GridLayout):
 		pass
 
 	def on_touch_down(self, touch):
-		step = .1
-		if touch.is_mouse_scrolling:
-			if touch.button == 'scrollup':
-				up = len(self.children) / 15.0
-				if self.pos_hint['top'] < up:
-					self.pos_hint['top'] += step
-				else:
-					self.pos_hint['top'] = up + step
-				animation = Animation(pos=(self.x, self.y + 10))
-				animation.start(self)
-			elif touch.button == 'scrolldown':
-				down = 1.0
-				if self.pos_hint['top'] > down:
-					self.pos_hint['top'] -= step
-				else:
-					self.pos_hint['top'] = down - step
-				animation = Animation(pos=(self.x, self.y - 10))
-				animation.start(self)
+		if self.collide_point(touch.x, touch.y):
+			if touch.is_mouse_scrolling:
+				step = .1
+				if touch.button == 'scrollup':
+					up = len(self.children) / 15.0
+					if self.pos_hint['top'] < up:
+						self.pos_hint['top'] += step
+					else:
+						self.pos_hint['top'] = up + step
+					animation = Animation(pos=(self.x, self.y + 10))
+					animation.start(self)
+				elif touch.button == 'scrolldown':
+					down = 1.0
+					if self.pos_hint['top'] > down:
+						self.pos_hint['top'] -= step
+					else:
+						self.pos_hint['top'] = down - step
+					animation = Animation(pos=(self.x, self.y - 10))
+					animation.start(self)
+		super(ListLabel, self).on_touch_down(touch)
 
 
 class FileListApp(App):
 	def build(self):
-		f = FileList()
+		f = ListLabel()
 		f.insert(a=[range(4)] * 23)
 		f.update(text=[['a', 'b', 'a', 'd', 'ab']] * len(f.children))
 		f.update(size_hint_x=[[.2, .3, .1, .4]] * len(f.children))
 		#f.delete(text=[[('a', 'b'), ('a', 'c'), 'd', 'e']] * len(f.children))
+		#f.draw()
 		return f
 
 if __name__ == '__main__':
