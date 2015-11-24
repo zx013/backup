@@ -9,7 +9,7 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.animation import Animation
 from kivy.logger import Logger
 
-from Tools import apply_insert, apply_delete, apply_walk, insert_args, delete_args
+from Tools import apply_insert, apply_delete, apply_update, insert_args, delete_args
 
 
 class BaseLabel(Label):
@@ -22,9 +22,6 @@ class BaseLabel(Label):
 	def update(self, **kwargs):
 		insert_args(self, **kwargs)
 
-	def show(self):
-		pass
-
 class FileLabel(GridLayout):
 	@apply_insert(BaseLabel)
 	def insert(self, **kwargs):
@@ -34,12 +31,8 @@ class FileLabel(GridLayout):
 	def delete(self, **kwargs):
 		pass
 
-	@apply_walk
+	@apply_update
 	def update(self, **kwargs):
-		pass
-
-	@apply_walk
-	def show(self):
 		pass
 
 class FileList(GridLayout):
@@ -51,23 +44,29 @@ class FileList(GridLayout):
 	def delete(self, **kwargs):
 		pass
 
-	@apply_walk
+	@apply_update
 	def update(self, **kwargs):
 		pass
 
-	@apply_walk
-	def show(self):
-		pass
-
 	def on_touch_down(self, touch):
+		step = .1
 		if touch.is_mouse_scrolling:
 			if touch.button == 'scrollup':
-				self.pos_hint['top'] += .1
+				up = len(self.children) / 15.0
+				if self.pos_hint['top'] < up:
+					self.pos_hint['top'] += step
+				else:
+					self.pos_hint['top'] = up + step
 				animation = Animation(pos=(self.x, self.y + 10))
+				animation.start(self)
 			elif touch.button == 'scrolldown':
-				self.pos_hint['top'] -= .1
+				down = 1.0
+				if self.pos_hint['top'] > down:
+					self.pos_hint['top'] -= step
+				else:
+					self.pos_hint['top'] = down - step
 				animation = Animation(pos=(self.x, self.y - 10))
-			animation.start(self)
+				animation.start(self)
 
 
 class FileListApp(App):
@@ -76,7 +75,7 @@ class FileListApp(App):
 		f.insert(a=[range(4)] * 23)
 		f.update(text=[['a', 'b', 'a', 'd', 'ab']] * len(f.children))
 		f.update(size_hint_x=[[.2, .3, .1, .4]] * len(f.children))
-		f.delete(text=[[('a', 'b'), ('a', 'c'), 'd', 'e']] * len(f.children))
+		#f.delete(text=[[('a', 'b'), ('a', 'c'), 'd', 'e']] * len(f.children))
 		return f
 
 if __name__ == '__main__':

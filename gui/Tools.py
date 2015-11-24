@@ -42,7 +42,7 @@ def apply_delete(func):
 
 
 #将**kwargs依次应用到children中
-def apply_walk(func):
+def apply_update(func):
 	@wraps(func)
 	def run(self, *args, **kwargs):
 		ret = func(self, *args, **kwargs)
