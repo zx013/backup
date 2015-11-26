@@ -17,14 +17,6 @@ from Tools import *
 
 
 class AttributeLabel(Label):
-	def draw(self):
-		with self.canvas:
-			Color(rgba=(.6, .7, 0, 1))
-			Line(rectangle=(self.x, self.y, self.width, self.height))
-
-	def refresh(self):
-		pass
-
 	def insert(self, **kwargs):
 		insert_args(self, **kwargs)
 
@@ -36,18 +28,23 @@ class AttributeLabel(Label):
 
 
 class FileLabel(GridLayout):
-	@apply_walk(True)
-	def draw(self):
-		with self.canvas:
-			if self.select:
+	select = False
+	rect = None
+
+	def selected(self):
+		if not self.rect:
+			with self.canvas:
 				Color(rgba=(0, 1, 1, .3))
-			else:
-				Color(rgba=(0, 1, 1, 0))
-			self.rect = Rectangle(pos=self.pos, size=self.size)
+				self.rect = Rectangle(size=self.size)
+
+		if self.select:
+			self.rect.pos = self.pos
+		else:
+			self.rect.pos = -1000, -1000
 
 	@apply_insert(AttributeLabel)
 	def insert(self, **kwargs):
-		self.select = False
+		pass
 
 	@apply_delete
 	def delete(self, **kwargs):
@@ -63,23 +60,19 @@ class FileLabel(GridLayout):
 		if self.collide_point(touch.x, touch.y):
 			if touch.button == 'left':
 				self.select = not self.select
+				self.selected()
 			elif touch.button == 'right':
 				if not self.select:
 					for child in self.parent.children:
 						if child.select:
 							child.select = False
+							child.selected()
 					self.select = True
-				#open_option()
-			if touch.button in ['left', 'right']:
-				self.draw()
+				self.selected()
+				
 
 
 class ListLabel(GridLayout):
-	@apply_walk(True)
-	def draw(self):
-		with self.canvas:
-			pass
-
 	@apply_insert(FileLabel)
 	def insert(self, **kwargs):
 		pass
@@ -97,8 +90,11 @@ class DisplayScreen(ScrollView):
 	def build(self):
 		f = ListLabel()
 		self.add_widget(f)
-		f.insert(a=[range(4)] * 23)
-		f.update(text=[['a', 'b', 'a', 'd', 'ab']] * len(f.children))
+		f.insert(a=[range(4)] * 28)
+		t = []
+		for i in range(len(f.children)):
+			t.append(['a%s' % i, 'b', 'a', 'd', 'ab'])
+		f.update(text=t)
 		f.update(size_hint_x=[[.2, .3, .1, .4]] * len(f.children))
 		#f.delete(text=[[('a', 'b'), ('a', 'c'), 'd', 'e']] * len(f.children))
 		#f.draw()
