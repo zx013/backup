@@ -5,12 +5,12 @@ kivy.require('1.9.0')
 from kivy.app import App
 from kivy.uix.label import Label
 from kivy.uix.gridlayout import GridLayout
+from kivy.uix.screenmanager import ScreenManager, Screen
 
 from kivy.graphics import Color
 from kivy.graphics import Line
 from kivy.graphics import Rectangle
 
-from kivy.animation import Animation
 from kivy.logger import Logger
 
 from Tools import *
@@ -53,10 +53,6 @@ class FileLabel(GridLayout):
 	def refresh(self):
 		pass
 
-	def update_rect(self):
-		self.rect.pos = self.pos
-		self.rect.size = self.size
-
 	@apply_insert(AttributeLabel)
 	def insert(self, **kwargs):
 		self.select = False
@@ -93,6 +89,9 @@ class ListLabel(GridLayout):
 		with self.canvas:
 			pass
 
+	def move(self, x, y):
+		pass
+
 	@apply_insert(FileLabel)
 	def insert(self, **kwargs):
 		pass
@@ -110,33 +109,30 @@ class ListLabel(GridLayout):
 			if touch.is_mouse_scrolling:
 				step = .1
 				if touch.button == 'scrollup':
-					up = len(self.children) / 15.0
-					if self.pos_hint['top'] < up:
-						self.pos_hint['top'] += step
-					else:
-						self.pos_hint['top'] = up + step
-					animation = Animation(pos=(self.x, self.y + 10))
-					animation.start(self)
+					if self.y < .1 * self.parent.height:
+						self.y += 30
 				elif touch.button == 'scrolldown':
-					down = 1.0
-					if self.pos_hint['top'] > down:
-						self.pos_hint['top'] -= step
-					else:
-						self.pos_hint['top'] = down - step
-					animation = Animation(pos=(self.x, self.y - 10))
-					animation.start(self)
+					if self.top > .9 * self.parent.height:
+						self.y -= 30
 		super(ListLabel, self).on_touch_down(touch)
 
 
-class FileListApp(App):
+class DisplayScreen(Screen):
 	def build(self):
 		f = ListLabel()
+		self.add_widget(f)
 		f.insert(a=[range(4)] * 23)
 		f.update(text=[['a', 'b', 'a', 'd', 'ab']] * len(f.children))
 		f.update(size_hint_x=[[.2, .3, .1, .4]] * len(f.children))
 		#f.delete(text=[[('a', 'b'), ('a', 'c'), 'd', 'e']] * len(f.children))
 		#f.draw()
-		return f
+
+
+class FileListApp(App):
+	def build(self):
+		ds = DisplayScreen()
+		ds.build()
+		return ds
 
 if __name__ == '__main__':
 	FileListApp().run()

@@ -25,8 +25,9 @@
 
 <ListLabel>:
 	cols: 1
-	pos_hint: {'x': .1, 'top': .9}
-	size_hint: .6, len(self.children) / 15.0
+	pos_hint: {'x': .1}
+	top: .9 * self.height
+	size_hint_x: .6
 	canvas:
 		Color:
 			rgba: 0, 1, 1, 1
