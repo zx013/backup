@@ -25,11 +25,12 @@
 
 <ListLabel>:
 	cols: 1
-	pos_hint: {'x': .1}
-	top: .9 * self.height
-	size_hint_x: .6
-	canvas:
-		Color:
-			rgba: 0, 1, 1, 1
-		Line:
-			rectangle: self.x, self.y, self.width, self.height
+	size_hint: None, None
+	size: 800, len(self.children) * 20
+
+
+<DisplayScreen>:
+	size_hint: None, None
+	size: 600, 400
+	pos_hint: {'x': .05, 'y': .05}
+	#do_scroll_x: False

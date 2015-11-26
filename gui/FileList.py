@@ -5,7 +5,7 @@ kivy.require('1.9.0')
 from kivy.app import App
 from kivy.uix.label import Label
 from kivy.uix.gridlayout import GridLayout
-from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.uix.scrollview import ScrollView 
 
 from kivy.graphics import Color
 from kivy.graphics import Line
@@ -39,19 +39,11 @@ class FileLabel(GridLayout):
 	@apply_walk(True)
 	def draw(self):
 		with self.canvas:
-			Color(rgba=(1, 1, 1, 1))
-			Rectangle(pos=self.pos, size=self.size)
-			Color(rgba=(0, .5, 0, 1))
-			Line(rectangle=(self.x, self.y, self.width, self.height))
 			if self.select:
 				Color(rgba=(0, 1, 1, .3))
 			else:
 				Color(rgba=(0, 1, 1, 0))
-			Rectangle(pos=self.pos, size=self.size)
-
-	@apply_canvas
-	def refresh(self):
-		pass
+			self.rect = Rectangle(pos=self.pos, size=self.size)
 
 	@apply_insert(AttributeLabel)
 	def insert(self, **kwargs):
@@ -78,9 +70,8 @@ class FileLabel(GridLayout):
 							child.select = False
 					self.select = True
 				#open_option()
-			#if touch.button in ['left', 'right']:
-				#self.draw()
-			#self.refresh()
+			if touch.button in ['left', 'right']:
+				self.draw()
 
 
 class ListLabel(GridLayout):
@@ -88,9 +79,6 @@ class ListLabel(GridLayout):
 	def draw(self):
 		with self.canvas:
 			pass
-
-	def move(self, x, y):
-		pass
 
 	@apply_insert(FileLabel)
 	def insert(self, **kwargs):
@@ -104,20 +92,8 @@ class ListLabel(GridLayout):
 	def update(self, **kwargs):
 		pass
 
-	def on_touch_down(self, touch):
-		if self.collide_point(touch.x, touch.y):
-			if touch.is_mouse_scrolling:
-				step = .1
-				if touch.button == 'scrollup':
-					if self.y < .1 * self.parent.height:
-						self.y += 30
-				elif touch.button == 'scrolldown':
-					if self.top > .9 * self.parent.height:
-						self.y -= 30
-		super(ListLabel, self).on_touch_down(touch)
 
-
-class DisplayScreen(Screen):
+class DisplayScreen(ScrollView):
 	def build(self):
 		f = ListLabel()
 		self.add_widget(f)
@@ -126,6 +102,7 @@ class DisplayScreen(Screen):
 		f.update(size_hint_x=[[.2, .3, .1, .4]] * len(f.children))
 		#f.delete(text=[[('a', 'b'), ('a', 'c'), 'd', 'e']] * len(f.children))
 		#f.draw()
+		f.bind(minimum_height=f.setter('height'))
 
 
 class FileListApp(App):

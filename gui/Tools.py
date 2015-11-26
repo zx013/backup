@@ -87,23 +87,3 @@ def delete_args(self, **kwargs):
 				return
 		except:
 			pass
-
-
-def walk_canvas(canvas):
-	for child in canvas.children:
-		if type(child) in [kivy.graphics.instructions.Canvas, kivy.graphics.instructions.CanvasBase, kivy.graphics.context_instructions.BindTexture, kivy.graphics.context_instructions.Color]: continue
-		elif type(child) in [kivy.graphics.vertex_instructions.Line, kivy.graphics.vertex_instructions.Rectangle]:
-			yield child
-
-def apply_canvas(func):
-	@wraps(func)
-	def run(self, *args, **kwargs):
-		ret = func(self, *args, **kwargs)
-		for child in walk_canvas(self.canvas):
-			if type(child) in [kivy.graphics.vertex_instructions.Line]:
-				pass
-			elif type(child) in [kivy.graphics.vertex_instructions.Rectangle]:
-				child.pos = self.pos
-				child.size = self.size
-		return ret
-	return run
