@@ -12,16 +12,9 @@
 
 <FileLabel>:
 	rows: 1
-	canvas:
-		Color:
-			rgba: 1, 1, 1, 1
-		Rectangle:
-			pos: self.pos
-			size: self.size
-		Color:
-			rgba: 0, .5, 0, 1
-		Line:
-			rectangle: self.x, self.y, self.width, self.height
+
+<ClickMenu>:
+	Label:
 
 <ListLabel>:
 	cols: 1
@@ -30,7 +23,12 @@
 
 
 <DisplayScreen>:
-	size_hint: None, None
-	size: 600, 400
-	pos_hint: {'x': .05, 'y': .05}
-	#do_scroll_x: False
+	size_hint: .6, .9
+	pos_hint: {'x': .05, 'top': .95}
+	do_scroll: True, True
+	canvas:
+		Color:
+			rgba: 1, 1, 1, 1
+		Rectangle:
+			pos: self.pos
+			size: self.size

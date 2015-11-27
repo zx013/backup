@@ -5,11 +5,7 @@ kivy.require('1.9.0')
 from kivy.app import App
 from kivy.uix.label import Label
 from kivy.uix.gridlayout import GridLayout
-from kivy.uix.scrollview import ScrollView 
-
-from kivy.graphics import Color
-from kivy.graphics import Line
-from kivy.graphics import Rectangle
+from kivy.uix.scrollview import ScrollView
 
 from kivy.logger import Logger
 
@@ -27,21 +23,7 @@ class AttributeLabel(Label):
 		insert_args(self, **kwargs)
 
 
-class FileLabel(GridLayout):
-	select = False
-	rect = None
-
-	def selected(self):
-		if not self.rect:
-			with self.canvas:
-				Color(rgba=(0, 1, 1, .3))
-				self.rect = Rectangle(size=self.size)
-
-		if self.select:
-			self.rect.pos = self.pos
-		else:
-			self.rect.pos = -1000, -1000
-
+class FileLabel(Back_Ground, GridLayout):
 	@apply_insert(AttributeLabel)
 	def insert(self, **kwargs):
 		pass
@@ -59,17 +41,37 @@ class FileLabel(GridLayout):
 		#如果未选中则清空其它选项并选择该项，然后打开选项栏
 		if self.collide_point(touch.x, touch.y):
 			if touch.button == 'left':
-				self.select = not self.select
-				self.selected()
+				if self.select == 0 or self.select == 1:
+					self.selected(2)
+				elif self.select == 2:
+					self.selected(0)
 			elif touch.button == 'right':
 				if not self.select:
 					for child in self.parent.children:
 						if child.select:
-							child.select = False
-							child.selected()
-					self.select = True
-				self.selected()
-				
+							child.selected(0)
+					self.selected(2)
+
+	#def on_touch_move(self, touch):
+	#	Logger.info('on_touch_move')
+	#	if self.collide_point(touch.x, touch.y):
+	#		if self.select == 0:
+	#			self.selected(1)
+
+
+class AttributeMenu(GridLayout):
+	select = False
+
+
+class OptionMenu(GridLayout):
+	select = False
+
+
+class ClickMenu(GridLayout):
+	select = False
+
+	def __init__(self, *args, **kwargs):
+		super(ClickMenu, self).__init__(*args, **kwargs)
 
 
 class ListLabel(GridLayout):
@@ -90,7 +92,7 @@ class DisplayScreen(ScrollView):
 	def build(self):
 		f = ListLabel()
 		self.add_widget(f)
-		f.insert(a=[range(4)] * 28)
+		f.insert(a=[range(4)] * 32)
 		t = []
 		for i in range(len(f.children)):
 			t.append(['a%s' % i, 'b', 'a', 'd', 'ab'])
