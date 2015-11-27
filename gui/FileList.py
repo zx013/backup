@@ -59,17 +59,14 @@ class FileLabel(Back_Ground, GridLayout):
 	#			self.selected(1)
 
 
-class AttributeMenu(GridLayout):
-	select = False
+class AttributeMenu(Back_Ground, GridLayout):
+	pass
 
-
-class OptionMenu(GridLayout):
-	select = False
+class OptionMenu(Back_Ground, GridLayout):
+	pass
 
 
 class ClickMenu(GridLayout):
-	select = False
-
 	def __init__(self, *args, **kwargs):
 		super(ClickMenu, self).__init__(*args, **kwargs)
 
