@@ -1,11 +1,7 @@
 #-*- coding:utf-8 -*-
 from functools import wraps
 
-from kivy.graphics import Color
-from kivy.graphics import Line
-from kivy.graphics import Rectangle
-
-from kivy.logger import Logger
+from kivy.properties import NumericProperty
 
 
 def apply_walk(before):
@@ -93,37 +89,15 @@ def delete_args(self, **kwargs):
 		except:
 			pass
 
-
-class Back_Ground:
-	select_init = False
+class BackGround:
 	select = 0
+	transparent = NumericProperty(0)
 
 	def selected(self, select):
-		if not self.select_init:
-			self.back_color1 = Color(rgba=(1, 1, 1, 1))
-			self.back_rect1 = Rectangle(pos=self.pos, size=self.size)
-			self.back_color2 = Color(rgba=(0, 1, 1, .1))
-			self.back_rect2 = Rectangle(pos=self.pos, size=self.size)
-			self.back_color3 = Color(rgba=(0, 1, 1, .3))
-			self.back_rect3 = Rectangle(pos=self.pos, size=self.size)
-			self.select_init = True
-		else:
-			self.canvas.before.remove(self.back_color1)
-			self.canvas.before.remove(self.back_rect1)
-			if self.select == 1:
-				self.canvas.before.remove(self.back_color2)
-				self.canvas.before.remove(self.back_rect2)
-			elif self.select == 2:
-				self.canvas.before.remove(self.back_color3)
-				self.canvas.before.remove(self.back_rect3)
-			
 		self.select = select
-
-		self.canvas.before.add(self.back_color1)
-		self.canvas.before.add(self.back_rect1)
-		if self.select == 1:
-			self.canvas.before.add(self.back_color2)
-			self.canvas.before.add(self.back_rect2)
-		elif self.select == 2:
-			self.canvas.before.add(self.back_color3)
-			self.canvas.before.add(self.back_rect3)
+		if select == 0:
+			self.transparent = 0
+		elif select == 1:
+			self.transparent = .15
+		elif select == 2:
+			self.transparent = .4

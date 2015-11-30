@@ -7,6 +7,8 @@ from kivy.uix.label import Label
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.scrollview import ScrollView
 
+from HoverBehavior import HoverBehavior
+
 from kivy.logger import Logger
 
 from Tools import *
@@ -23,7 +25,7 @@ class AttributeLabel(Label):
 		insert_args(self, **kwargs)
 
 
-class FileLabel(Back_Ground, GridLayout):
+class FileLabel(BackGround, GridLayout, HoverBehavior):
 	@apply_insert(AttributeLabel)
 	def insert(self, **kwargs):
 		pass
@@ -46,23 +48,25 @@ class FileLabel(Back_Ground, GridLayout):
 				elif self.select == 2:
 					self.selected(0)
 			elif touch.button == 'right':
-				if not self.select:
+				if self.select == 0 or self.select == 1:
 					for child in self.parent.children:
 						if child.select:
 							child.selected(0)
 					self.selected(2)
 
-	#def on_touch_move(self, touch):
-	#	Logger.info('on_touch_move')
-	#	if self.collide_point(touch.x, touch.y):
-	#		if self.select == 0:
-	#			self.selected(1)
+	def on_enter(self, *args):
+		if self.select == 0:
+			self.selected(1)
+
+	def on_leave(self, *args):
+		if self.select == 1:
+			self.selected(0)
 
 
-class AttributeMenu(Back_Ground, GridLayout):
+class AttributeMenu(BackGround, GridLayout):
 	pass
 
-class OptionMenu(Back_Ground, GridLayout):
+class OptionMenu(BackGround, GridLayout):
 	pass
 
 
