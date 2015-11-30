@@ -89,6 +89,10 @@ def delete_args(self, **kwargs):
 		except:
 			pass
 
+#kv文件中根据transparent设置可见度
+#selected函数实现了select（选择类型）到可见度的转换
+#select类型
+#0未选中，1鼠标滑过，2选中
 class BackGround:
 	select = 0
 	transparent = NumericProperty(0)

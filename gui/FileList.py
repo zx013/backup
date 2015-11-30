@@ -7,7 +7,9 @@ from kivy.uix.label import Label
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.scrollview import ScrollView
 
-from HoverBehavior import HoverBehavior
+from modalview import ModalView
+from hoverbehavior import HoverBehavior
+import time
 
 from kivy.logger import Logger
 
@@ -37,7 +39,7 @@ class FileLabel(BackGround, GridLayout, HoverBehavior):
 	@apply_update
 	def update(self, **kwargs):
 		pass
-
+  	
 	def on_touch_down(self, touch):
 		#如果选中则直接打开选项栏
 		#如果未选中则清空其它选项并选择该项，然后打开选项栏
@@ -66,9 +68,8 @@ class FileLabel(BackGround, GridLayout, HoverBehavior):
 class AttributeMenu(BackGround, GridLayout):
 	pass
 
-class OptionMenu(BackGround, GridLayout):
+class OptionMenu(BackGround, ModalView):
 	pass
-
 
 class ClickMenu(GridLayout):
 	def __init__(self, *args, **kwargs):
@@ -88,6 +89,29 @@ class ListLabel(GridLayout):
 	def update(self, **kwargs):
 		pass
 
+	mv = None
+	def open_menu(self, x, y):
+		#om = OptionMenu(pos=(0, 0), size=(100, 100))
+		Logger.info(str((x, y)))
+		if not self.mv:
+			self.mv = OptionMenu()
+		self.mv.pos=(x, y)
+		self.mv.open()
+		Logger.info(str([child.select for child in self.children]))
+
+	def close_menu(self):
+		if self.mv:
+			self.mv.dismiss(animation=False)
+
+	def on_touch_down(self, touch):
+		super(ListLabel, self).on_touch_down(touch) #先调用子节点的事件更新select值
+		if self.collide_point(touch.x, touch.y):
+			if touch.button == 'left':
+				self.close_menu()
+			elif touch.button == 'right':
+				self.close_menu()
+				self.open_menu(touch.x, touch.y)
+		
 
 class DisplayScreen(ScrollView):
 	def build(self):

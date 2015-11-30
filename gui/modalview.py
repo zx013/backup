@@ -234,8 +234,6 @@ class ModalView(GridLayout):
             self._window = None
             self._window = _window
 
-    
-
     def on__anim_alpha(self, instance, value):
         if value == 0 and self._window is not None:
             self._real_remove_widget()

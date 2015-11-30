@@ -20,10 +20,12 @@
 			size: self.size
 
 <AttributeMenu>:
-	cols: 1
+	rows: 1
 
 <OptionMenu>:
 	cols: 1
+	size_hint: .5, .3
+	background_color: [0, 0, 0, 0]
 
 <ClickMenu>:
 	cols: 1
@@ -37,7 +39,7 @@
 <DisplayScreen>:
 	size_hint: .6, .9
 	pos_hint: {'x': .05, 'top': .95}
-	do_scroll: True, True
+	do_scroll: False, True
 	canvas:
 		Color:
 			rgba: 1, 1, 1, 1
