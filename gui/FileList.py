@@ -7,15 +7,13 @@ from kivy.uix.label import Label
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.scrollview import ScrollView
 
-from clickmenu import ClickMenu
+from clickmenu import BackGround, OptionMenu
 from hoverbehavior import HoverBehavior
 import time
 
 from kivy.logger import Logger
 from Tools import *
 
-from kivy.lang import Builder
-Builder.load_file('clickmenu.kv')
 
 class AttributeLabel(Label):
 	def insert(self, **kwargs):
@@ -58,19 +56,14 @@ class FileLabel(BackGround, GridLayout, HoverBehavior):
 					self.selected(2)
 
 	def on_enter(self, *args):
-		if self.select == 0:
+		if self.parent.parent.optionmenu.status:
+			return
+		if self.select == 0:	
 			self.selected(1)
 
 	def on_leave(self, *args):
 		if self.select == 1:
 			self.selected(0)
-
-
-class AttributeMenu(BackGround, GridLayout):
-	pass
-
-class OptionMenu(BackGround, ClickMenu):
-	pass
 
 
 class ListLabel(GridLayout):
@@ -100,25 +93,21 @@ class DisplayScreen(ScrollView):
 		#f.delete(text=[[('a', 'b'), ('a', 'c'), 'd', 'e']] * len(f.children))
 		#f.draw()
 		f.bind(minimum_height=f.setter('height'))
+		self.optionmenu = OptionMenu()
+		self.optionmenu.insert(text=['aaa', 'bbb', 'ccc', 'ddd'])
 
 	optionmenu = None
-	def open_menu(self, x, y):
-		Logger.info(str((x, y)) + ', ' + str(self.pos))
-		if not self.optionmenu:
-			self.optionmenu = OptionMenu()
-		self.optionmenu.pos=(x, y)
-		self.optionmenu.open()
-
-	def close_menu(self):
-		if self.optionmenu:
-			self.optionmenu.dismiss(animation=False)
 
 	def on_touch_down(self, touch):
-		super(DisplayScreen, self).on_touch_down(touch) #先调用子节点的事件更新select值
-		self.close_menu()
+		#未打开菜单或不是
+		if not self.optionmenu.status or touch.button not in ['scrollup', 'scrolldown', 'middle']:
+			super(DisplayScreen, self).on_touch_down(touch) #先调用子节点的事件更新select值
+		#Logger.info(str(touch.button))
+		if touch.button not in ['scrollup', 'scrolldown', 'middle']:
+			self.optionmenu.close()
 		if self.collide_point(touch.x, touch.y):
 			if touch.button == 'right':
-				self.open_menu(touch.x, touch.y)
+				self.optionmenu.open(touch.x, touch.y)
 
 
 class FileListApp(App):

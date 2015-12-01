@@ -14,21 +14,10 @@
 	rows: 1
 	canvas.before:
 		Color:
-			rgba: 0, 1, 1, self.transparent
+			rgba: self.color
 		Rectangle:
 			pos: self.pos
 			size: self.size
-
-
-<AttributeMenu>:
-	rows: 1
-
-<OptionMenu>:
-	cols: 1
-	size_hint: None, None
-	size: 200, 400
-	background_color: [0, 0, 0, 0]
-
 
 <ListLabel>:
 	cols: 1

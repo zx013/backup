@@ -1,9 +1,6 @@
 #-*- coding:utf-8 -*-
 from functools import wraps
 
-from kivy.properties import NumericProperty
-
-
 def apply_walk(before):
 	def run_func(func):
 		@wraps(func)
@@ -88,20 +85,3 @@ def delete_args(self, **kwargs):
 				return
 		except:
 			pass
-
-#kv文件中根据transparent设置可见度
-#selected函数实现了select（选择类型）到可见度的转换
-#select类型
-#0未选中，1鼠标滑过，2选中
-class BackGround:
-	select = 0
-	transparent = NumericProperty(0)
-
-	def selected(self, select):
-		self.select = select
-		if select == 0:
-			self.transparent = 0
-		elif select == 1:
-			self.transparent = .15
-		elif select == 2:
-			self.transparent = .4

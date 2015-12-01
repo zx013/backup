@@ -5,3 +5,26 @@
 		Rectangle:
 			pos: self.pos
 			size: self.size
+
+<AttributeMenuLabel>:
+	color: 0, 0, 0, 1
+	font_size: 16
+
+<AttributeMenu>:
+	rows: 1
+	canvas.before:
+		Color:
+			rgba: self.color
+		Rectangle:
+			pos: self.pos
+			size: self.size
+	canvas:
+		Color:
+			rgba: .6, 0 ,7, 1
+		Line:
+			rectangle: self.x, self.y, self.width, self.height
+
+<OptionMenu>:
+	cols: 1
+	size_hint: None, None
+	size: 150, len(self.children) * 30
