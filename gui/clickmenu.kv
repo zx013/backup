@@ -1,16 +1,9 @@
-<ClickMenu>:
-	canvas:
-		Color:
-			rgba: 1, 1, 1, 1
-		Rectangle:
-			pos: self.pos
-			size: self.size
 
-<AttributeMenuLabel>:
+<AttributeMenu>:
 	color: 0, 0, 0, 1
 	font_size: 16
 
-<AttributeMenu>:
+<OptionMenu>:
 	rows: 1
 	canvas.before:
 		Color:
@@ -24,7 +17,13 @@
 		Line:
 			rectangle: self.x, self.y, self.width, self.height
 
-<OptionMenu>:
+<ClickMenu>:
 	cols: 1
 	size_hint: None, None
 	size: 150, len(self.children) * 30
+	canvas:
+		Color:
+			rgba: 1, 1, 1, 1
+		Rectangle:
+			pos: self.pos
+			size: self.size

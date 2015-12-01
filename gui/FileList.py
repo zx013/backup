@@ -7,7 +7,7 @@ from kivy.uix.label import Label
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.scrollview import ScrollView
 
-from clickmenu import BackGround, OptionMenu
+from clickmenu import BackGround, ClickMenu
 from hoverbehavior import HoverBehavior
 import time
 
@@ -56,7 +56,7 @@ class FileLabel(BackGround, GridLayout, HoverBehavior):
 					self.selected(2)
 
 	def on_enter(self, *args):
-		if self.parent.parent.optionmenu.status:
+		if self.parent.parent.clickmenu.status:
 			return
 		if self.select == 0:	
 			self.selected(1)
@@ -93,21 +93,21 @@ class DisplayScreen(ScrollView):
 		#f.delete(text=[[('a', 'b'), ('a', 'c'), 'd', 'e']] * len(f.children))
 		#f.draw()
 		f.bind(minimum_height=f.setter('height'))
-		self.optionmenu = OptionMenu()
-		self.optionmenu.insert(text=['aaa', 'bbb', 'ccc', 'ddd'])
+		self.clickmenu = ClickMenu()
+		self.clickmenu.insert(text=['aaa', ['bbb', 'bbb1', 'bbb2', ['ee', 'ee1', 'ee2']], 'ccc', 'ddd'])
 
-	optionmenu = None
+	clickmenu = None
 
 	def on_touch_down(self, touch):
 		#未打开菜单或不是
-		if not self.optionmenu.status or touch.button not in ['scrollup', 'scrolldown', 'middle']:
+		if not self.clickmenu.status or touch.button not in ['scrollup', 'scrolldown', 'middle']:
 			super(DisplayScreen, self).on_touch_down(touch) #先调用子节点的事件更新select值
 		#Logger.info(str(touch.button))
 		if touch.button not in ['scrollup', 'scrolldown', 'middle']:
-			self.optionmenu.close()
+			self.clickmenu.close()
 		if self.collide_point(touch.x, touch.y):
 			if touch.button == 'right':
-				self.optionmenu.open(touch.x, touch.y)
+				self.clickmenu.open(touch.x, touch.y)
 
 
 class FileListApp(App):
