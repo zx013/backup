@@ -55,26 +55,20 @@ class OptionMenu(BackGround, GridLayout, HoverBehavior):
 
 	#进入子菜单时主菜单不关闭clickmenu
 	def on_enter(self, *args):
+		#关闭其余同级菜单的子菜单
 		if self.select == 0:
-			for child in self.parent.children:
-				if child.select == 1:
-					child.selected(0)
-					if child.clickmenu:
-						child.clickmenu.close()
+			self.parent.close(False)
 			self.selected(1)
 		if self.clickmenu:
 			self.clickmenu.open(self.x + self.width - 3, self.y + self.height)
 
 	def on_leave(self, *args):
-		#if self.select == 1:
-			#self.selected(0)
 		if self.clickmenu:
+			#没有进入子菜单则关闭
 			child_select = [child.select for child in self.clickmenu.children]
 			if 1 not in child_select:
 				self.clickmenu.close()
 				self.selected(0)
-		else:
-			self.selected(0)
 
 
 class ClickMenu(GridLayout, HoverBehavior):
@@ -103,6 +97,8 @@ class ClickMenu(GridLayout, HoverBehavior):
 		return window
 
 	def open(self, x=0, y=0):
+		if self.status: return
+
 		if self._window is not None:
 			Logger.warning('ModalView: you can only open once.')
 			return self
@@ -128,15 +124,19 @@ class ClickMenu(GridLayout, HoverBehavior):
 		self.status = True
 		return self
 
-	def close(self, *largs, **kwargs):
+	#include，是否关闭自身
+	def close(self, include=True):
 		#递归关闭所有节点
 		for child in self.children:
+			if child.select == 1:
+					child.selected(0)
 			if child.clickmenu:
-				child.clickmenu.close()
+				child.clickmenu.close(True)
 
-		if self._window is None:
-			return self
-		self._window.remove_widget(self)
-		self._window = None
-		self.status = False
+		if include:
+			if self._window is None:
+				return self
+			self._window.remove_widget(self)
+			self._window = None
+			self.status = False
 		return self

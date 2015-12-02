@@ -56,6 +56,7 @@ class FileLabel(BackGround, GridLayout, HoverBehavior):
 					self.selected(2)
 
 	def on_enter(self, *args):
+		#如果打开了右键菜单，则不选中
 		if self.parent.parent.clickmenu.status:
 			return
 		if self.select == 0:	
