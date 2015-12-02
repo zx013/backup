@@ -4,20 +4,19 @@
 	color: 0, 0, 0, 1
 	font_size: 16
 	text: 'abc'
-	canvas:
-		Color:
-			rgba: .6, .7, 0, 1
-		Line:
-			rectangle: self.x, self.y, self.width, self.height
 
 <FileLabel>:
 	rows: 1
 	canvas.before:
 		Color:
-			rgba: self.color
+			rgba: self.space_color
 		Rectangle:
 			pos: self.pos
 			size: self.size
+		Color:
+			rgba: self.frame_color
+		Line:
+			rectangle: self.x, self.y, self.width, self.height
 
 <ListLabel>:
 	cols: 1
@@ -26,7 +25,7 @@
 
 
 <DisplayScreen>:
-	size_hint: .6, .9
+	size_hint: .9, .9
 	pos_hint: {'x': .05, 'top': .95}
 	do_scroll: False, True
 	canvas:

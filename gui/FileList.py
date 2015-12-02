@@ -57,8 +57,14 @@ class FileLabel(BackGround, GridLayout, HoverBehavior):
 
 	def on_enter(self, *args):
 		#如果打开了右键菜单，则不选中
-		if self.parent.parent.clickmenu.status:
-			return
+		try:
+			if self.parent.parent.clickmenu.status:
+				return
+		except: pass
+		#选中前，将其它选中的清空
+		for child in self.parent.children:
+			if child.select == 1:
+				child.selected(0)
 		if self.select == 0:	
 			self.selected(1)
 
@@ -95,7 +101,7 @@ class DisplayScreen(ScrollView):
 		#f.draw()
 		f.bind(minimum_height=f.setter('height'))
 		self.clickmenu = ClickMenu()
-		self.clickmenu.insert(text=['aaa', ['bbb', 'bbb1', 'bbb2', ['ee', 'ee1', 'ee2']], 'ccc', 'ddd'])
+		self.clickmenu.insert(text=['a', ['b', 'b1', 'b2', 'b3', 'b4', 'b5', ['ee', 'ee1', 'ee2']], 'c', 'd'])
 
 	clickmenu = None
 
@@ -108,7 +114,7 @@ class DisplayScreen(ScrollView):
 			self.clickmenu.close()
 		if self.collide_point(touch.x, touch.y):
 			if touch.button == 'right':
-				self.clickmenu.open(touch.x, touch.y)
+				self.clickmenu.open(touch.pos)
 
 
 class FileListApp(App):

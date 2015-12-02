@@ -18,20 +18,23 @@ Builder.load_file('clickmenu.kv')
 #0未选中，1鼠标滑过，2选中
 class BackGround:
 	select = 0
-	color = ListProperty([0, 1, 1, 0])
+	space_color = ListProperty([0, .6, 1, 0])
+	frame_color = ListProperty([0, .6, 1, 0])
 
 	def selected(self, select):
 		self.select = select
 		if select == 0:
-			self.color[3] = 0
+			self.space_color[3] = 0
+			self.frame_color[3] = 0
 		elif select == 1:
-			self.color[3] = .15
+			self.space_color[3] = .1
+			self.frame_color[3] = .4
 		elif select == 2:
-			self.color[3] = .4
+			self.space_color[3] = .3
+			self.frame_color[3] = .6
 
 class AttributeMenu(Label):
-	def __init__(self, **kwargs):
-		super(AttributeMenu, self).__init__(**kwargs)
+	pass
 
 class OptionMenu(BackGround, GridLayout, HoverBehavior):
 	clickmenu = None #下一级菜单
@@ -60,7 +63,7 @@ class OptionMenu(BackGround, GridLayout, HoverBehavior):
 			self.parent.close(False)
 			self.selected(1)
 		if self.clickmenu:
-			self.clickmenu.open(self.x + self.width - 3, self.y + self.height)
+			self.clickmenu.open(self.pos, open_type='enter', size=self.size)
 
 	def on_leave(self, *args):
 		if self.clickmenu:
@@ -96,7 +99,7 @@ class ClickMenu(GridLayout, HoverBehavior):
 			window = Window
 		return window
 
-	def open(self, x=0, y=0):
+	def open(self, pos, open_type='click', size=(0, 0)):
 		if self.status: return
 
 		if self._window is not None:
@@ -108,14 +111,23 @@ class ClickMenu(GridLayout, HoverBehavior):
 			Logger.warning('ModalView: cannot open view, no window found.')
 			return self
 
-		if self.width + x > self._window.width:
-			x = self._window.width - self.width
+		x, y = pos
+		if open_type == 'click':
+			if self.width + x > self._window.width:
+				x = self._window.width - self.width
 
-		#if self.height + y > self._window.height:
-		#	y = self._window.height - self.height
+			if y > self.height:
+				y -= self.height
 
-		if y > self.height:
-			y -= self.height
+		elif open_type == 'enter':
+			width, height = size
+			if self.width + x + width > self._window.width:
+				x -= width - 13
+			else:
+				x += width - 13
+
+			if y > self.height:
+				y = y - self.height + height
 
 		self.pos = (x, y)
 		#Logger.info(str(self.pos))
