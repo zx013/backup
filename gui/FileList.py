@@ -58,7 +58,7 @@ class FileLabel(BackGround, GridLayout, HoverBehavior):
 	def on_enter(self, *args):
 		#如果打开了右键菜单，则不选中
 		try:
-			if self.parent.parent.clickmenu.status:
+			if self.parent.parent.click_menu.status:
 				return
 		except: pass
 		#选中前，将其它选中的清空
@@ -100,21 +100,21 @@ class DisplayScreen(ScrollView):
 		#f.delete(text=[[('a', 'b'), ('a', 'c'), 'd', 'e']] * len(f.children))
 		#f.draw()
 		f.bind(minimum_height=f.setter('height'))
-		self.clickmenu = ClickMenu()
-		self.clickmenu.insert(text=['a', ['b', 'b1', 'b2', 'b3', 'b4', 'b5', ['ee', 'ee1', 'ee2']], 'c', 'd'])
+		self.click_menu = ClickMenu()
+		self.click_menu.insert(text=['a', ['b', 'b1', 'b2', 'b3', 'b4', 'b5', ['ee', 'ee1', 'ee2']], ['c', 'c1', 'c2'], 'd'])
 
-	clickmenu = None
+	click_menu = None
 
 	def on_touch_down(self, touch):
 		#未打开菜单或不是
-		if not self.clickmenu.status or touch.button not in ['scrollup', 'scrolldown', 'middle']:
+		if not self.click_menu.status or touch.button not in ['scrollup', 'scrolldown', 'middle']:
 			super(DisplayScreen, self).on_touch_down(touch) #先调用子节点的事件更新select值
 		#Logger.info(str(touch.button))
 		if touch.button not in ['scrollup', 'scrolldown', 'middle']:
-			self.clickmenu.close()
+			self.click_menu.close()
 		if self.collide_point(touch.x, touch.y):
 			if touch.button == 'right':
-				self.clickmenu.open(touch.pos)
+				self.click_menu.open(touch.pos)
 
 
 class FileListApp(App):

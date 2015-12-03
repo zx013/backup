@@ -37,15 +37,16 @@ class AttributeMenu(Label):
 	pass
 
 class OptionMenu(BackGround, GridLayout, HoverBehavior):
-	clickmenu = None #下一级菜单
+	click_menu = None #下一级菜单
 
 	def insert(self, **kwargs):
 		text = kwargs.get('text')
 		#可以继续扩展
 		if isinstance(text, tuple) or isinstance(text, list):
-			self.clickmenu = ClickMenu()
+			self.click_menu = ClickMenu()
+			self.click_menu.parent_menu = self.parent #设置父菜单
 			kwargs['text'] = text[1:]
-			self.clickmenu.insert(**kwargs)
+			self.click_menu.insert(**kwargs)
 			kwargs['text'] = text[0]
 		label = AttributeMenu(**kwargs)
 		self.add_widget(label)
@@ -56,22 +57,45 @@ class OptionMenu(BackGround, GridLayout, HoverBehavior):
 			return True
 		super(OptionMenu, self).on_touch_down(touch)
 
-	#进入子菜单时主菜单不关闭clickmenu
+	def click(self):
+		if self.click_menu:
+			self.click_menu.open(self.pos, open_type='enter', size=self.size)
+
 	def on_enter(self, *args):
-		#关闭其余同级菜单的子菜单
+		#进入父控件时在子控件中
+		if self.parent.child_menu:
+			if self.parent.child_menu.collide_point(self.border_point[0], self.border_point[1]):
+				return
+			self.parent.child_menu.close()
+			
+		#清空同级菜单select值
+		for child in self.parent.children:
+			if child.select == 1:
+				child.selected(0)
 		if self.select == 0:
-			self.parent.close(False)
 			self.selected(1)
-		if self.clickmenu:
-			self.clickmenu.open(self.pos, open_type='enter', size=self.size)
+		self.click()
 
 	def on_leave(self, *args):
-		if self.clickmenu:
-			#没有进入子菜单则关闭
-			child_select = [child.select for child in self.clickmenu.children]
-			if 1 not in child_select:
-				self.clickmenu.close()
-				self.selected(0)
+		#子控件内的切换
+		if self.parent.collide_point(self.border_point[0], self.border_point[1]):
+			return
+
+		#离开子控件时在父控件中
+		if self.parent.parent_menu:
+			if self.parent.parent_menu.collide_point(self.border_point[0], self.border_point[1]): #在父控件内
+				self.parent.close()
+				#清空同级菜单select值
+				for child in self.parent.parent_menu.children:
+					if child.select == 1:
+						child.selected(0)
+				#获取所在控件
+				for child in self.parent.parent_menu.children:
+					if child.collide_point(self.border_point[0], self.border_point[1]):
+						if child.select == 0:
+							child.selected(1)
+						child.click()
+						break
 
 
 class ClickMenu(GridLayout, HoverBehavior):
@@ -82,6 +106,8 @@ class ClickMenu(GridLayout, HoverBehavior):
 	attach_to = ObjectProperty(None)
 	_window = ObjectProperty(None, allownone=True)
 	status = False #是否打开
+	child_menu = None #打开的子菜单
+	parent_menu = None #父菜单
 
 	def __init__(self, **kwargs):
 		self._parent = None
@@ -122,9 +148,9 @@ class ClickMenu(GridLayout, HoverBehavior):
 		elif open_type == 'enter':
 			width, height = size
 			if self.width + x + width > self._window.width:
-				x -= width - 13
+				x -= width - 3
 			else:
-				x += width - 13
+				x += width - 3
 
 			if y > self.height:
 				y = y - self.height + height
@@ -134,21 +160,24 @@ class ClickMenu(GridLayout, HoverBehavior):
 		self._window.add_widget(self)
 
 		self.status = True
+		if self.parent_menu:
+			self.parent_menu.child_menu = self
 		return self
 
-	#include，是否关闭自身
-	def close(self, include=True):
+	def close(self):
 		#递归关闭所有节点
 		for child in self.children:
 			if child.select == 1:
 					child.selected(0)
-			if child.clickmenu:
-				child.clickmenu.close(True)
+			if child.click_menu:
+				child.click_menu.close()
 
-		if include:
-			if self._window is None:
-				return self
-			self._window.remove_widget(self)
-			self._window = None
-			self.status = False
+		if self._window is None:
+			return self
+		self._window.remove_widget(self)
+		self._window = None
+		self.status = False
+		#关闭时父控件的child_menu置空
+		if self.parent_menu:
+			self.parent_menu.child_menu = None
 		return self
