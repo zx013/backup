@@ -61,10 +61,18 @@ class OptionMenu(BackGround, GridLayout, HoverBehavior):
 		if self.click_menu:
 			self.click_menu.open(self.pos, open_type='enter', size=self.size)
 
+	#递归判断点是否在子控件中
+	def collide(self, child_menu, x, y):
+		if child_menu:
+			if child_menu.collide_point(x, y):
+				return True
+			return self.collide(child_menu.child_menu, x, y)
+		return False
+
 	def on_enter(self, *args):
 		#进入父控件时在子控件中
 		if self.parent.child_menu:
-			if self.parent.child_menu.collide_point(self.border_point[0], self.border_point[1]):
+			if self.collide(self.parent.child_menu, self.border_point[0], self.border_point[1]):
 				return
 			self.parent.child_menu.close()
 			
@@ -77,9 +85,10 @@ class OptionMenu(BackGround, GridLayout, HoverBehavior):
 		self.click()
 
 	def on_leave(self, *args):
-		#子控件内的切换
-		if self.parent.collide_point(self.border_point[0], self.border_point[1]):
-			return
+		#离开子控件时在其子控件中
+		if self.parent.child_menu:
+			if self.collide(self.parent, self.border_point[0], self.border_point[1]):
+				return
 
 		#离开子控件时在父控件中
 		if self.parent.parent_menu:
@@ -98,7 +107,7 @@ class OptionMenu(BackGround, GridLayout, HoverBehavior):
 						break
 
 
-class ClickMenu(GridLayout, HoverBehavior):
+class ClickMenu(GridLayout):
 	@apply_insert(OptionMenu)
 	def insert(self, **kwargs):
 		pass
