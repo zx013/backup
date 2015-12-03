@@ -58,7 +58,8 @@ class FileLabel(BackGround, GridLayout, HoverBehavior):
 	def on_enter(self, *args):
 		#如果打开了右键菜单，则不选中
 		try:
-			if self.parent.parent.click_menu.status:
+			#DisplayScreen的click_menu
+			if self.parent.parent.parent.click_menu.status:
 				return
 		except: pass
 		#选中前，将其它选中的清空
@@ -71,6 +72,11 @@ class FileLabel(BackGround, GridLayout, HoverBehavior):
 	def on_leave(self, *args):
 		if self.select == 1:
 			self.selected(0)
+
+class TitleLabel(GridLayout):
+	@apply_insert(AttributeLabel)
+	def insert(self, **kwargs):
+		pass
 
 
 class ListLabel(GridLayout):
@@ -87,10 +93,9 @@ class ListLabel(GridLayout):
 		pass
 
 
-class DisplayScreen(ScrollView):
+class DisplayScreen(GridLayout):
 	def build(self):
 		f = ListLabel()
-		self.add_widget(f)
 		f.insert(a=[range(4)] * 32)
 		t = []
 		for i in range(len(f.children)):
@@ -99,9 +104,18 @@ class DisplayScreen(ScrollView):
 		f.update(size_hint_x=[[.2, .3, .1, .4]] * len(f.children))
 		#f.delete(text=[[('a', 'b'), ('a', 'c'), 'd', 'e']] * len(f.children))
 		#f.draw()
-		f.bind(minimum_height=f.setter('height'))
+		f.bind(minimum_height=f.setter('height'), minimum_width=f.setter('width'))
+
+		s = ScrollView()
+		s.add_widget(f)
+
+		t = TitleLabel()
+		t.insert(text=['title-1', 'title-2', 'title-3', 'title-4'])
+		self.add_widget(t)
+		self.add_widget(s)
+
 		self.click_menu = ClickMenu()
-		self.click_menu.insert(text=['a', ['b', 'b1', 'b2', 'b3', 'b4', 'b5', ['ee', 'ee1', 'ee2']], ['c', 'c1', 'c2'], 'd'])
+		self.click_menu.insert(text=['a', ['b', 'b1', 'b2', 'b3', 'b4', 'b5', ['ee', 'ee1', 'ee2', ['f', 'f1', ['g', ['h', 'h1']]]]], ['c', 'c1', 'c2'], 'd'])
 
 	click_menu = None
 

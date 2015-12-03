@@ -18,14 +18,22 @@
 		Line:
 			rectangle: self.x, self.y, self.width, self.height
 
+<TitleLabel>:
+	rows: 1
+	size_hint: None, None
+	size: 400, 20
+
 <ListLabel>:
 	cols: 1
 	size_hint: None, None
-	size: 800, len(self.children) * 20
+	size: 400, len(self.children) * 20
 
+<ScrollView>:
+	scroll_type: ['bars']
 
 <DisplayScreen>:
-	size_hint: .9, .9
+	cols: 1
+	size_hint: .6, .9
 	pos_hint: {'x': .05, 'top': .95}
 	do_scroll: False, True
 	canvas:
