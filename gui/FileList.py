@@ -29,7 +29,6 @@ class AttributeLabel(Label):
 	#direction: 拉伸的方向，True向右，False往左
 	#value: 拉伸的值
 	def stretch(self, side, direction, value):
-		#Logger.info('before: %s,%s' % (str(self.pos), str(self.size)))
 		if side:
 			if direction:
 				self.width += value
@@ -38,11 +37,10 @@ class AttributeLabel(Label):
 		else:
 			if direction:
 				self.width -= value
-				self.x += value
+				#self.x += value
 			else:
 				self.width += value
-				self.x -= value
-		#Logger.info('after: %s,%s' % (str(self.pos), str(self.size)))
+				#self.x -= value
 
 
 class FileLabel(BackGround, GridLayout, HoverBehavior):
@@ -109,22 +107,49 @@ class TitleLabel(GridLayout):
 	def update(self, **kwargs):
 		pass
 
+	#第num个标题后的分隔线向direction方向移动value个单位
 	def stretch(self, num, direction, value):
-		self.children[::-1][num].stretch(True, direction, value)
-		if len(self.children) > num + 1:
-			self.children[::-1][num + 1].stretch(False, direction, value)
+		children = self.children[::-1]
+		if num < 0 or num > len(children):  #超出范围
+			return
+		children[num].stretch(True, direction, value)
+		if len(children) > num + 1:
+			children[num + 1].stretch(False, direction, value)
 
 		#调节子标题后重新设置宽度
 		self.width = sum([child.width for child in self.children])
 
-		return
 		if self.filelist:
 			for filelabel in self.filelist.children:
-				filelabel.children[::-1][num].stretch(True, direction, value)
-				if len(filelabel.children) > num + 1:
-					filelabel.children[::-1][num + 1].stretch(False, direction, value)
+				children = filelabel.children[::-1]
+				children[num].stretch(True, direction, value)
+				if len(children) > num + 1:
+					children[num + 1].stretch(False, direction, value)
 					#child.stretch(side, direction, value)
 				filelabel.width = sum([child.width for child in filelabel.children])
+
+	#将第num个标题插入到position之后
+	def change(self, num, position):
+		children = self.children[::-1]
+		if num < 0 or num > len(children):  #超出范围
+			return
+		if position < 0 or position > len(children):  #超出范围
+			return
+
+		if num == position: #相同位置，无须移动
+			return
+		move_label = children.pop(num)
+		children = children[:position] + [move_label] + children[position:]
+		self.children = children[::-1]
+		
+		if self.filelist:
+			for filelabel in self.filelist.children:
+				children = filelabel.children[::-1]
+				if num == position: #相同位置，无须移动
+					return
+				move_label = children.pop(num)
+				children = children[:position] + [move_label] + children[position:]
+				filelabel.children = children[::-1]
 
 
 class ListLabel(GridLayout):
@@ -147,7 +172,7 @@ class DisplayScreen(GridLayout):
 		f.insert(a=[range(4)] * 32)
 		t = []
 		for i in range(len(f.children)):
-			t.append(['a%s' % i, 'b', 'a', 'd', 'ab'])
+			t.append(['a%s' % i, 'b', 'c', 'd', 'ab'])
 		f.update(text=t)
 		f.update(width=[[120, 80, 160, 40]] * len(f.children))
 		#f.delete(text=[[('a', 'b'), ('a', 'c'), 'd', 'e']] * len(f.children))
@@ -159,13 +184,14 @@ class DisplayScreen(GridLayout):
 
 		t = TitleLabel()
 		t.mapping(f)
-		t.insert(text=['title-1', 'title-2', 'title-3', 'title-4'])
+		t.insert(text=['title-0', 'title-1', 'title-2', 'title-3'])
 		t.update(width=[120, 80, 160, 40])
 		self.add_widget(t)
 		self.add_widget(s)
 		t.stretch(0, False, 20)
 		t.stretch(1, True, 20)
 		t.stretch(2, False, 20)
+		t.change(2, 3)
 		#Logger.info(str(t.size))
 
 		self.click_menu = ClickMenu()
