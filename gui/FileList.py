@@ -25,6 +25,25 @@ class AttributeLabel(Label):
 	def update(self, **kwargs):
 		insert_args(self, **kwargs)
 
+	#side: True右侧，False左侧
+	#direction: 拉伸的方向，True向右，False往左
+	#value: 拉伸的值
+	def stretch(self, side, direction, value):
+		#Logger.info('before: %s,%s' % (str(self.pos), str(self.size)))
+		if side:
+			if direction:
+				self.width += value
+			else:
+				self.width -= value
+		else:
+			if direction:
+				self.width -= value
+				self.x += value
+			else:
+				self.width += value
+				self.x -= value
+		#Logger.info('after: %s,%s' % (str(self.pos), str(self.size)))
+
 
 class FileLabel(BackGround, GridLayout, HoverBehavior):
 	@apply_insert(AttributeLabel)
@@ -73,10 +92,39 @@ class FileLabel(BackGround, GridLayout, HoverBehavior):
 		if self.select == 1:
 			self.selected(0)
 
+
+#调节宽度，改变排列顺序等功能
 class TitleLabel(GridLayout):
+	filelist = None
+
+	#将标题栏和文件列表关联起来
+	def mapping(self, filelist):
+		self.filelist = filelist
+
 	@apply_insert(AttributeLabel)
 	def insert(self, **kwargs):
 		pass
+
+	@apply_update
+	def update(self, **kwargs):
+		pass
+
+	def stretch(self, num, direction, value):
+		self.children[::-1][num].stretch(True, direction, value)
+		if len(self.children) > num + 1:
+			self.children[::-1][num + 1].stretch(False, direction, value)
+
+		#调节子标题后重新设置宽度
+		self.width = sum([child.width for child in self.children])
+
+		return
+		if self.filelist:
+			for filelabel in self.filelist.children:
+				filelabel.children[::-1][num].stretch(True, direction, value)
+				if len(filelabel.children) > num + 1:
+					filelabel.children[::-1][num + 1].stretch(False, direction, value)
+					#child.stretch(side, direction, value)
+				filelabel.width = sum([child.width for child in filelabel.children])
 
 
 class ListLabel(GridLayout):
@@ -101,7 +149,7 @@ class DisplayScreen(GridLayout):
 		for i in range(len(f.children)):
 			t.append(['a%s' % i, 'b', 'a', 'd', 'ab'])
 		f.update(text=t)
-		f.update(size_hint_x=[[.2, .3, .1, .4]] * len(f.children))
+		f.update(width=[[120, 80, 160, 40]] * len(f.children))
 		#f.delete(text=[[('a', 'b'), ('a', 'c'), 'd', 'e']] * len(f.children))
 		#f.draw()
 		f.bind(minimum_height=f.setter('height'), minimum_width=f.setter('width'))
@@ -110,9 +158,15 @@ class DisplayScreen(GridLayout):
 		s.add_widget(f)
 
 		t = TitleLabel()
+		t.mapping(f)
 		t.insert(text=['title-1', 'title-2', 'title-3', 'title-4'])
+		t.update(width=[120, 80, 160, 40])
 		self.add_widget(t)
 		self.add_widget(s)
+		t.stretch(0, False, 20)
+		t.stretch(1, True, 20)
+		t.stretch(2, False, 20)
+		#Logger.info(str(t.size))
 
 		self.click_menu = ClickMenu()
 		self.click_menu.insert(text=['a', ['b', 'b1', 'b2', 'b3', 'b4', 'b5', ['ee', 'ee1', 'ee2', ['f', 'f1', ['g', ['h', 'h1']]]]], ['c', 'c1', 'c2'], 'd'])

@@ -4,9 +4,18 @@
 	color: 0, 0, 0, 1
 	font_size: 16
 	text: 'abc'
+	size_hint: None, None
+	size: 100, 20
+	canvas.before:
+		Color:
+			rgba: .2, .2, .2, .2
+		Line:
+			rectangle: self.x, self.y, self.width, self.height
 
 <FileLabel>:
 	rows: 1
+	size_hint: None, None
+	size: 400, 20
 	canvas.before:
 		Color:
 			rgba: self.space_color
@@ -22,6 +31,11 @@
 	rows: 1
 	size_hint: None, None
 	size: 400, 20
+	canvas.before:
+		Color:
+			rgba: .1, .5, .2, .4
+		Line:
+			rectangle: self.x, self.y, self.width, self.height
 
 <ListLabel>:
 	cols: 1
@@ -30,12 +44,12 @@
 
 <ScrollView>:
 	scroll_type: ['bars']
+	do_scroll: True, True
 
 <DisplayScreen>:
 	cols: 1
 	size_hint: .6, .9
 	pos_hint: {'x': .05, 'top': .95}
-	do_scroll: False, True
 	canvas:
 		Color:
 			rgba: 1, 1, 1, 1
