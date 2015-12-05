@@ -151,6 +151,18 @@ class TitleLabel(GridLayout):
 				children = children[:position] + [move_label] + children[position:]
 				filelabel.children = children[::-1]
 
+	#调节宽度事件
+	#移动位置事件
+	def on_touch_down(self, touch):
+		#判断鼠标位置，靠近右边界进入调节宽度状态，其它位置进入移动位置状态
+		super(TitleLabel, self).on_touch_down(touch)
+
+	def on_touch_move(self, touch):
+		super(TitleLabel, self).on_touch_move(touch)
+
+	def on_touch_up(self, touch):
+		super(TitleLabel, self).on_touch_up(touch)
+
 
 class ListLabel(GridLayout):
 	@apply_insert(FileLabel)
