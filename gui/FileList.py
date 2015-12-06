@@ -25,23 +25,6 @@ class AttributeLabel(Label):
 	def update(self, **kwargs):
 		insert_args(self, **kwargs)
 
-	#side: True右侧，False左侧
-	#direction: 拉伸的方向，True向右，False往左
-	#value: 拉伸的值
-	def stretch(self, side, direction, value):
-		if side:
-			if direction:
-				self.width += value
-			else:
-				self.width -= value
-		else:
-			if direction:
-				self.width -= value
-				#self.x += value
-			else:
-				self.width += value
-				#self.x -= value
-
 
 class FileLabel(BackGround, GridLayout, HoverBehavior):
 	@apply_insert(AttributeLabel)
@@ -107,14 +90,17 @@ class TitleLabel(GridLayout):
 	def update(self, **kwargs):
 		pass
 
-	#第num个标题后的分隔线向direction方向移动value个单位
-	def stretch(self, num, direction, value):
+	#第num个标题后的分隔线向右移动distance个单位
+	def stretch(self, num, distance):
+		width_min = 40 #最小宽度
+		if distance == 0: #移动0距离时直接返回
+			return
 		children = self.children[::-1]
 		if num < 0 or num > len(children):  #超出范围
 			return
-		children[num].stretch(True, direction, value)
-		if len(children) > num + 1:
-			children[num + 1].stretch(False, direction, value)
+		children[num].width += distance
+		if children[num].width < width_min:
+			children[num].width = width_min
 
 		#调节子标题后重新设置宽度
 		self.width = sum([child.width for child in self.children])
@@ -122,10 +108,9 @@ class TitleLabel(GridLayout):
 		if self.filelist:
 			for filelabel in self.filelist.children:
 				children = filelabel.children[::-1]
-				children[num].stretch(True, direction, value)
-				if len(children) > num + 1:
-					children[num + 1].stretch(False, direction, value)
-					#child.stretch(side, direction, value)
+				children[num].width += distance
+				if children[num].width < width_min:
+					children[num].width = width_min
 				filelabel.width = sum([child.width for child in filelabel.children])
 
 	#将第num个标题插入到position之后
@@ -151,14 +136,30 @@ class TitleLabel(GridLayout):
 				children = children[:position] + [move_label] + children[position:]
 				filelabel.children = children[::-1]
 
+	#事件类型
+	move_type = 0
+	#上一个点
+	last_pos = None
+	#操作编号
+	num = 0
+
 	#调节宽度事件
 	#移动位置事件
 	def on_touch_down(self, touch):
 		#判断鼠标位置，靠近右边界进入调节宽度状态，其它位置进入移动位置状态
 		super(TitleLabel, self).on_touch_down(touch)
+		self.move_type = 1
+		self.last_pos = int(round(touch.x)), int(round(touch.y))
+		for num, child in enumerate(self.children[::-1]):
+			if child.collide_point(touch.x, touch.y):
+				self.num = num
 
 	def on_touch_move(self, touch):
 		super(TitleLabel, self).on_touch_move(touch)
+		pos = int(round(touch.x)), int(round(touch.y))
+		if self.move_type == 1:
+			self.stretch(self.num, pos[0] - self.last_pos[0])
+		self.last_pos = pos
 
 	def on_touch_up(self, touch):
 		super(TitleLabel, self).on_touch_up(touch)
@@ -200,9 +201,9 @@ class DisplayScreen(GridLayout):
 		t.update(width=[120, 80, 160, 40])
 		self.add_widget(t)
 		self.add_widget(s)
-		t.stretch(0, False, 20)
-		t.stretch(1, True, 20)
-		t.stretch(2, False, 20)
+		t.stretch(0, -20)
+		t.stretch(1, 20)
+		t.stretch(2, -20)
 		t.change(2, 3)
 		#Logger.info(str(t.size))
 
