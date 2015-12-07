@@ -61,6 +61,8 @@ class FileLabel(BackGround, GridLayout, HoverBehavior):
 	def on_enter(self, *args):
 		#如果打开了右键菜单，则不选中
 		try:
+			if not self.parent.enable:
+				return
 			#DisplayScreen的click_menu
 			if self.parent.parent.parent.click_menu.status:
 				return
@@ -146,29 +148,55 @@ class TitleLabel(GridLayout):
 	#事件类型
 	move_type = 0
 	#操作编号
-	move_num = 0
+	move_num = -1
+	move_position = -1
 	#上一个点
 	move_pos = None
+	#向左移动或向右移动的标志
+	move_side = 0
+
+	#判定宽度
+	split_width = 10
 
 	def get_type(self):
+		pos = Window.mouse_pos[0]
 		children = self.children[::-1]
 		for child in children:
 			split_line = child.x + child.width
-			split_width = 10
-			if split_line - split_width < Window.mouse_pos[0] < split_line + split_width:
+			if split_line - self.split_width < pos < split_line + self.split_width:
 				return 1
 		return 2
 
 	def get_num(self):
+		pos = Window.mouse_pos[0]
 		children = self.children[::-1]
 		for num, child in enumerate(children):
-			if child.x < Window.mouse_pos[0] <= child.x + child.width:
-				return num
-		return -1
+			if num == self.move_num:
+				continue
+			if child.x < pos <= child.x + child.width:
+				split_left = child.x + self.split_width
+				split_right = child.x + child.width - self.split_width
+				if child.x < pos <= split_left:
+					side = -1
+				elif split_right < pos <= child.x + child.width:
+					side = 1
+				else:
+					side = 0
+				return (num, side)
+		return (self.move_num, 0)
+
+	def animate(self, child, distance):
+		animation = Animation(x=child.x + distance)
+		animation.start(child)
+
+	#设置光标暂时无效
+	def set_mouse_cursor(self):
+		import win32api
+		import win32con
+		win32api.SetCursor(win32con.IDC_SIZEWE)
 
 	def on_mouse_pos(self, *args):
-		#self.get_type()
-		pass
+		self.set_mouse_cursor()
 
 	#调节宽度事件，move_type = 1
 	#移动位置事件，move_type = 2
@@ -176,8 +204,11 @@ class TitleLabel(GridLayout):
 		#判断鼠标位置，靠近右边界进入调节宽度状态，其它位置进入移动位置状态
 		super(TitleLabel, self).on_touch_down(touch)
 		self.move_type = self.get_type()
+		self.move_num, side = self.get_num()
+		if side == -1: #在左侧时拉伸上一个
+			self.move_num -= 1
 		self.move_pos = int(round(touch.x)), int(round(touch.y))
-		self.move_num = self.get_num()
+		self.filelist.enable = False
 
 	def on_touch_move(self, touch):
 		super(TitleLabel, self).on_touch_move(touch)
@@ -185,20 +216,36 @@ class TitleLabel(GridLayout):
 		if self.move_type == 1:
 			self.stretch(self.move_num, pos[0] - self.move_pos[0])
 		elif self.move_type == 2:
-			num = self.get_num()
+			num, side = self.get_num()
+			child = self.children[::-1][self.move_num]
+			child.x += pos[0] - self.move_pos[0]
+			if side and not self.move_side:
+				#self.children[::-1][num].x += side * child.width
+				self.move_position = num
+				self.move_side = side
+				Logger.info(str((num, side)))
 		self.move_pos = pos
 
 	def on_touch_up(self, touch):
 		super(TitleLabel, self).on_touch_up(touch)
-		num = self.get_num()
+		num, side = self.get_num()
+		if self.move_num == num:
+			return
 		if self.move_type == 2:
-			if self.move_num == num:
-				return
-			else:
-				self.change(self.move_num, num)
+			child = self.children[::-1][self.move_num]
+			#child.x
+			self.change(self.move_num, self.move_position)
+		self.move_type = 0
+		self.move_num = -1
+		self.move_position = -1
+		self.move_pos = None
+		self.move_side = 0
+		self.filelist.enable = True
 
 
 class ListLabel(GridLayout):
+	enable = True
+
 	@apply_insert(FileLabel)
 	def insert(self, **kwargs):
 		pass
