@@ -7,6 +7,9 @@ from kivy.uix.label import Label
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.scrollview import ScrollView
 
+from kivy.core.window import Window
+from kivy.animation import Animation
+
 from clickmenu import BackGround, ClickMenu
 from hoverbehavior import HoverBehavior
 import time
@@ -66,7 +69,7 @@ class FileLabel(BackGround, GridLayout, HoverBehavior):
 		for child in self.parent.children:
 			if child.select == 1:
 				child.selected(0)
-		if self.select == 0:	
+		if self.select == 0:
 			self.selected(1)
 
 	def on_leave(self, *args):
@@ -76,6 +79,10 @@ class FileLabel(BackGround, GridLayout, HoverBehavior):
 
 #调节宽度，改变排列顺序等功能
 class TitleLabel(GridLayout):
+	def __init__(self, **kwargs):
+		Window.bind(mouse_pos=self.on_mouse_pos)
+		super(TitleLabel, self).__init__(**kwargs)
+
 	filelist = None
 
 	#将标题栏和文件列表关联起来
@@ -126,7 +133,7 @@ class TitleLabel(GridLayout):
 		move_label = children.pop(num)
 		children = children[:position] + [move_label] + children[position:]
 		self.children = children[::-1]
-		
+
 		if self.filelist:
 			for filelabel in self.filelist.children:
 				children = filelabel.children[::-1]
@@ -138,31 +145,57 @@ class TitleLabel(GridLayout):
 
 	#事件类型
 	move_type = 0
-	#上一个点
-	last_pos = None
 	#操作编号
-	num = 0
+	move_num = 0
+	#上一个点
+	move_pos = None
 
-	#调节宽度事件
-	#移动位置事件
+	def get_type(self):
+		children = self.children[::-1]
+		for child in children:
+			split_line = child.x + child.width
+			split_width = 10
+			if split_line - split_width < Window.mouse_pos[0] < split_line + split_width:
+				return 1
+		return 2
+
+	def get_num(self):
+		children = self.children[::-1]
+		for num, child in enumerate(children):
+			if child.x < Window.mouse_pos[0] <= child.x + child.width:
+				return num
+		return -1
+
+	def on_mouse_pos(self, *args):
+		#self.get_type()
+		pass
+
+	#调节宽度事件，move_type = 1
+	#移动位置事件，move_type = 2
 	def on_touch_down(self, touch):
 		#判断鼠标位置，靠近右边界进入调节宽度状态，其它位置进入移动位置状态
 		super(TitleLabel, self).on_touch_down(touch)
-		self.move_type = 1
-		self.last_pos = int(round(touch.x)), int(round(touch.y))
-		for num, child in enumerate(self.children[::-1]):
-			if child.collide_point(touch.x, touch.y):
-				self.num = num
+		self.move_type = self.get_type()
+		self.move_pos = int(round(touch.x)), int(round(touch.y))
+		self.move_num = self.get_num()
 
 	def on_touch_move(self, touch):
 		super(TitleLabel, self).on_touch_move(touch)
 		pos = int(round(touch.x)), int(round(touch.y))
 		if self.move_type == 1:
-			self.stretch(self.num, pos[0] - self.last_pos[0])
-		self.last_pos = pos
+			self.stretch(self.move_num, pos[0] - self.move_pos[0])
+		elif self.move_type == 2:
+			num = self.get_num()
+		self.move_pos = pos
 
 	def on_touch_up(self, touch):
 		super(TitleLabel, self).on_touch_up(touch)
+		num = self.get_num()
+		if self.move_type == 2:
+			if self.move_num == num:
+				return
+			else:
+				self.change(self.move_num, num)
 
 
 class ListLabel(GridLayout):
