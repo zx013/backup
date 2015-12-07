@@ -152,8 +152,8 @@ class TitleLabel(GridLayout):
 	move_position = -1
 	#上一个点
 	move_pos = None
-	#向左移动或向右移动的标志
-	move_side = 0
+	#初始位置
+	move_base = None
 
 	#判定宽度
 	split_width = 10
@@ -208,6 +208,7 @@ class TitleLabel(GridLayout):
 		if side == -1: #在左侧时拉伸上一个
 			self.move_num -= 1
 		self.move_pos = int(round(touch.x)), int(round(touch.y))
+		self.move_base = list(self.children[::-1][self.move_num].pos)
 		self.filelist.enable = False
 
 	def on_touch_move(self, touch):
@@ -219,27 +220,27 @@ class TitleLabel(GridLayout):
 			num, side = self.get_num()
 			child = self.children[::-1][self.move_num]
 			child.x += pos[0] - self.move_pos[0]
-			if side and not self.move_side:
+			if side:
 				#self.children[::-1][num].x += side * child.width
 				self.move_position = num
-				self.move_side = side
 				Logger.info(str((num, side)))
 		self.move_pos = pos
 
 	def on_touch_up(self, touch):
 		super(TitleLabel, self).on_touch_up(touch)
 		num, side = self.get_num()
+		child = self.children[::-1][self.move_num]
 		if self.move_num == num:
-			return
-		if self.move_type == 2:
-			child = self.children[::-1][self.move_num]
-			#child.x
-			self.change(self.move_num, self.move_position)
+			if self.move_type == 2:
+				child.pos = self.move_base
+		else:
+			if self.move_type == 2:
+				self.change(self.move_num, self.move_position)
 		self.move_type = 0
 		self.move_num = -1
 		self.move_position = -1
 		self.move_pos = None
-		self.move_side = 0
+		self.move_base = None
 		self.filelist.enable = True
 
 
