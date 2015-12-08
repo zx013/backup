@@ -191,9 +191,12 @@ class TitleLabel(GridLayout):
 
 	#设置光标暂时无效
 	def set_mouse_cursor(self):
-		import win32api
-		import win32con
-		win32api.SetCursor(win32con.IDC_SIZEWE)
+		try:
+			import win32api
+			import win32con
+			win32api.SetCursor(win32con.IDC_SIZEWE)
+		except:
+			pass
 
 	def on_mouse_pos(self, *args):
 		self.set_mouse_cursor()
@@ -203,6 +206,10 @@ class TitleLabel(GridLayout):
 	def on_touch_down(self, touch):
 		#判断鼠标位置，靠近右边界进入调节宽度状态，其它位置进入移动位置状态
 		super(TitleLabel, self).on_touch_down(touch)
+		if not self.collide_point(touch.x, touch.y):
+			return
+		if touch.button != 'left':
+			return
 		self.move_type = self.get_type()
 		self.move_num, side = self.get_num()
 		if side == -1: #在左侧时拉伸上一个
@@ -213,6 +220,10 @@ class TitleLabel(GridLayout):
 
 	def on_touch_move(self, touch):
 		super(TitleLabel, self).on_touch_move(touch)
+		if not self.collide_point(touch.x, touch.y):
+			return
+		if touch.button != 'left':
+			return
 		pos = int(round(touch.x)), int(round(touch.y))
 		if self.move_type == 1:
 			self.stretch(self.move_num, pos[0] - self.move_pos[0])
@@ -228,6 +239,10 @@ class TitleLabel(GridLayout):
 
 	def on_touch_up(self, touch):
 		super(TitleLabel, self).on_touch_up(touch)
+		if not self.collide_point(touch.x, touch.y):
+			return
+		if touch.button != 'left':
+			return
 		num, side = self.get_num()
 		child = self.children[::-1][self.move_num]
 		if self.move_num == num:
@@ -282,11 +297,6 @@ class DisplayScreen(GridLayout):
 		t.update(width=[120, 80, 160, 40])
 		self.add_widget(t)
 		self.add_widget(s)
-		t.stretch(0, -20)
-		t.stretch(1, 20)
-		t.stretch(2, -20)
-		t.change(2, 3)
-		#Logger.info(str(t.size))
 
 		self.click_menu = ClickMenu()
 		self.click_menu.insert(text=['a', ['b', 'b1', 'b2', 'b3', 'b4', 'b5', ['ee', 'ee1', 'ee2', ['f', 'f1', ['g', ['h', 'h1']]]]], ['c', 'c1', 'c2'], 'd'])
