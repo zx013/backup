@@ -63,8 +63,8 @@ class FileLabel(BackGround, GridLayout, HoverBehavior):
 		try:
 			if not self.parent.enable:
 				return
-			#DisplayScreen的click_menu
-			if self.parent.parent.parent.click_menu.status:
+			#ListLabel的click_menu
+			if self.parent.click_menu.status:
 				return
 		except: pass
 		#选中前，将其它选中的清空
@@ -185,21 +185,16 @@ class TitleLabel(GridLayout):
 				return (num, side)
 		return (self.move_num, 0)
 
-	def animate(self, child, distance):
-		animation = Animation(x=child.x + distance)
-		animation.start(child)
-
-	#设置光标暂时无效
-	def set_mouse_cursor(self):
+	def on_mouse_pos(self, *args):
 		try:
 			import win32api
 			import win32con
-			win32api.SetCursor(win32con.IDC_SIZEWE)
+			if self.move_type == 1 or (self.get_type() == 1 and self.y < Window.mouse_pos[1] < self.y + self.height):
+				win32api.SetCursor(win32api.LoadCursor(0, win32con.IDC_SIZEWE))
+			#else:
+			#	win32api.SetCursor(win32api.LoadCursor(0, win32con.IDC_ARROW))
 		except:
 			pass
-
-	def on_mouse_pos(self, *args):
-		self.set_mouse_cursor()
 
 	#调节宽度事件，move_type = 1
 	#移动位置事件，move_type = 2
@@ -217,11 +212,11 @@ class TitleLabel(GridLayout):
 		self.move_pos = int(round(touch.x)), int(round(touch.y))
 		self.move_base = list(self.children[::-1][self.move_num].pos)
 		self.filelist.enable = False
+		self.on_mouse_pos()
 
 	def on_touch_move(self, touch):
 		super(TitleLabel, self).on_touch_move(touch)
-		if not self.collide_point(touch.x, touch.y):
-			return
+		#移动时鼠标可能移出范围
 		if touch.button != 'left':
 			return
 		pos = int(round(touch.x)), int(round(touch.y))
@@ -232,15 +227,12 @@ class TitleLabel(GridLayout):
 			child = self.children[::-1][self.move_num]
 			child.x += pos[0] - self.move_pos[0]
 			if side:
-				#self.children[::-1][num].x += side * child.width
 				self.move_position = num
-				Logger.info(str((num, side)))
 		self.move_pos = pos
+		self.on_mouse_pos()
 
 	def on_touch_up(self, touch):
 		super(TitleLabel, self).on_touch_up(touch)
-		if not self.collide_point(touch.x, touch.y):
-			return
 		if touch.button != 'left':
 			return
 		num, side = self.get_num()
@@ -257,6 +249,7 @@ class TitleLabel(GridLayout):
 		self.move_pos = None
 		self.move_base = None
 		self.filelist.enable = True
+		self.on_mouse_pos()
 
 
 class ListLabel(GridLayout):
@@ -274,45 +267,54 @@ class ListLabel(GridLayout):
 	def update(self, **kwargs):
 		pass
 
-
-class DisplayScreen(GridLayout):
-	def build(self):
-		f = ListLabel()
-		f.insert(a=[range(4)] * 32)
-		t = []
-		for i in range(len(f.children)):
-			t.append(['a%s' % i, 'b', 'c', 'd', 'ab'])
-		f.update(text=t)
-		f.update(width=[[120, 80, 160, 40]] * len(f.children))
-		#f.delete(text=[[('a', 'b'), ('a', 'c'), 'd', 'e']] * len(f.children))
-		#f.draw()
-		f.bind(minimum_height=f.setter('height'), minimum_width=f.setter('width'))
-
-		s = ScrollView()
-		s.add_widget(f)
-
-		t = TitleLabel()
-		t.mapping(f)
-		t.insert(text=['title-0', 'title-1', 'title-2', 'title-3'])
-		t.update(width=[120, 80, 160, 40])
-		self.add_widget(t)
-		self.add_widget(s)
-
-		self.click_menu = ClickMenu()
-		self.click_menu.insert(text=['a', ['b', 'b1', 'b2', 'b3', 'b4', 'b5', ['ee', 'ee1', 'ee2', ['f', 'f1', ['g', ['h', 'h1']]]]], ['c', 'c1', 'c2'], 'd'])
-
 	click_menu = None
 
 	def on_touch_down(self, touch):
+		if not self.click_menu:
+			return
 		#未打开菜单或不是
 		if not self.click_menu.status or touch.button not in ['scrollup', 'scrolldown', 'middle']:
-			super(DisplayScreen, self).on_touch_down(touch) #先调用子节点的事件更新select值
+			super(ListLabel, self).on_touch_down(touch) #先调用子节点的事件更新select值
 		#Logger.info(str(touch.button))
 		if touch.button not in ['scrollup', 'scrolldown', 'middle']:
 			self.click_menu.close()
 		if self.collide_point(touch.x, touch.y):
 			if touch.button == 'right':
-				self.click_menu.open(touch.pos)
+				self.click_menu.open(Window.mouse_pos) #touch的坐标为相对坐标
+
+class DisplayScreen(GridLayout):
+	def __init__(self, **kwargs):
+		super(DisplayScreen, self).__init__(**kwargs)
+		#文件列表
+		self.filelist = ListLabel()
+		self.filelist.click_menu = ClickMenu()
+		self.filelist.bind(minimum_height=self.filelist.setter('height'), minimum_width=self.filelist.setter('width'))
+
+		#标题栏
+		self.titlelabel = TitleLabel()
+		self.titlelabel.mapping(self.filelist)
+
+		#滚动条
+		self.scrollview = ScrollView()
+		self.scrollview.add_widget(self.filelist)
+
+		self.add_widget(self.titlelabel)
+		self.add_widget(self.scrollview)
+
+	def build(self):
+
+		self.filelist.insert(a=[range(4)] * 32)
+		t = []
+		for i in range(len(self.filelist.children)):
+			t.append(['a%s' % i, 'b', 'c', 'd', 'ab'])
+		self.filelist.update(text=t)
+		self.filelist.update(width=[[120, 80, 160, 40]] * len(self.filelist.children))
+		#f.delete(text=[[('a', 'b'), ('a', 'c'), 'd', 'e']] * len(self.filelist.children))
+
+		self.titlelabel.insert(text=['title-0', 'title-1', 'title-2', 'title-3'])
+		self.titlelabel.update(width=[120, 80, 160, 40])
+
+		self.filelist.click_menu.insert(text=['a', ['b', 'b1', 'b2', 'b3', 'b4', 'b5', ['ee', 'ee1', 'ee2', ['f', 'f1', ['g', ['h', 'h1']]]]], ['c', 'c1', 'c2'], 'd'])
 
 
 class FileListApp(App):
