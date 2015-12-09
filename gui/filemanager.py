@@ -45,8 +45,8 @@ class FileLabel(BackGround, GridLayout, HoverBehavior):
 		pass
 
 	def on_touch_down(self, touch):
-		#Èç¹ûÑ¡ÖĞÔòÖ±½Ó´ò¿ªÑ¡ÏîÀ¸
-		#Èç¹ûÎ´Ñ¡ÖĞÔòÇå¿ÕÆäËüÑ¡Ïî²¢Ñ¡Ôñ¸ÃÏî£¬È»ºó´ò¿ªÑ¡ÏîÀ¸
+		#å¦‚æœé€‰ä¸­åˆ™ç›´æ¥æ‰“å¼€é€‰é¡¹æ 
+		#å¦‚æœæœªé€‰ä¸­åˆ™æ¸…ç©ºå…¶å®ƒé€‰é¡¹å¹¶é€‰æ‹©è¯¥é¡¹ï¼Œç„¶åæ‰“å¼€é€‰é¡¹æ 
 		if self.collide_point(touch.x, touch.y):
 			if touch.button == 'left':
 				if self.select == 0 or self.select == 1:
@@ -61,15 +61,15 @@ class FileLabel(BackGround, GridLayout, HoverBehavior):
 					self.selected(2)
 
 	def on_enter(self, *args):
-		#Èç¹û´ò¿ªÁËÓÒ¼ü²Ëµ¥£¬Ôò²»Ñ¡ÖĞ
+		#å¦‚æœæ‰“å¼€äº†å³é”®èœå•ï¼Œåˆ™ä¸é€‰ä¸­
 		try:
 			if not self.parent.enable:
 				return
-			#ListLabelµÄclick_menu
+			#ListLabelçš„click_menu
 			if self.parent.click_menu.status:
 				return
 		except: pass
-		#Ñ¡ÖĞÇ°£¬½«ÆäËüÑ¡ÖĞµÄÇå¿Õ
+		#é€‰ä¸­å‰ï¼Œå°†å…¶å®ƒé€‰ä¸­çš„æ¸…ç©º
 		for child in self.parent.children:
 			if child.select == 1:
 				child.selected(0)
@@ -81,7 +81,7 @@ class FileLabel(BackGround, GridLayout, HoverBehavior):
 			self.selected(0)
 
 
-#µ÷½Ú¿í¶È£¬¸Ä±äÅÅÁĞË³ĞòµÈ¹¦ÄÜ
+#è°ƒèŠ‚å®½åº¦ï¼Œæ”¹å˜æ’åˆ—é¡ºåºç­‰åŠŸèƒ½
 class TitleLabel(GridLayout):
 	def __init__(self, **kwargs):
 		Window.bind(mouse_pos=self.on_mouse_pos)
@@ -89,7 +89,7 @@ class TitleLabel(GridLayout):
 
 	filelist = None
 
-	#½«±êÌâÀ¸ºÍÎÄ¼şÁĞ±í¹ØÁªÆğÀ´
+	#å°†æ ‡é¢˜æ å’Œæ–‡ä»¶åˆ—è¡¨å…³è”èµ·æ¥
 	def mapping(self, filelist):
 		self.filelist = filelist
 
@@ -101,19 +101,19 @@ class TitleLabel(GridLayout):
 	def update(self, **kwargs):
 		pass
 
-	#µÚnum¸ö±êÌâºóµÄ·Ö¸ôÏßÏòÓÒÒÆ¶¯distance¸öµ¥Î»
+	#ç¬¬numä¸ªæ ‡é¢˜åçš„åˆ†éš”çº¿å‘å³ç§»åŠ¨distanceä¸ªå•ä½
 	def stretch(self, num, distance):
-		width_min = 40 #×îĞ¡¿í¶È
-		if distance == 0: #ÒÆ¶¯0¾àÀëÊ±Ö±½Ó·µ»Ø
+		width_min = 40 #æœ€å°å®½åº¦
+		if distance == 0: #ç§»åŠ¨0è·ç¦»æ—¶ç›´æ¥è¿”å›
 			return
 		children = self.children[::-1]
-		if num < 0 or num > len(children):  #³¬³ö·¶Î§
+		if num < 0 or num > len(children):  #è¶…å‡ºèŒƒå›´
 			return
 		children[num].width += distance
 		if children[num].width < width_min:
 			children[num].width = width_min
 
-		#µ÷½Ú×Ó±êÌâºóÖØĞÂÉèÖÃ¿í¶È
+		#è°ƒèŠ‚å­æ ‡é¢˜åé‡æ–°è®¾ç½®å®½åº¦
 		self.width = sum([child.width for child in self.children])
 
 		if self.filelist:
@@ -124,15 +124,15 @@ class TitleLabel(GridLayout):
 					children[num].width = width_min
 				filelabel.width = sum([child.width for child in filelabel.children])
 
-	#½«µÚnum¸ö±êÌâ²åÈëµ½positionÖ®ºó
+	#å°†ç¬¬numä¸ªæ ‡é¢˜æ’å…¥åˆ°positionä¹‹å
 	def change(self, num, position):
 		children = self.children[::-1]
-		if num < 0 or num > len(children):  #³¬³ö·¶Î§
+		if num < 0 or num > len(children):  #è¶…å‡ºèŒƒå›´
 			return
-		if position < 0 or position > len(children):  #³¬³ö·¶Î§
+		if position < 0 or position > len(children):  #è¶…å‡ºèŒƒå›´
 			return
 
-		if num == position: #ÏàÍ¬Î»ÖÃ£¬ÎŞĞëÒÆ¶¯
+		if num == position: #ç›¸åŒä½ç½®ï¼Œæ— é¡»ç§»åŠ¨
 			return
 		move_label = children.pop(num)
 		children = children[:position] + [move_label] + children[position:]
@@ -141,23 +141,23 @@ class TitleLabel(GridLayout):
 		if self.filelist:
 			for filelabel in self.filelist.children:
 				children = filelabel.children[::-1]
-				if num == position: #ÏàÍ¬Î»ÖÃ£¬ÎŞĞëÒÆ¶¯
+				if num == position: #ç›¸åŒä½ç½®ï¼Œæ— é¡»ç§»åŠ¨
 					return
 				move_label = children.pop(num)
 				children = children[:position] + [move_label] + children[position:]
 				filelabel.children = children[::-1]
 
-	#ÊÂ¼şÀàĞÍ
+	#äº‹ä»¶ç±»å‹
 	move_type = 0
-	#²Ù×÷±àºÅ
+	#æ“ä½œç¼–å·
 	move_num = -1
 	move_position = -1
-	#ÉÏÒ»¸öµã
+	#ä¸Šä¸€ä¸ªç‚¹
 	move_pos = None
-	#³õÊ¼Î»ÖÃ
+	#åˆå§‹ä½ç½®
 	move_base = None
 
-	#ÅĞ¶¨¿í¶È
+	#åˆ¤å®šå®½åº¦
 	split_width = 10
 
 	def get_type(self):
@@ -188,20 +188,22 @@ class TitleLabel(GridLayout):
 		return (self.move_num, 0)
 
 	def on_mouse_pos(self, *args):
+		if self.filelist.click_menu.status:
+				return
 		try:
 			import win32api
 			import win32con
-			if self.move_type == 1 or (self.get_type() == 1 and self.y < Window.mouse_pos[1] < self.y + self.height):
+			if self.move_type == 1 or (self.move_type != 2 and self.get_type() == 1 and self.y < Window.mouse_pos[1] < self.y + self.height):
 				win32api.SetCursor(win32api.LoadCursor(0, win32con.IDC_SIZEWE))
 			#else:
 			#	win32api.SetCursor(win32api.LoadCursor(0, win32con.IDC_ARROW))
 		except:
 			pass
 
-	#µ÷½Ú¿í¶ÈÊÂ¼ş£¬move_type = 1
-	#ÒÆ¶¯Î»ÖÃÊÂ¼ş£¬move_type = 2
+	#è°ƒèŠ‚å®½åº¦äº‹ä»¶ï¼Œmove_type = 1
+	#ç§»åŠ¨ä½ç½®äº‹ä»¶ï¼Œmove_type = 2
 	def on_touch_down(self, touch):
-		#ÅĞ¶ÏÊó±êÎ»ÖÃ£¬¿¿½üÓÒ±ß½ç½øÈëµ÷½Ú¿í¶È×´Ì¬£¬ÆäËüÎ»ÖÃ½øÈëÒÆ¶¯Î»ÖÃ×´Ì¬
+		#åˆ¤æ–­é¼ æ ‡ä½ç½®ï¼Œé è¿‘å³è¾¹ç•Œè¿›å…¥è°ƒèŠ‚å®½åº¦çŠ¶æ€ï¼Œå…¶å®ƒä½ç½®è¿›å…¥ç§»åŠ¨ä½ç½®çŠ¶æ€
 		super(TitleLabel, self).on_touch_down(touch)
 		if not self.collide_point(touch.x, touch.y):
 			return
@@ -209,16 +211,17 @@ class TitleLabel(GridLayout):
 			return
 		self.move_type = self.get_type()
 		self.move_num, side = self.get_num()
-		if side == -1: #ÔÚ×ó²àÊ±À­ÉìÉÏÒ»¸ö
+		if side == -1: #åœ¨å·¦ä¾§æ—¶æ‹‰ä¼¸ä¸Šä¸€ä¸ª
 			self.move_num -= 1
 		self.move_pos = int(round(touch.x)), int(round(touch.y))
 		self.move_base = list(self.children[::-1][self.move_num].pos)
 		self.filelist.enable = False
 		self.on_mouse_pos()
+		self.filelist.click_menu.close() #å…³é—­å³é”®èœå•
 
 	def on_touch_move(self, touch):
 		super(TitleLabel, self).on_touch_move(touch)
-		#ÒÆ¶¯Ê±Êó±ê¿ÉÄÜÒÆ³ö·¶Î§
+		#ç§»åŠ¨æ—¶é¼ æ ‡å¯èƒ½ç§»å‡ºèŒƒå›´
 		if touch.button != 'left':
 			return
 		pos = int(round(touch.x)), int(round(touch.y))
@@ -274,29 +277,29 @@ class ListLabel(GridLayout):
 	def on_touch_down(self, touch):
 		if not self.click_menu:
 			return
-		#Î´´ò¿ª²Ëµ¥»ò²»ÊÇ
+		#æœªæ‰“å¼€èœå•æˆ–ä¸æ˜¯
 		if not self.click_menu.status or touch.button not in ['scrollup', 'scrolldown', 'middle']:
-			super(ListLabel, self).on_touch_down(touch) #ÏÈµ÷ÓÃ×Ó½ÚµãµÄÊÂ¼ş¸üĞÂselectÖµ
+			super(ListLabel, self).on_touch_down(touch) #å…ˆè°ƒç”¨å­èŠ‚ç‚¹çš„äº‹ä»¶æ›´æ–°selectå€¼
 		#Logger.info(str(touch.button))
 		if touch.button not in ['scrollup', 'scrolldown', 'middle']:
 			self.click_menu.close()
 		if self.collide_point(touch.x, touch.y):
 			if touch.button == 'right':
-				self.click_menu.open(Window.mouse_pos) #touchµÄ×ø±êÎªÏà¶Ô×ø±ê
+				self.click_menu.open(Window.mouse_pos) #touchçš„åæ ‡ä¸ºç›¸å¯¹åæ ‡
 
 class FileManager(GridLayout):
 	def __init__(self, **kwargs):
 		super(FileManager, self).__init__(**kwargs)
-		#ÎÄ¼şÁĞ±í
+		#æ–‡ä»¶åˆ—è¡¨
 		self.filelist = ListLabel()
 		self.filelist.click_menu = ClickMenu()
 		self.filelist.bind(minimum_height=self.filelist.setter('height'), minimum_width=self.filelist.setter('width'))
 
-		#±êÌâÀ¸
+		#æ ‡é¢˜æ 
 		self.titlelabel = TitleLabel()
 		self.titlelabel.mapping(self.filelist)
 
-		#¹ö¶¯Ìõ
+		#æ»šåŠ¨æ¡
 		self.scrollview = ScrollView()
 		self.scrollview.add_widget(self.filelist)
 

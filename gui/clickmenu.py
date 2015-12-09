@@ -12,10 +12,10 @@ from kivy.lang import Builder
 Builder.load_file('clickmenu.kv')
 
 
-#kvÎÄ¼şÖĞ¸ù¾İtransparentÉèÖÃ¿É¼û¶È
-#selectedº¯ÊıÊµÏÖÁËselect£¨Ñ¡ÔñÀàĞÍ£©µ½¿É¼û¶ÈµÄ×ª»»
-#selectÀàĞÍ
-#0Î´Ñ¡ÖĞ£¬1Êó±ê»¬¹ı£¬2Ñ¡ÖĞ
+#kvæ–‡ä»¶ä¸­æ ¹æ®transparentè®¾ç½®å¯è§åº¦
+#selectedå‡½æ•°å®ç°äº†selectï¼ˆé€‰æ‹©ç±»å‹ï¼‰åˆ°å¯è§åº¦çš„è½¬æ¢
+#selectç±»å‹
+#0æœªé€‰ä¸­ï¼Œ1é¼ æ ‡æ»‘è¿‡ï¼Œ2é€‰ä¸­
 class BackGround:
 	select = 0
 	space_color = ListProperty([0, .6, 1, 0])
@@ -37,14 +37,14 @@ class AttributeMenu(Label):
 	pass
 
 class OptionMenu(BackGround, GridLayout, HoverBehavior):
-	click_menu = None #ÏÂÒ»¼¶²Ëµ¥
+	click_menu = None #ä¸‹ä¸€çº§èœå•
 
 	def insert(self, **kwargs):
 		text = kwargs.get('text')
-		#¿ÉÒÔ¼ÌĞøÀ©Õ¹
+		#å¯ä»¥ç»§ç»­æ‰©å±•
 		if isinstance(text, tuple) or isinstance(text, list):
 			self.click_menu = ClickMenu()
-			self.click_menu.parent_menu = self.parent #ÉèÖÃ¸¸²Ëµ¥
+			self.click_menu.parent_menu = self.parent #è®¾ç½®çˆ¶èœå•
 			kwargs['text'] = text[1:]
 			self.click_menu.insert(**kwargs)
 			kwargs['text'] = text[0]
@@ -61,7 +61,7 @@ class OptionMenu(BackGround, GridLayout, HoverBehavior):
 		if self.click_menu:
 			self.click_menu.open(self.pos, open_type='enter', size=self.size)
 
-	#µİ¹éÅĞ¶ÏµãÊÇ·ñÔÚ×Ó¿Ø¼şÖĞ
+	#é€’å½’åˆ¤æ–­ç‚¹æ˜¯å¦åœ¨å­æ§ä»¶ä¸­
 	def collide(self, child_menu, x, y):
 		if child_menu:
 			if child_menu.collide_point(x, y):
@@ -70,13 +70,13 @@ class OptionMenu(BackGround, GridLayout, HoverBehavior):
 		return False
 
 	def on_enter(self, *args):
-		#½øÈë¸¸¿Ø¼şÊ±ÔÚ×Ó¿Ø¼şÖĞ
+		#è¿›å…¥çˆ¶æ§ä»¶æ—¶åœ¨å­æ§ä»¶ä¸­
 		if self.parent.child_menu:
 			if self.collide(self.parent.child_menu, self.border_point[0], self.border_point[1]):
 				return
 			self.parent.child_menu.close()
 			
-		#Çå¿ÕÍ¬¼¶²Ëµ¥selectÖµ
+		#æ¸…ç©ºåŒçº§èœå•selectå€¼
 		for child in self.parent.children:
 			if child.select == 1:
 				child.selected(0)
@@ -85,20 +85,20 @@ class OptionMenu(BackGround, GridLayout, HoverBehavior):
 		self.click()
 
 	def on_leave(self, *args):
-		#Àë¿ª×Ó¿Ø¼şÊ±ÔÚÆä×Ó¿Ø¼şÖĞ
+		#ç¦»å¼€å­æ§ä»¶æ—¶åœ¨å…¶å­æ§ä»¶ä¸­
 		if self.parent.child_menu:
 			if self.collide(self.parent, self.border_point[0], self.border_point[1]):
 				return
 
-		#Àë¿ª×Ó¿Ø¼şÊ±ÔÚ¸¸¿Ø¼şÖĞ
+		#ç¦»å¼€å­æ§ä»¶æ—¶åœ¨çˆ¶æ§ä»¶ä¸­
 		if self.parent.parent_menu:
-			if self.parent.parent_menu.collide_point(self.border_point[0], self.border_point[1]): #ÔÚ¸¸¿Ø¼şÄÚ
+			if self.parent.parent_menu.collide_point(self.border_point[0], self.border_point[1]): #åœ¨çˆ¶æ§ä»¶å†…
 				self.parent.close()
-				#Çå¿ÕÍ¬¼¶²Ëµ¥selectÖµ
+				#æ¸…ç©ºåŒçº§èœå•selectå€¼
 				for child in self.parent.parent_menu.children:
 					if child.select == 1:
 						child.selected(0)
-				#»ñÈ¡ËùÔÚ¿Ø¼ş
+				#è·å–æ‰€åœ¨æ§ä»¶
 				for child in self.parent.parent_menu.children:
 					if child.collide_point(self.border_point[0], self.border_point[1]):
 						if child.select == 0:
@@ -114,9 +114,9 @@ class ClickMenu(GridLayout):
 
 	attach_to = ObjectProperty(None)
 	_window = ObjectProperty(None, allownone=True)
-	status = False #ÊÇ·ñ´ò¿ª
-	child_menu = None #´ò¿ªµÄ×Ó²Ëµ¥
-	parent_menu = None #¸¸²Ëµ¥
+	status = False #æ˜¯å¦æ‰“å¼€
+	child_menu = None #æ‰“å¼€çš„å­èœå•
+	parent_menu = None #çˆ¶èœå•
 
 	def __init__(self, **kwargs):
 		self._parent = None
@@ -174,7 +174,7 @@ class ClickMenu(GridLayout):
 		return self
 
 	def close(self):
-		#µİ¹é¹Ø±ÕËùÓĞ½Úµã
+		#é€’å½’å…³é—­æ‰€æœ‰èŠ‚ç‚¹
 		for child in self.children:
 			if child.select == 1:
 					child.selected(0)
@@ -186,7 +186,7 @@ class ClickMenu(GridLayout):
 		self._window.remove_widget(self)
 		self._window = None
 		self.status = False
-		#¹Ø±ÕÊ±¸¸¿Ø¼şµÄchild_menuÖÃ¿Õ
+		#å…³é—­æ—¶çˆ¶æ§ä»¶çš„child_menuç½®ç©º
 		if self.parent_menu:
 			self.parent_menu.child_menu = None
 		return self

@@ -1,9 +1,14 @@
 #:kivy 1.9.0
+#:import ttf font.ttf
 
 <AttributeLabel>:
 	color: 0, 0, 0, 1
+	font_name: ttf
 	font_size: 16
-	text: 'abc'
+	text_size: self.size
+	shorten: True
+	shorten_from: 'right'
+
 	size_hint: None, None
 	size: 100, 20
 	canvas.before:
@@ -47,6 +52,7 @@
 	width: 500
 	scroll_type: ['bars']
 	do_scroll: True, True
+	bar_width: 5
 
 <FileManager>:
 	cols: 1
