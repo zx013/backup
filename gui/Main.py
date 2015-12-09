@@ -22,11 +22,11 @@ class DisplayScreen(FileManager):
 		self.filelist.click_menu.insert(text=['a', ['b', 'b1', 'b2', 'b3', 'b4', 'b5', ['ee', 'ee1', 'ee2', ['f', 'f1', ['g', ['h', 'h1']]]]], ['c', 'c1', 'c2'], 'd'])
 
 
-class MainApp(App):
+class mainApp(App):
 	def build(self):
 		ds = DisplayScreen()
 		ds.build()
 		return ds
 
 if __name__ == '__main__':
-	MainApp().run()
+	mainApp().run()

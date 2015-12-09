@@ -6,7 +6,7 @@ from kivy.properties import ListProperty, ObjectProperty
 
 from hoverbehavior import HoverBehavior
 
-from Tools import *
+from tools import *
 
 from kivy.lang import Builder
 Builder.load_file('clickmenu.kv')

@@ -15,7 +15,7 @@ from hoverbehavior import HoverBehavior
 import time
 
 from kivy.logger import Logger
-from Tools import *
+from tools import *
 
 from kivy.lang import Builder
 Builder.load_file('filemanager.kv')
