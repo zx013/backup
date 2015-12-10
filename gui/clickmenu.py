@@ -38,24 +38,39 @@ class AttributeMenu(Label):
 
 class OptionMenu(BackGround, GridLayout, HoverBehavior):
 	click_menu = None #下一级菜单
+	click_event = None
 
 	def insert(self, **kwargs):
-		text = kwargs.get('text')
-		#可以继续扩展
-		if isinstance(text, tuple) or isinstance(text, list):
+		if not self.click_menu:
 			self.click_menu = ClickMenu()
 			self.click_menu.parent_menu = self.parent #设置父菜单
-			kwargs['text'] = text[1:]
+
+		args = {} #缓存
+		for key, value in kwargs.items():
+			if isinstance(value, tuple) or isinstance(value, list):
+				kwargs[key] = value[1:]
+				args[key] = value[0]
+		if args:
 			self.click_menu.insert(**kwargs)
-			kwargs['text'] = text[0]
+		for key, value in args.items():
+			kwargs[key] = value
+
 		label = AttributeMenu(**kwargs)
 		self.add_widget(label)
-		#insert_args(self, **kwargs)
+		self.click_event = kwargs.get('event')
 
+	#捕捉点击事件，使其后控件的事件不生效
 	def on_touch_down(self, touch):
 		if self.collide_point(touch.x, touch.y):
 			return True
 		super(OptionMenu, self).on_touch_down(touch)
+
+	def on_touch_up(self, touch):
+		if self.collide_point(touch.x, touch.y):
+			if hasattr(self.click_event, '__call__'):
+				self.click_event()
+			return True
+		super(OptionMenu, self).on_touch_up(touch)
 
 	def click(self):
 		if self.click_menu:
@@ -75,7 +90,7 @@ class OptionMenu(BackGround, GridLayout, HoverBehavior):
 			if self.collide(self.parent.child_menu, self.border_point[0], self.border_point[1]):
 				return
 			self.parent.child_menu.close()
-			
+
 		#清空同级菜单select值
 		for child in self.parent.children:
 			if child.select == 1:

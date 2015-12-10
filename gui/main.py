@@ -3,6 +3,7 @@ import kivy
 kivy.require('1.9.0')
 
 from kivy.app import App
+from kivy.logger import Logger
 
 from filemanager import FileManager
 
@@ -25,6 +26,15 @@ def get_filelist(target_path):
 def get_titlelabel():
 	return ['名称', '修改日期', '设备', '大小']
 
+def a():
+	Logger.info('click a')
+
+def b():
+	Logger.info('click b')
+
+def b2():
+	Logger.info('click b2')
+
 class DisplayScreen(FileManager):
 	w = [180, 180, 60, 40]
 	def build(self):
@@ -34,7 +44,7 @@ class DisplayScreen(FileManager):
 		self.titlelabel.insert(text=get_titlelabel())
 		self.titlelabel.update(width=self.w)
 
-		self.filelist.click_menu.insert(text=['a', ['b', 'b1', 'b2', ['ee', 'ee1', 'ee2']], ['c', 'c1', 'c2'], 'd'])
+		self.filelist.click_menu.insert(text=['a', ['b', 'b1', 'b2', ['ee', 'ee1', 'ee2']], ['c', 'c1', 'c2'], 'd'], event=[a, [b, 'b1', b2, ['ee', 'ee1', 'ee2']], ['c', 'c1', 'c2'], 'd'])
 
 
 class mainApp(App):
