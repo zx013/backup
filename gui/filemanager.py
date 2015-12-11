@@ -6,9 +6,9 @@ from kivy.app import App
 from kivy.uix.label import Label
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.scrollview import ScrollView
+from kivy.properties import NumericProperty
 
 from kivy.core.window import Window
-from kivy.animation import Animation
 
 from clickmenu import BackGround, ClickMenu
 from hoverbehavior import HoverBehavior
@@ -23,6 +23,10 @@ Builder.load_file('filemanager.kv')
 class AttributeLabel(Label):
 	def insert(self, **kwargs):
 		insert_args(self, **kwargs)
+		if isinstance(self.parent, TitleLabel):
+			self.reverse = NumericProperty(0)
+			if len(self.parent.children) == 1: #开始时第一列初始化排序方式
+				self.reverse.defaultvalue = 1
 
 	def delete(self, **kwargs):
 		delete_args(self, **kwargs)
@@ -147,6 +151,45 @@ class TitleLabel(GridLayout):
 				children = children[:position] + [move_label] + children[position:]
 				filelabel.children = children[::-1]
 
+	#根据reverse值进行排序
+	def auto_sort(self):
+		children = self.children[::-1]
+		if self.filelist:
+			for num, child in enumerate(children):
+				if child.reverse.defaultvalue != 0:
+					def compare(x, y):
+						try: #如果为数字，则转换为数字比较
+							return cmp(float(x), float(y))
+						except:
+							return cmp(x, y)
+					key = lambda x: x.children[::-1][num].text
+					if child.reverse.defaultvalue == 1:
+						reverse = True
+					else:
+						reverse = False
+					#reverse=True，从小到大，reverse=False，从大到小
+					self.filelist.children = sorted(self.filelist.children, cmp=compare, key=key, reverse=reverse)
+					break
+
+	#将文件列表按num的compare顺序排列
+	def sort(self, num):
+		children = self.children[::-1]
+		if num < 0 or num > len(children):  #超出范围	
+			return
+
+		if self.filelist:
+			child_reverse = children[num].reverse.defaultvalue
+			#清空其它的reverse
+			for child in children:
+				child.reverse.defaultvalue = 0
+
+			if child_reverse <= 0:
+				children[num].reverse.defaultvalue = 1
+			else:
+				children[num].reverse.defaultvalue = -1
+			
+			self.auto_sort()
+
 	#事件类型
 	move_type = 0
 	#操作编号
@@ -154,8 +197,10 @@ class TitleLabel(GridLayout):
 	move_position = -1
 	#上一个点
 	move_pos = None
-	#初始位置
+	#点击的控件初始位置
 	move_base = None
+	#点击之间是否有移动，无移动释放时则是排序事件
+	is_move = False
 
 	#判定宽度
 	split_width = 10
@@ -215,12 +260,14 @@ class TitleLabel(GridLayout):
 			self.move_num -= 1
 		self.move_pos = int(round(touch.x)), int(round(touch.y))
 		self.move_base = list(self.children[::-1][self.move_num].pos)
+		self.is_move = False
 		self.filelist.enable = False
 		self.on_mouse_pos()
 		self.filelist.click_menu.close() #关闭右键菜单
 
 	def on_touch_move(self, touch):
 		super(TitleLabel, self).on_touch_move(touch)
+		self.is_move = True
 		#移动时鼠标可能移出范围
 		if touch.button != 'left':
 			return
@@ -242,17 +289,21 @@ class TitleLabel(GridLayout):
 			return
 		num, side = self.get_num()
 		child = self.children[::-1][self.move_num]
-		if self.move_num == num:
-			if self.move_type == 2:
-				child.pos = self.move_base
-		else:
-			if self.move_type == 2:
-				self.change(self.move_num, self.move_position)
+		if self.move_type == 2:
+			if not self.is_move:
+				self.sort(self.move_num)
+			else:
+				if self.move_num == num:
+					child.pos = self.move_base
+				else:
+					self.change(self.move_num, self.move_position)
+				
 		self.move_type = 0
 		self.move_num = -1
 		self.move_position = -1
 		self.move_pos = None
 		self.move_base = None
+		self.is_move = False
 		self.filelist.enable = True
 		self.on_mouse_pos()
 

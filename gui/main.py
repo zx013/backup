@@ -43,6 +43,7 @@ class DisplayScreen(FileManager):
 
 		self.titlelabel.insert(text=get_titlelabel())
 		self.titlelabel.update(width=self.w)
+		self.titlelabel.auto_sort()
 
 		self.filelist.click_menu.insert(text=['a', ['b', 'b1', 'b2', ['ee', 'ee1', 'ee2']], ['c', 'c1', 'c2'], 'd'], event=[a, [b, 'b1', b2, ['ee', 'ee1', 'ee2']], ['c', 'c1', 'c2'], 'd'])
 
