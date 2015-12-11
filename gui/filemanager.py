@@ -20,13 +20,10 @@ from tools import *
 from kivy.lang import Builder
 Builder.load_file('filemanager.kv')
 
-class AttributeLabel(Label):
+
+class AttributeFileLabel(Label):
 	def insert(self, **kwargs):
 		insert_args(self, **kwargs)
-		if isinstance(self.parent, TitleLabel):
-			self.reverse = NumericProperty(0)
-			if len(self.parent.children) == 1: #开始时第一列初始化排序方式
-				self.reverse.defaultvalue = 1
 
 	def delete(self, **kwargs):
 		delete_args(self, **kwargs)
@@ -36,7 +33,7 @@ class AttributeLabel(Label):
 
 
 class FileLabel(BackGround, GridLayout, HoverBehavior):
-	@apply_insert(AttributeLabel)
+	@apply_insert(AttributeFileLabel)
 	def insert(self, **kwargs):
 		pass
 
@@ -85,6 +82,21 @@ class FileLabel(BackGround, GridLayout, HoverBehavior):
 			self.selected(0)
 
 
+class AttributeTitleLabel(Label):
+	reverse = NumericProperty(0)
+	def insert(self, **kwargs):
+		insert_args(self, **kwargs)
+		if isinstance(self.parent, TitleLabel):
+			if len(self.parent.children) == 1: #开始时第一列初始化排序方式
+				self.reverse = 1
+
+	def delete(self, **kwargs):
+		delete_args(self, **kwargs)
+
+	def update(self, **kwargs):
+		insert_args(self, **kwargs)
+
+
 #调节宽度，改变排列顺序等功能
 class TitleLabel(GridLayout):
 	def __init__(self, **kwargs):
@@ -97,7 +109,7 @@ class TitleLabel(GridLayout):
 	def mapping(self, filelist):
 		self.filelist = filelist
 
-	@apply_insert(AttributeLabel)
+	@apply_insert(AttributeTitleLabel)
 	def insert(self, **kwargs):
 		pass
 
@@ -156,14 +168,14 @@ class TitleLabel(GridLayout):
 		children = self.children[::-1]
 		if self.filelist:
 			for num, child in enumerate(children):
-				if child.reverse.defaultvalue != 0:
+				if child.reverse != 0:
 					def compare(x, y):
 						try: #如果为数字，则转换为数字比较
 							return cmp(float(x), float(y))
 						except:
 							return cmp(x, y)
 					key = lambda x: x.children[::-1][num].text
-					if child.reverse.defaultvalue == 1:
+					if child.reverse == 1:
 						reverse = True
 					else:
 						reverse = False
@@ -178,15 +190,15 @@ class TitleLabel(GridLayout):
 			return
 
 		if self.filelist:
-			child_reverse = children[num].reverse.defaultvalue
+			child_reverse = children[num].reverse
 			#清空其它的reverse
 			for child in children:
-				child.reverse.defaultvalue = 0
+				child.reverse = 0
 
 			if child_reverse <= 0:
-				children[num].reverse.defaultvalue = 1
+				children[num].reverse = 1
 			else:
-				children[num].reverse.defaultvalue = -1
+				children[num].reverse = -1
 			
 			self.auto_sort()
 

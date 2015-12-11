@@ -1,7 +1,7 @@
 #:kivy 1.9.0
 #:import ttf font.ttf
 
-<AttributeLabel>:
+<AttributeFileLabel>:
 	color: 0, 0, 0, 1
 	font_name: ttf
 	font_size: 16
@@ -31,6 +31,29 @@
 			rgba: self.frame_color
 		Line:
 			rectangle: self.x, self.y, self.width, self.height
+
+<AttributeTitleLabel>:
+	color: 0, 0, 0, 1
+	font_name: ttf
+	font_size: 16
+	text_size: self.size
+	shorten: True
+	shorten_from: 'right'
+
+	size_hint: None, None
+	size: 100, 20
+	reverse_pos: self.x + self.width / 2.0, self.y + 16
+	canvas.before:
+		Color:
+			rgba: .2, .2, .2, .2
+		Line:
+			rectangle: self.x, self.y, self.width, self.height
+		#排列顺序的小三角形
+		Color:
+			rgba: 0, 0, 0, .4 if self.reverse else 0
+		Line:
+			points: self.x + self.width / 2.0, self.y + 16 + self.reverse * 2, self.x + self.width / 2.0 - 4, self.y + 16 - self.reverse *  2, self.x + self.width / 2.0 + 4, self.y + 16 - self.reverse *  2
+			close: True
 
 <TitleLabel>:
 	rows: 1
