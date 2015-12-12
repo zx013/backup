@@ -82,7 +82,7 @@ class FileLabel(BackGround, GridLayout, HoverBehavior):
 			self.selected(0)
 
 
-class AttributeTitleLabel(Label):
+class AttributeTitleLabel(BackGround, Label, HoverBehavior):
 	reverse = NumericProperty(0)
 	def insert(self, **kwargs):
 		insert_args(self, **kwargs)
@@ -95,6 +95,54 @@ class AttributeTitleLabel(Label):
 
 	def update(self, **kwargs):
 		insert_args(self, **kwargs)
+
+	def on_enter(self, *args):
+		#如果打开了右键菜单，则不选中
+		try:
+			#ListLabel的click_menu
+			if self.parent.parent.click_menu.status:
+				return
+		except: pass
+		#有事件时，不产生进入效果
+		if self.parent.move_type:
+			return
+		#选中前，将其它选中的清空
+		for child in self.parent.children:
+			if child.select == 1:
+				child.selected(0)
+		if self.select == 0:
+			self.selected(1)
+
+	def on_leave(self, *args):
+		if self.parent.move_type:
+			return
+		if self.select == 1:
+			self.selected(0)
+
+	def on_touch_down(self, touch):
+		if not self.collide_point(touch.x, touch.y):
+			return
+		if self.parent.move_type == 2:
+			self.selected(2)
+
+	def on_touch_up(self, touch):
+		for child in self.parent.children:
+			if child.select == 1:
+				child.selected(0)
+		#只操作移动的控件
+		for child in self.parent.children:
+			if child.select == 2:
+				break
+		else:
+			if self.collide_point(touch.x, touch.y):
+				child.selected(1)
+			return
+
+		#释放点在控件内则置1，不在则置0
+		if child.collide_point(touch.x, touch.y):
+			child.selected(1)
+		else:
+			child.selected(0)
 
 
 #调节宽度，改变排列顺序等功能
@@ -260,8 +308,7 @@ class TitleLabel(GridLayout):
 	#调节宽度事件，move_type = 1
 	#移动位置事件，move_type = 2
 	def on_touch_down(self, touch):
-		#判断鼠标位置，靠近右边界进入调节宽度状态，其它位置进入移动位置状态
-		super(TitleLabel, self).on_touch_down(touch)
+		#判断鼠标位置，靠近右边界进入调节宽度状态，其它位置进入移动位置状态		
 		if not self.collide_point(touch.x, touch.y):
 			return
 		if touch.button != 'left':
@@ -276,6 +323,8 @@ class TitleLabel(GridLayout):
 		self.filelist.enable = False
 		self.on_mouse_pos()
 		self.filelist.click_menu.close() #关闭右键菜单
+		#更新self.move_type后再调用子控件事件，以便使拉伸操作不变深
+		super(TitleLabel, self).on_touch_down(touch)
 
 	def on_touch_move(self, touch):
 		super(TitleLabel, self).on_touch_move(touch)

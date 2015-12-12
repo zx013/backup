@@ -48,6 +48,16 @@
 			rgba: .2, .2, .2, .2
 		Line:
 			rectangle: self.x, self.y, self.width, self.height
+		Color:
+			rgba: self.space_color
+		Rectangle:
+			pos: self.pos
+			size: self.size
+		Color:
+			rgba: self.frame_color
+		Line:
+			rectangle: self.x, self.y, self.width, self.height
+		
 		#排列顺序的小三角形
 		Color:
 			rgba: 0, 0, 0, .4 if self.reverse else 0
