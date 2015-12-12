@@ -126,6 +126,7 @@ class AttributeTitleLabel(BackGround, Label, HoverBehavior):
 			self.selected(2)
 
 	def on_touch_up(self, touch):
+		#多个控件同时作用，相互间会有影响
 		for child in self.parent.children:
 			if child.select == 1:
 				child.selected(0)
