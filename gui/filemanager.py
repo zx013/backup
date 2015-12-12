@@ -305,10 +305,8 @@ class TitleLabel(GridLayout):
 			if not self.is_move:
 				self.sort(self.move_num)
 			else:
-				if self.move_num == num:
-					child.pos = self.move_base
-				else:
-					self.change(self.move_num, self.move_position)
+				child.pos = self.move_base
+				self.change(self.move_num, self.move_position)
 				
 		self.move_type = 0
 		self.move_num = -1
