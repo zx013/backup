@@ -9,7 +9,7 @@ from hoverbehavior import HoverBehavior
 from tools import *
 
 from kivy.lang import Builder
-Builder.load_file('clickmenu.kv')
+Builder.load_file('gui/clickmenu.kv')
 
 
 #kv文件中根据transparent设置可见度

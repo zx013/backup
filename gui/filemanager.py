@@ -18,7 +18,7 @@ from kivy.logger import Logger
 from tools import *
 
 from kivy.lang import Builder
-Builder.load_file('filemanager.kv')
+Builder.load_file('gui/filemanager.kv')
 
 
 class AttributeFileLabel(Label):
