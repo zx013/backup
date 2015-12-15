@@ -10,7 +10,7 @@ import urllib
 import urllib2
 import hashlib
 import time
-from Base import Base
+from base import Base
 from tools import make_list, split_file, code
 from log import error_log
 

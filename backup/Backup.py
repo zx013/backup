@@ -9,10 +9,10 @@ import os
 import thread
 import time
 
-from Config import Config
-from Windows import Windows
-from Disk import Disk
-from Baidu import Baidu
+from config import Config
+from windows import Windows
+from disk import Disk
+from baidu import Baidu
 from tools import *
 from log import debug_log, write_log
 

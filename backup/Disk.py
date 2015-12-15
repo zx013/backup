@@ -1,7 +1,7 @@
 #-*- coding:utf-8 -*-
 import os
 import shutil
-from Base import Base
+from base import Base
 from tools import make_list, split_file, code
 from log import debug_log, write_log, error_log
 
