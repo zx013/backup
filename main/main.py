@@ -1,6 +1,6 @@
 #-*- coding:utf-8 -*-
-import os
-os.chdir('..') #切换回根目录
+#import os
+#os.chdir('..') #切换回根目录
 import sys
 sys.path.append('.') #添加到搜索路径
 
@@ -11,7 +11,7 @@ from kivy.app import App
 from kivy.logger import Logger
 
 from gui.filemanager import FileManager
-
+from right_click import text, event
 
 import os
 def show(target_path):
@@ -31,14 +31,6 @@ def get_filelist(target_path):
 def get_titlelabel():
 	return ['名称', '修改日期', '设备', '大小']
 
-def a():
-	Logger.info('click a')
-
-def b():
-	Logger.info('click b')
-
-def b2():
-	Logger.info('click b2')
 
 class DisplayScreen(FileManager):
 	w = [180, 180, 60, 40]
@@ -50,7 +42,7 @@ class DisplayScreen(FileManager):
 		self.titlelabel.update(width=self.w)
 		self.titlelabel.auto_sort()
 
-		self.filelist.click_menu.insert(text=['a', ['b', 'b1', 'b2', ['ee', 'ee1', 'ee2']], ['c', 'c1', 'c2'], 'd'], event=[a, [b, 'b1', b2, ['ee', 'ee1', 'ee2']], ['c', 'c1', 'c2'], 'd'])
+		self.filelist.click_menu.insert(text=text, event=event)
 
 
 class mainApp(App):
