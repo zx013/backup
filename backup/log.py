@@ -32,6 +32,8 @@ def check_log(name):
 		if base_size > size: os.remove(path)
 
 def debug_log(log):
+	if isinstance(log, unicode):
+		log = log.encode('utf-8')
 	print log
 
 def write_log_inside(name, log):

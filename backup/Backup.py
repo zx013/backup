@@ -140,11 +140,13 @@ class Backup():
 		#windows = Windows(self.config.get('basic', 'base', 'save'))
 		#thread.start_new_thread(windows.save_file, ())
 
-		#self.start_backup(Disk)
+		self.start_backup(Disk)
 		#self.start_backup(Baidu)
-		self.start_restore(Baidu, '/backup/test', 'F:/', restore_cover=True)
+		#self.start_restore(Baidu, '/backup/test', 'F:/', restore_cover=True)
 
 
 if __name__ == '__main__':
 	backup = Backup()
 	backup.run()
+	while True:
+		pass
