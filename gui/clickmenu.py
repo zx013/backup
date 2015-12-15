@@ -41,17 +41,17 @@ class OptionMenu(BackGround, GridLayout, HoverBehavior):
 	click_event = None
 
 	def insert(self, **kwargs):
-		if not self.click_menu:
-			self.click_menu = ClickMenu()
-			self.click_menu.parent_menu = self.parent #设置父菜单
-
 		args = {} #缓存
 		for key, value in kwargs.items():
 			if isinstance(value, tuple) or isinstance(value, list):
 				kwargs[key] = value[1:]
 				args[key] = value[0]
 		if args:
-			self.click_menu.insert(**kwargs)
+			if not self.click_menu:
+				self.click_menu = ClickMenu()
+				self.click_menu.parent_menu = self.parent #设置父菜单
+				self.click_menu.insert(**kwargs)
+			
 		for key, value in args.items():
 			kwargs[key] = value
 
