@@ -1,7 +1,9 @@
 #-*- coding:utf-8 -*-
-#import os
-#os.chdir('..') #切换回根目录
+import os
 import sys
+path = os.path.split(os.path.realpath(sys.argv[0]))[0]
+os.chdir(path)
+os.chdir('..')
 sys.path.append('.') #添加到搜索路径
 
 import kivy
