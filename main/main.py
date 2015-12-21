@@ -14,15 +14,11 @@ from gui.filemanager import FileManager
 from right_click import text, event
 
 import os
-def show(target_path):
-	target_list = os.walk(target_path).next()
-	target_dir = map(lambda x: '%s/%s' % (target_list[0], x), target_list[1][::-1])
-	target_file = map(lambda x: '%s/%s' % (target_list[0], x), target_list[2][::-1])
-	return target_dir, target_file
+from backup.disk import Disk
 
 def get_filelist(target_path):
 	t = []
-	target_dir, target_file = show(target_path)
+	target_dir, target_file = Disk.show(target_path)
 	for f in target_dir + target_file:
 		f_stat= os.stat(f)
 		t.append(map(str, [f.encode('utf-8'), f_stat.st_mtime, f_stat.st_dev, f_stat.st_size]))
