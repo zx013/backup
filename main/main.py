@@ -42,6 +42,9 @@ class DisplayScreen(FileManager):
 
 		self.filelist.click_menu.insert(text=text, event=event)
 
+		self.statusbar.insert(text=['a', 'b', 'c', 'd'])
+		self.statusbar.update(width=self.w)
+
 
 class mainApp(App):
 	def build(self):

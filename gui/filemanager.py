@@ -8,6 +8,7 @@ from kivy.uix.scrollview import ScrollView
 from clickmenu import ClickMenu
 from titlelabel import TitleLabel
 from filelist import FileList
+from statusbar import StatusBar
 
 from kivy.logger import Logger
 from tools import *
@@ -32,5 +33,9 @@ class FileManager(GridLayout):
 		self.scrollview = ScrollView()
 		self.scrollview.add_widget(self.filelist)
 
+		#状态栏
+		self.statusbar = StatusBar()
+
 		self.add_widget(self.titlelabel)
 		self.add_widget(self.scrollview)
+		self.add_widget(self.statusbar)
