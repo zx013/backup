@@ -14,7 +14,8 @@ from kivy.app import App
 from kivy.logger import Logger
 
 from gui.filemanager import FileManager
-from right_click import text, event
+from clickmenu_event import clickmenu_text, clickmenu_event
+from statusbar_event import statusbar_event
 
 from backup.config import Config
 
@@ -44,9 +45,9 @@ class DisplayScreen(FileManager):
 		self.titlelabel.update(width=self.w)
 		self.titlelabel.auto_sort()
 
-		self.filelist.click_menu.insert(text=text, event=event)
+		self.filelist.click_menu.insert(text=clickmenu_text, event=clickmenu_event)
 
-		self.statusbar.insert(text=['a', 'b', 'c', 'd'])
+		self.statusbar.insert(event=statusbar_event)
 		self.statusbar.update(width=self.w)
 
 
