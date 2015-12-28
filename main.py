@@ -3,7 +3,6 @@ import os
 import sys
 path = os.path.split(os.path.realpath(sys.argv[0]))[0]
 os.chdir(path)
-os.chdir('..')
 sys.path.append('.') #添加到搜索路径
 
 
@@ -14,8 +13,8 @@ from kivy.app import App
 from kivy.logger import Logger
 
 from gui.filemanager import FileManager
-from clickmenu_event import clickmenu_text, clickmenu_event
-from statusbar_event import statusbar_event
+from event.clickmenu_event import clickmenu_text, clickmenu_event
+from event.statusbar_event import statusbar_text, statusbar_event
 
 from backup.config import Config
 
@@ -47,7 +46,7 @@ class DisplayScreen(FileManager):
 
 		self.filelist.click_menu.insert(text=clickmenu_text, event=clickmenu_event)
 
-		self.statusbar.insert(event=statusbar_event)
+		self.statusbar.insert(text=statusbar_text, event=statusbar_event)
 		self.statusbar.update(width=self.w)
 
 
