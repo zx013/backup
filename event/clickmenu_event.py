@@ -1,18 +1,18 @@
 #-*- coding:utf-8 -*-
 
-def click_1():
+def click_1(self):
 	pass
 
-def click_2():
+def click_2(self):
 	pass
 
-def click_3():
+def click_3(self):
 	pass
 
-def click_4():
+def click_4(self):
 	pass
 
-def click_5():
+def click_5(self):
 	pass
 
 

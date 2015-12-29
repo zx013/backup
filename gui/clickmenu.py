@@ -48,7 +48,7 @@ class OptionMenu(BackGround, GridLayout, HoverBehavior):
 	def on_touch_up(self, touch):
 		if self.collide_point(touch.x, touch.y):
 			if hasattr(self.click_event, '__call__'):
-				self.click_event()
+				self.click_event(self)
 			return True
 		super(OptionMenu, self).on_touch_up(touch)
 
