@@ -41,6 +41,10 @@ class FileLabel(BackGround, GridLayout, HoverBehavior):
 	def update(self, **kwargs):
 		pass
 
+	@apply_destroy
+	def destroy(self, **kwargs):
+		pass
+
 	def on_touch_down(self, touch):
 		#如果选中则直接打开选项栏
 		#如果未选中则清空其它选项并选择该项，然后打开选项栏
@@ -91,6 +95,10 @@ class FileList(GridLayout):
 
 	@apply_update
 	def update(self, **kwargs):
+		pass
+
+	@apply_destroy
+	def destroy(self, **kwargs):
 		pass
 
 	click_menu = None

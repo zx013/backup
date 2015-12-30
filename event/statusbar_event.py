@@ -1,6 +1,7 @@
 #-*- coding:utf-8 -*-
 from event import connect
 
+
 #更新方式
 #定时刷新 备份介质信息
 #函数起止 备份状态信息
@@ -28,3 +29,11 @@ def status_3(*args, **kwargs):
 
 def status_4(*args, **kwargs):
 	pass
+
+
+def statusbar_init(*args, **kwargs):
+	w = [180, 180, 60, 40]
+	self = args[0]
+	self.statusbar.insert(width=w)
+	self.statusbar.timer() #启动定时器
+connect('statusbar_init', statusbar_init)

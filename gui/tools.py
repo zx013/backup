@@ -54,7 +54,6 @@ def apply_delete(func):
 		return ret
 	return run
 
-
 #将**kwargs依次应用到children中
 def apply_update(func):
 	@wraps(func)
@@ -68,6 +67,19 @@ def apply_update(func):
 			child_func = getattr(child, func.__name__, None)
 			if child_func: #子控件中存在该方法
 				child_func(**kwarg)
+		return ret
+	return run
+
+#清空所有控件
+def apply_destroy(func):
+	@wraps(func)
+	def run(self, *args, **kwargs):
+		ret = func(self, *args, **kwargs)
+		for child in self.children[::-1]:
+			child_func = getattr(child, func.__name__, None)
+			if child_func: #子控件中存在该方法
+				child_func(*args, **kwargs)
+			self.remove_widget(child)
 		return ret
 	return run
 
