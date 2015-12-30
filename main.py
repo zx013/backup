@@ -14,7 +14,7 @@ from kivy.logger import Logger
 
 from gui.filemanager import FileManager
 from event.clickmenu_event import clickmenu_text, clickmenu_event
-from event.statusbar_event import statusbar_mark, statusbar_event
+from event.statusbar_event import statusbar_event
 
 from backup.config import Config
 
@@ -46,7 +46,7 @@ class DisplayScreen(FileManager):
 
 		self.filelist.click_menu.insert(text=clickmenu_text, event=clickmenu_event)
 
-		self.statusbar.insert(mark=statusbar_mark, event=statusbar_event)
+		self.statusbar.insert(event=statusbar_event)
 		self.statusbar.update(width=self.w)
 		self.statusbar.start_timer() #启动定时器
 

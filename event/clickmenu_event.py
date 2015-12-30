@@ -1,18 +1,20 @@
 #-*- coding:utf-8 -*-
+from event import connect
 
-def click_1(self):
+def click_1(*args, **kwargs):
+	pass
+connect('backup_event', click_1)
+
+def click_2(*args, **kwargs):
 	pass
 
-def click_2(self):
+def click_3(*args, **kwargs):
 	pass
 
-def click_3(self):
+def click_4(*args, **kwargs):
 	pass
 
-def click_4(self):
-	pass
-
-def click_5(self):
+def click_5(*args, **kwargs):
 	pass
 
 
