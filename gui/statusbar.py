@@ -6,9 +6,7 @@ from kivy.uix.label import Label
 from kivy.uix.gridlayout import GridLayout
 
 from tools import *
-from event.event import signal
-import thread
-import time
+from event.event import signal, timer
 
 from kivy.lang import Builder
 Builder.load_file('gui/statusbar.kv')
@@ -21,7 +19,6 @@ class AttributeStatusBar(Label):
 	def update(self, **kwargs):
 		insert_args(self, **kwargs)
 
-
 class StatusBar(GridLayout):
 	@apply_insert(AttributeStatusBar)
 	def insert(self, **kwargs):
@@ -31,11 +28,8 @@ class StatusBar(GridLayout):
 	def update(self, **kwargs):
 		pass
 
-	def timer(self):
-		while 1:
-			signal('statusbar_timer_event', self)
-			time.sleep(1)
-		thread.exit_thread()
+	def achieve_timer(self):
+		signal('statusbar_timer_event', self)
 
-	def start_timer(self):
-		thread.start_new_thread(self.timer, ())
+	def timer(self):
+		timer(self.achieve_timer, (), 1)

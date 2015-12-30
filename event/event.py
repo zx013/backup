@@ -1,4 +1,6 @@
 #-*- coding:utf-8 -*-
+import thread
+import time
 
 global event
 event = {}
@@ -15,3 +17,14 @@ def connect(sign, func):
 	global event
 	event.setdefault(sign, [])
 	event[sign].append(func)
+
+
+def achieve_timer(func, interval, *args):
+	while 1:
+		func(*args)
+		time.sleep(interval)
+	thread.exit_thread()
+
+#¶¨Ê±Æ÷
+def timer(func, args, interval):
+	thread.start_new_thread(achieve_timer, (func, interval) + args)

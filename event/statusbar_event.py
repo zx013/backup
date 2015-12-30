@@ -28,6 +28,3 @@ def status_3(*args, **kwargs):
 
 def status_4(*args, **kwargs):
 	pass
-
-
-statusbar_event = [status_1, status_2, status_3, status_4]

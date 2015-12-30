@@ -1,9 +1,7 @@
 #-*- coding:utf-8 -*-
-from event import connect
 
 def click_1(*args, **kwargs):
 	pass
-connect('backup_event', click_1)
 
 def click_2(*args, **kwargs):
 	pass
