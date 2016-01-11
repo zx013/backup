@@ -19,15 +19,17 @@ class OperateButton(Button):
 	def update(self, **kwargs):
 		insert_args(self, **kwargs)
 
-	def on_touch_down(self, touch):
+	def on_touch_up(self, touch):
 		if self.collide_point(touch.x, touch.y):
 			if hasattr(self, 'event'):
 				if hasattr(self.event, '__call__'):
 					self.event(self)
-		super(OperateButton, self).on_touch_down(touch)
+		super(OperateButton, self).on_touch_up(touch)
 
 
 class OperateList(GridLayout):
+	config_view = None
+
 	@apply_insert(OperateButton)
 	def insert(self, **kwargs):
 		pass

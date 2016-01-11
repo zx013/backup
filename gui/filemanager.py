@@ -10,6 +10,7 @@ from titlelabel import TitleLabel
 from filelist import FileList
 from statusbar import StatusBar
 from operatelist import OperateList
+from configview import ConfigView
 
 from tools import *
 
@@ -38,6 +39,7 @@ class FileManager(GridLayout):
 
 		#操作按钮
 		self.operatelist = OperateList()
+		self.operatelist.config_view = ConfigView()
 
 		self.add_widget(self.operatelist)
 		self.add_widget(self.titlelabel)
