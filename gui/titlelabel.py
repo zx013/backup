@@ -107,22 +107,24 @@ class TitleLabel(GridLayout):
 		if distance == 0: #移动0距离时直接返回
 			return
 		children = self.children[::-1]
-		if num < 0 or num > len(children):  #超出范围
+		if num < 0 or num > len(children) - 2:  #超出范围
+			return
+		if children[num].width + distance < width_min or children[num + 1].width - distance < width_min:
 			return
 		children[num].width += distance
-		if children[num].width < width_min:
-			children[num].width = width_min
+		children[num + 1].width -= distance
 
 		#调节子标题后重新设置宽度
-		self.width = sum([child.width for child in self.children])
+		#self.width = sum([child.width for child in self.children])
 
 		if self.filelist:
 			for filelabel in self.filelist.children:
 				children = filelabel.children[::-1]
+				if children[num].width + distance < width_min or children[num + 1].width - distance < width_min:
+					continue
 				children[num].width += distance
-				if children[num].width < width_min:
-					children[num].width = width_min
-				filelabel.width = sum([child.width for child in filelabel.children])
+				children[num + 1].width -= distance
+				#filelabel.width = sum([child.width for child in filelabel.children])
 
 	#将第num个标题插入到position之后
 	def change(self, num, position):

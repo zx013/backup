@@ -39,7 +39,8 @@ class FileManager(GridLayout):
 		#操作按钮
 		self.operatelist = OperateList()
 
+		self.add_widget(self.operatelist)
 		self.add_widget(self.titlelabel)
 		self.add_widget(self.scrollview)
 		self.add_widget(self.statusbar)
-		self.add_widget(self.operatelist)
+

@@ -19,8 +19,8 @@
 
 <FileLabel>:
 	rows: 1
-	size_hint: None, None
-	size: 400, 20
+	size_hint: 1, None
+	height: 20
 	canvas.before:
 		Color:
 			rgba: self.space_color
@@ -34,5 +34,5 @@
 
 <FileList>:
 	cols: 1
-	size_hint: None, None
-	size: 400, len(self.children) * 20
+	size_hint: 1, None
+	height: len(self.children) * 20

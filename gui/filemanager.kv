@@ -2,15 +2,18 @@
 #:import ttf gui.font.ttf
 
 <ScrollView>:
-	size_hint_x: None
-	width: 500
 	scroll_type: ['bars']
 	do_scroll: True, True
 	bar_width: 5
+	canvas.before:
+		Color:
+			rgba: .5, .5, .5, .5
+		Line:
+			rectangle: self.x, self.y, self.width, self.height
 
 <FileManager>:
 	cols: 1
-	size_hint: .6, .9
+	size_hint: .9, .9
 	pos_hint: {'x': .05, 'top': .95}
 	canvas:
 		Color:
