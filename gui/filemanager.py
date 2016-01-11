@@ -9,8 +9,8 @@ from clickmenu import ClickMenu
 from titlelabel import TitleLabel
 from filelist import FileList
 from statusbar import StatusBar
+from operatelist import OperateList
 
-from kivy.logger import Logger
 from tools import *
 
 from kivy.lang import Builder
@@ -36,6 +36,10 @@ class FileManager(GridLayout):
 		#状态栏
 		self.statusbar = StatusBar()
 
+		#操作按钮
+		self.operatelist = OperateList()
+
 		self.add_widget(self.titlelabel)
 		self.add_widget(self.scrollview)
 		self.add_widget(self.statusbar)
+		self.add_widget(self.operatelist)

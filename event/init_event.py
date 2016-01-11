@@ -10,6 +10,7 @@ import clickmenu_event
 import filelist_event
 import titlelabel_event
 import statusbar_event
+import operatelist_event
 
 
 def system_init(*args, **kwargs):
@@ -18,4 +19,5 @@ def system_init(*args, **kwargs):
 	signal('filelist_init', self)
 	signal('titlelabel_init', self)
 	signal('statusbar_init', self)
+	signal('operatelist_init', self)
 connect('system_init', system_init)
