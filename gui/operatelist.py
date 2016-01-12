@@ -18,12 +18,12 @@ class OperateButton(Button):
 	def update(self, **kwargs):
 		insert_args(self, **kwargs)
 
-	def on_touch_up(self, touch):
-		if self.collide_point(touch.x, touch.y):
+	def on_release(self):
+		if self.collide_point(self.last_touch.x, self.last_touch.y):
 			if hasattr(self, 'event'):
 				if hasattr(self.event, '__call__'):
 					self.event(self)
-		super(OperateButton, self).on_touch_up(touch)
+		super(OperateButton, self).on_release()
 
 
 class OperateList(GridLayout):
