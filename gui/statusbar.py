@@ -8,9 +8,6 @@ from kivy.uix.gridlayout import GridLayout
 from tools import *
 from event.event import signal, timer
 
-from kivy.lang import Builder
-Builder.load_file('gui/statusbar.kv')
-
 
 class AttributeStatusBar(Label):
 	def insert(self, **kwargs):

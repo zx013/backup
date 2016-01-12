@@ -7,8 +7,6 @@ from configview import ConfigView
 
 from tools import *
 
-from kivy.lang import Builder
-Builder.load_file('gui/operatelist.kv')
 
 class OperateButton(Button):
 	def insert(self, **kwargs):

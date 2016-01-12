@@ -14,9 +14,6 @@ import time
 from kivy.logger import Logger
 from tools import *
 
-from kivy.lang import Builder
-Builder.load_file('gui/filelist.kv')
-
 
 class AttributeFileLabel(Label):
 	def insert(self, **kwargs):

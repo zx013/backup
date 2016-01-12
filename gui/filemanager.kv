@@ -15,7 +15,7 @@
 	cols: 1
 	canvas:
 		Color:
-			rgba: .5, .5, 1, 1
+			rgba: .5, .5, 1, .5
 		Rectangle:
 			pos: self.pos
 			size: self.size
@@ -23,7 +23,7 @@
 	titlelabel: self.ids['d_titlelabel']
 	TitleLabel:
 		id: d_titlelabel
-		filelist: root.ids['d_filelist']
+		filelist: root.filelist
 	ScrollView:
 		FileList:
 			id: d_filelist

@@ -13,9 +13,6 @@ from hoverbehavior import HoverBehavior
 from kivy.logger import Logger
 from tools import *
 
-from kivy.lang import Builder
-Builder.load_file('gui/titlelabel.kv')
-
 
 class AttributeTitleLabel(BackGround, Label, HoverBehavior):
 	reverse = NumericProperty(0)
