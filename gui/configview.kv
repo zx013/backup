@@ -3,6 +3,44 @@
 
 <ConfigView>:
 	title: 'Test popup'
-	size_hint: None, None
-	size: 200, 200
+	size_hint: .8, .8
 	disabled: True
+	auto_dismiss: False
+	GridLayout:
+		cols: 1
+		size_hint: 1, 1
+		GridLayout:
+			rows: 1
+			size_hint: 1, .9
+			GridLayout:
+				cols: 1
+				Button:
+					text: 'base'
+				Button:
+					text: 'disk'
+				Button:
+					text: 'baidu'
+			GridLayout:
+				cols: 1
+				Button:
+					text: 'ignore'
+					size_hint: 1, .9
+				GridLayout:
+					rows: 1
+					size_hint: 1, .1
+					Button:
+						text: 'add'
+					Button:
+						text: 'mod'
+					Button:
+						text: 'del'
+		GridLayout:
+			rows: 1
+			size_hint: 1, .1
+			Label:
+				size_hint: .8, 1
+			Button:
+				size_hint: .1, 1
+			Button:
+				size_hint: .1, 1
+		
