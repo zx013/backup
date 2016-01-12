@@ -9,25 +9,25 @@ from event import connect
 global num
 num = 1
 
-def status_1(*args, **kwargs):
+def statusbar_1(*args, **kwargs):
 	self = args[0]
 	self.children[-1].text = str(num)
-connect('statusbar_timer_event', status_1)
+connect('statusbar_timer_event', statusbar_1)
 
-def status_2(*args, **kwargs):
+def statusbar_2(*args, **kwargs):
 	self = args[0]
 	self.children[-2].text = str(num * 2)
-connect('statusbar_timer_event', status_2)
+connect('statusbar_timer_event', statusbar_2)
 
-def status_num(*args, **kwargs):
+def statusbar_num(*args, **kwargs):
 	global num
 	num += 1
-connect('statusbar_timer_event', status_num)
+connect('statusbar_timer_event', statusbar_num)
 
-def status_3(*args, **kwargs):
+def statusbar_3(*args, **kwargs):
 	pass
 
-def status_4(*args, **kwargs):
+def statusbar_4(*args, **kwargs):
 	pass
 
 
