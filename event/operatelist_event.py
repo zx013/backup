@@ -18,5 +18,5 @@ operatelist_event = [operatelist_1, operatelist_2, operatelist_3]
 
 def operatelist_init(*args, **kwargs):
 	self = args[0]
-	self.operatelist.insert(text=operatelist_text, event=operatelist_event)
+	self.insert(text=operatelist_text, event=operatelist_event)
 connect('operatelist_init', operatelist_init)

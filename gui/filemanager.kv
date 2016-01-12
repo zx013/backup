@@ -11,13 +11,19 @@
 		Line:
 			rectangle: self.x, self.y, self.width, self.height
 
-<FileManager>:
+<FileManager@GridLayout>:
 	cols: 1
-	size_hint: .9, .9
-	pos_hint: {'x': .05, 'top': .95}
 	canvas:
 		Color:
-			rgba: 1, 1, 1, 1
+			rgba: .5, .5, 1, 1
 		Rectangle:
 			pos: self.pos
 			size: self.size
+	filelist: self.ids['d_filelist']
+	titlelabel: self.ids['d_titlelabel']
+	TitleLabel:
+		id: d_titlelabel
+		filelist: root.ids['d_filelist']
+	ScrollView:
+		FileList:
+			id: d_filelist

@@ -1,0 +1,17 @@
+#:kivy 1.9.0
+#:import ttf gui.font.ttf
+
+<MainView@GridLayout>:
+	cols: 1
+	canvas:
+		Color:
+			rgba: 1, 1, 1, 1
+		Rectangle:
+			pos: self.pos
+			size: self.size
+	OperateList:
+		id: d_operatelist
+	FileManager:
+		id: d_filemanager
+	StatusBar:
+		id: d_statusbar

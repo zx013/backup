@@ -34,6 +34,6 @@ def status_4(*args, **kwargs):
 def statusbar_init(*args, **kwargs):
 	w = [180, 180, 60, 40]
 	self = args[0]
-	self.statusbar.insert(width=w)
-	self.statusbar.timer() #启动定时器
+	self.insert(width=w)
+	self.timer() #启动定时器
 connect('statusbar_init', statusbar_init)

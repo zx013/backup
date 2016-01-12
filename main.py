@@ -4,14 +4,13 @@ kivy.require('1.9.0')
 
 from kivy.app import App
 
-from gui.filemanager import FileManager
+from gui.mainview import MainView
 from event import init_event, event
 
 
-class DisplayScreen(FileManager):
+class DisplayScreen(MainView):
 	def build(self):
 		event.signal('system_init', self)
-
 
 class mainApp(App):
 	def build(self):

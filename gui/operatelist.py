@@ -3,6 +3,7 @@ import kivy
 kivy.require('1.9.0')
 from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
+from configview import ConfigView
 
 from tools import *
 
@@ -28,7 +29,7 @@ class OperateButton(Button):
 
 
 class OperateList(GridLayout):
-	config_view = None
+	config_view = ConfigView()
 
 	@apply_insert(OperateButton)
 	def insert(self, **kwargs):

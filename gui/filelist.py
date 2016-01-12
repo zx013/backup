@@ -6,6 +6,7 @@ from kivy.uix.gridlayout import GridLayout
 
 from kivy.core.window import Window
 
+from clickmenu import ClickMenu
 from background import BackGround
 from hoverbehavior import HoverBehavior
 import time
@@ -53,7 +54,7 @@ class FileLabel(BackGround, GridLayout, HoverBehavior):
 				if self.select == 0 or self.select == 1:
 					self.selected(2)
 				elif self.select == 2:
-					self.selected(0)
+					self.selected(1)
 			elif touch.button == 'right':
 				if self.select == 0 or self.select == 1:
 					for child in self.parent.children:
@@ -101,7 +102,7 @@ class FileList(GridLayout):
 	def destroy(self, **kwargs):
 		pass
 
-	click_menu = None
+	click_menu = ClickMenu()
 
 	def on_touch_down(self, touch):
 		if not self.click_menu:

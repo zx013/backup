@@ -2,16 +2,21 @@
 #:import ttf gui.font.ttf
 
 <ConfigView>:
-	title: 'Test popup'
 	size_hint: .8, .8
-	disabled: True
+	disabled: False
 	auto_dismiss: False
 	GridLayout:
 		cols: 1
 		size_hint: 1, 1
 		GridLayout:
 			rows: 1
-			size_hint: 1, .9
+			size_hint: 1, .1
+			Label:
+				text: '配置'
+				font_name: ttf
+		GridLayout:
+			rows: 1
+			size_hint: 1, .8
 			GridLayout:
 				cols: 1
 				Button:
@@ -40,7 +45,12 @@
 			Label:
 				size_hint: .8, 1
 			Button:
+				text: '确认'
+				font_name: ttf
 				size_hint: .1, 1
 			Button:
+				text: '取消'
+				font_name: ttf
 				size_hint: .1, 1
+				on_release: root.dismiss()
 		

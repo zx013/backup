@@ -15,9 +15,9 @@ import operatelist_event
 
 def system_init(*args, **kwargs):
 	self = args[0]
-	signal('clickmenu_init', self)
-	signal('filelist_init', self)
-	signal('titlelabel_init', self)
-	signal('statusbar_init', self)
-	signal('operatelist_init', self)
+	signal('clickmenu_init', self.ids['d_filemanager'])
+	signal('filelist_init', self.ids['d_filemanager'])
+	signal('titlelabel_init', self.ids['d_filemanager'])
+	signal('statusbar_init', self.ids['d_statusbar'])
+	signal('operatelist_init', self.ids['d_operatelist'])
 connect('system_init', system_init)
