@@ -3,9 +3,11 @@ import os
 from backup.config import Config
 from event import connect
 
+global config
+config = Config()
 
 def get_filelist():
-	config = Config()
+	global config
 	config.read_config()
 	filelist = config.config['backup'].keys()
 

@@ -86,10 +86,6 @@ class TitleLabel(GridLayout):
 
 	filelist = None
 
-	#将标题栏和文件列表关联起来
-	def mapping(self, filelist):
-		self.filelist = filelist
-
 	@apply_insert(AttributeTitleLabel)
 	def insert(self, **kwargs):
 		pass

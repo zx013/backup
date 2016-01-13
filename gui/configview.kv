@@ -1,6 +1,11 @@
 #:kivy 1.9.0
 #:import ttf gui.font.ttf
 
+<InputLayout@GridLayout>:
+	rows: 1
+	size_hint: 1, None
+	height: 20
+
 <ConfigView>:
 	size_hint: .8, .8
 	disabled: False
@@ -19,17 +24,85 @@
 			size_hint: 1, .8
 			GridLayout:
 				cols: 1
-				Button:
-					text: 'base'
-				Button:
-					text: 'disk'
-				Button:
-					text: 'baidu'
+				GridLayout:
+					cols: 1
+					Label:
+						text: 'base'
+					InputLayout:
+						Label:
+							text: 'save'
+						TextInput:
+				GridLayout:
+					cols: 1
+					Label:
+						text: 'disk'
+					InputLayout:
+						Label:
+							text: 'enable'
+						CheckBox:
+							id: d_disk_checkbox
+					InputLayout:
+						Label:
+							text: 'path'
+						TextInput:
+							disabled: not d_disk_checkbox.active
+					InputLayout:
+						Label:
+							text: 'scan'
+						TextInput:
+							disabled: not d_disk_checkbox.active
+					InputLayout:
+						Label:
+							text: 'time'
+						TextInput:
+							disabled: not d_disk_checkbox.active
+					InputLayout:
+						Label:
+							text: 'number'
+						TextInput:
+							disabled: not d_disk_checkbox.active
+				GridLayout:
+					cols: 1
+					Label:
+						text: 'baidu'
+					InputLayout:
+						Label:
+							text: 'enable'
+						CheckBox:
+							id: d_baidu_checkbox
+					InputLayout:
+						Label:
+							text: 'username'
+						TextInput:
+							disabled: not d_baidu_checkbox.active
+					InputLayout:
+						Label:
+							text: 'password'
+						TextInput:
+							disabled: not d_baidu_checkbox.active
+					InputLayout:
+						Label:
+							text: 'path'
+						TextInput:
+							disabled: not d_baidu_checkbox.active
+					InputLayout:
+						Label:
+							text: 'time'
+						TextInput:
+							disabled: not d_baidu_checkbox.active
+					InputLayout:
+						Label:
+							text: 'number'
+						TextInput:
+							disabled: not d_baidu_checkbox.active
 			GridLayout:
 				cols: 1
+				Spinner:
+					text: 'file'
+					size_hint: 1, .1
 				Button:
 					text: 'ignore'
-					size_hint: 1, .9
+					size_hint: 1, .8
 				GridLayout:
 					rows: 1
 					size_hint: 1, .1
