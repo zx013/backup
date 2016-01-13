@@ -10,6 +10,8 @@
 
 	size_hint: 1, None
 	height: 40
+	
+	on_release: self.event(self) if self.collide_point(self.last_touch.x, self.last_touch.y) and hasattr(self, 'event') and hasattr(self.event, '__call__') else None
 
 <OperateList>:
 	rows: 1

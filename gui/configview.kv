@@ -1,10 +1,24 @@
 #:kivy 1.9.0
 #:import ttf gui.font.ttf
+#:import config backup.config.config
+
+<BasicLayout@GridLayout>:
+	cols: 1
+	size_hint: 1, len(self.children)
+	canvas.before:
+		Color:
+			rgba: .5, .5, .5, .5
+		Line:
+			rectangle: self.x, self.y, self.width, self.height
+
+<InputLabel@Label>:
+	size_hint: 1, None
+	height: 25
 
 <InputLayout@GridLayout>:
 	rows: 1
 	size_hint: 1, None
-	height: 20
+	height: 25
 
 <ConfigView>:
 	size_hint: .8, .8
@@ -24,77 +38,98 @@
 			size_hint: 1, .8
 			GridLayout:
 				cols: 1
-				GridLayout:
-					cols: 1
-					Label:
+				BasicLayout:
+					InputLabel:
 						text: 'base'
 					InputLayout:
 						Label:
 							text: 'save'
 						TextInput:
-				GridLayout:
-					cols: 1
-					Label:
+							text: config.get('basic', 'base', 'save')
+							on_focus: config.set(self.text, 'basic', 'base', 'save')
+				BasicLayout:
+					InputLabel:
 						text: 'disk'
 					InputLayout:
 						Label:
 							text: 'enable'
 						CheckBox:
 							id: d_disk_checkbox
+							active: True if config.get('basic', 'disk', 'enable') == 'on' else False
+							on_active: config.set('on' if self.active else 'off', 'basic', 'disk', 'enable')
 					InputLayout:
 						Label:
 							text: 'path'
 						TextInput:
 							disabled: not d_disk_checkbox.active
+							text: config.get('basic', 'disk', 'path')
+							on_focus: config.set(self.text, 'basic', 'disk', 'path')
 					InputLayout:
 						Label:
 							text: 'scan'
 						TextInput:
 							disabled: not d_disk_checkbox.active
+							text: config.get('basic', 'disk', 'scan')
+							on_focus: config.set(self.text, 'basic', 'disk', 'scan')
 					InputLayout:
 						Label:
 							text: 'time'
 						TextInput:
 							disabled: not d_disk_checkbox.active
+							text: config.get('basic', 'disk', 'time')
+							on_focus: config.set(self.text, 'basic', 'disk', 'time')
 					InputLayout:
 						Label:
 							text: 'number'
 						TextInput:
 							disabled: not d_disk_checkbox.active
-				GridLayout:
-					cols: 1
-					Label:
+							text: config.get('basic', 'disk', 'number')
+							on_focus: config.set(self.text, 'basic', 'disk', 'number')
+				BasicLayout:
+					InputLabel:
 						text: 'baidu'
 					InputLayout:
 						Label:
 							text: 'enable'
 						CheckBox:
 							id: d_baidu_checkbox
+							active: True if config.get('basic', 'baidu', 'enable') == 'on' else False
+							on_active: config.set('on' if self.active else 'off', 'basic', 'baidu', 'enable')
 					InputLayout:
 						Label:
 							text: 'username'
 						TextInput:
 							disabled: not d_baidu_checkbox.active
+							text: config.get('basic', 'baidu', 'username')
+							on_focus: config.set(self.text, 'basic', 'baidu', 'username')
 					InputLayout:
 						Label:
 							text: 'password'
 						TextInput:
 							disabled: not d_baidu_checkbox.active
+							text: config.get('basic', 'baidu', 'password')
+							on_focus: config.set(self.text, 'basic', 'baidu', 'password')
 					InputLayout:
 						Label:
 							text: 'path'
 						TextInput:
 							disabled: not d_baidu_checkbox.active
+							text: config.get('basic', 'baidu', 'path')
+							on_focus: config.set(self.text, 'basic', 'baidu', 'path')
 					InputLayout:
 						Label:
 							text: 'time'
 						TextInput:
 							disabled: not d_baidu_checkbox.active
+							text: config.get('basic', 'baidu', 'time')
+							on_focus: config.set(self.text, 'basic', 'baidu', 'time')
 					InputLayout:
 						Label:
 							text: 'number'
 						TextInput:
 							disabled: not d_baidu_checkbox.active
+							text: config.get('basic', 'baidu', 'number')
+							on_focus: config.set(self.text, 'basic', 'baidu', 'number')
 			GridLayout:
 				cols: 1
 				Spinner:
