@@ -1,6 +1,8 @@
 #-*- coding:utf-8 -*-
 import kivy
 kivy.require('1.9.0')
+import sys
+sys.path.append('.')
 
 from kivy.app import App
 
@@ -9,30 +11,52 @@ from kivy.adapters.dictadapter import DictAdapter
 from kivy.uix.listview import ListItemLabel, ListItemButton, CompositeListItem, ListView
 from kivy.uix.gridlayout import GridLayout
 
+from kivy.lang import Builder
+Builder.load_file('gui/file_list.kv')
 
-data = {'Cantaloupe': {'Total Carbo-hydrate': 0, 'Sugars': 1, 'Iron': 0, 'is_selected': False, 'Calories': 240, 'Vitamin C': 7, 'Calcium': 12, 'Vitamin A': 4, 'Total Fat': 1, 'Dietary Fiber': 4, '(gram weight/ ounce weight)': 1, 'Calories from Fat': 50, 'name': 'Cantaloupe', 'Potassium': 20, 'Sodium': 0, 'Serving Size': '1/4 medium (134 g/4.8 oz)', 'Protein': 11}, 'Honeydew': {'Total Carbo-hydrate': 0, 'Sugars': 1, 'Iron': 0, 'is_selected': False, 'Calories': 210, 'Vitamin C': 6, 'Calcium': 12, 'Vitamin A': 4, 'Total Fat': 1, 'Dietary Fiber': 4, '(gram weight/ ounce weight)': 1, 'Calories from Fat': 50, 'name': 'Honeydew', 'Potassium': 30, 'Sodium': 0, 'Serving Size': '1/10 medium melon (134 g/4.8 oz)', 'Protein': 11}, 'Grape': {'Total Carbo-hydrate': 0, 'Sugars': 1, 'Iron': 0, 'is_selected': False, 'Calories': 240, 'Vitamin C': 7, 'Calcium': 23, 'Vitamin A': 8, 'Total Fat': 1, 'Dietary Fiber': 4, '(gram weight/ ounce weight)': 0, 'Calories from Fat': 90, 'name': 'Grape', 'Potassium': 15, 'Sodium': 0, 'Serving Size': '3/4 cup (126 g/4.5 oz)', 'Protein': 20}, 'Apple': {'Total Carbo-hydrate': 0, 'Sugars': 0, 'Iron': 0, 'is_selected': False, 'Calories': 260, 'Vitamin C': 7, 'Calcium': 34, 'Vitamin A': 11, 'Total Fat': 5, 'Dietary Fiber': 20, '(gram weight/ ounce weight)': 1, 'Calories from Fat': 130, 'name': 'Apple', 'Potassium': 0, 'Sodium': 0, 'Serving Size': '1 large (242 g/8 oz)', 'Protein': 25}, 'Kiwifruit': {'Total Carbo-hydrate': 10, 'Sugars': 0, 'Iron': 1, 'is_selected': False, 'Calories': 450, 'Vitamin C': 13, 'Calcium': 20, 'Vitamin A': 7, 'Total Fat': 4, 'Dietary Fiber': 16, '(gram weight/ ounce weight)': 1, 'Calories from Fat': 90, 'name': 'Kiwifruit', 'Potassium': 0, 'Sodium': 2, 'Serving Size': '2 medium (148 g/5.3 oz)', 'Protein': 13}, 'Pear': {'Total Carbo-hydrate': 0, 'Sugars': 0, 'Iron': 0, 'is_selected': False, 'Calories': 190, 'Vitamin C': 5, 'Calcium': 26, 'Vitamin A': 9, 'Total Fat': 6, 'Dietary Fiber': 24, '(gram weight/ ounce weight)': 1, 'Calories from Fat': 100, 'name': 'Pear', 'Potassium': 0, 'Sodium': 0, 'Serving Size': '1 medium (166 g/5.9 oz)', 'Protein': 16}, 'Nectarine': {'Total Carbo-hydrate': 5, 'Sugars': 0, 'Iron': 0.5, 'is_selected': False, 'Calories': 250, 'Vitamin C': 7, 'Calcium': 15, 'Vitamin A': 5, 'Total Fat': 2, 'Dietary Fiber': 8, '(gram weight/ ounce weight)': 1, 'Calories from Fat': 60, 'name': 'Nectarine', 'Potassium': 0, 'Sodium': 1, 'Serving Size': '1 medium (140 g/5.0 oz)', 'Protein': 11}, 'Avocado': {'Total Carbo-hydrate': 35, 'Sugars': 0, 'Iron': 4.5, 'is_selected': False, 'Calories': 140, 'Vitamin C': 4, 'Calcium': 3, 'Vitamin A': 1, 'Total Fat': 1, 'Dietary Fiber': 4, '(gram weight/ ounce weight)': 1, 'Calories from Fat': 50, 'name': 'Avocado', 'Potassium': 0, 'Sodium': 7, 'Serving Size': '1/5 medium (30 g/1.1 oz)', 'Protein': 0}, 'Cherry': {'Total Carbo-hydrate': 0, 'Sugars': 0, 'Iron': 0, 'is_selected': False, 'Calories': 350, 'Vitamin C': 10, 'Calcium': 26, 'Vitamin A': 9, 'Total Fat': 1, 'Dietary Fiber': 4, '(gram weight/ ounce weight)': 1, 'Calories from Fat': 100, 'name': 'Cherry', 'Potassium': 0, 'Sodium': 0, 'Serving Size': '21 cherries; 1 cup (140 g/5.0 oz)', 'Protein': 16}, 'Strawberry': {'Total Carbo-hydrate': 0, 'Sugars': 0, 'Iron': 0, 'is_selected': False, 'Calories': 170, 'Vitamin C': 5, 'Calcium': 11, 'Vitamin A': 4, 'Total Fat': 2, 'Dietary Fiber': 8, '(gram weight/ ounce weight)': 1, 'Calories from Fat': 50, 'name': 'Strawberry', 'Potassium': 0, 'Sodium': 0, 'Serving Size': '8 medium (147 g/5.3 oz)', 'Protein': 8}, 'Grapefruit': {'Total Carbo-hydrate': 0, 'Sugars': 0, 'Iron': 0, 'is_selected': False, 'Calories': 160, 'Vitamin C': 5, 'Calcium': 15, 'Vitamin A': 5, 'Total Fat': 2, 'Dietary Fiber': 8, '(gram weight/ ounce weight)': 1, 'Calories from Fat': 60, 'name': 'Grapefruit', 'Potassium': 0, 'Sodium': 0, 'Serving Size': '1/2 medium (154 g/5.5 oz)', 'Protein': 11}, 'Plum': {'Total Carbo-hydrate': 0, 'Sugars': 0, 'Iron': 0, 'is_selected': False, 'Calories': 230, 'Vitamin C': 7, 'Calcium': 19, 'Vitamin A': 6, 'Total Fat': 2, 'Dietary Fiber': 8, '(gram weight/ ounce weight)': 1, 'Calories from Fat': 70, 'name': 'Plum', 'Potassium': 0, 'Sodium': 0, 'Serving Size': '2 medium (151 g/5.4 oz)', 'Protein': 16}, 'Watermelon': {'Total Carbo-hydrate': 0, 'Sugars': 0, 'Iron': 0, 'is_selected': False, 'Calories': 270, 'Vitamin C': 8, 'Calcium': 21, 'Vitamin A': 7, 'Total Fat': 1, 'Dietary Fiber': 4, '(gram weight/ ounce weight)': 1, 'Calories from Fat': 80, 'name': 'Watermelon', 'Potassium': 0, 'Sodium': 0, 'Serving Size': '1/18 medium melon; 2 cups diced pieces (280 g/10.0 oz)', 'Protein': 20}, 'Peach': {'Total Carbo-hydrate': 0, 'Sugars': 0, 'Iron': 0.5, 'is_selected': False, 'Calories': 230, 'Vitamin C': 7, 'Calcium': 15, 'Vitamin A': 5, 'Total Fat': 2, 'Dietary Fiber': 8, '(gram weight/ ounce weight)': 1, 'Calories from Fat': 60, 'name': 'Peach', 'Potassium': 0, 'Sodium': 1, 'Serving Size': '1 medium (147 g/5.3 oz)', 'Protein': 13}, 'Pineapple': {'Total Carbo-hydrate': 0, 'Sugars': 0, 'Iron': 0, 'is_selected': False, 'Calories': 120, 'Vitamin C': 3, 'Calcium': 13, 'Vitamin A': 4, 'Total Fat': 1, 'Dietary Fiber': 4, '(gram weight/ ounce weight)': 1, 'Calories from Fat': 50, 'name': 'Pineapple', 'Potassium': 10, 'Sodium': 0, 'Serving Size': '2 slices, 3" diameter, 3/4" thick (112 g/4 oz)', 'Protein': 10}, 'Orange': {'Total Carbo-hydrate': 0, 'Sugars': 0, 'Iron': 0, 'is_selected': False, 'Calories': 250, 'Vitamin C': 7, 'Calcium': 19, 'Vitamin A': 6, 'Total Fat': 3, 'Dietary Fiber': 12, '(gram weight/ ounce weight)': 1, 'Calories from Fat': 80, 'name': 'Orange', 'Potassium': 0, 'Sodium': 0, 'Serving Size': '1 medium (154 g/5.5 oz)', 'Protein': 14}, 'Lemon': {'Total Carbo-hydrate': 0, 'Sugars': 0, 'Iron': 0, 'is_selected': False, 'Calories': 75, 'Vitamin C': 2, 'Calcium': 5, 'Vitamin A': 2, 'Total Fat': 2, 'Dietary Fiber': 8, '(gram weight/ ounce weight)': 0, 'Calories from Fat': 15, 'name': 'Lemon', 'Potassium': 0, 'Sodium': 0, 'Serving Size': '1 medium (58 g/2.1 oz)', 'Protein': 2}, 'Tangerine': {'Total Carbo-hydrate': 0, 'Sugars': 0, 'Iron': 0, 'is_selected': False, 'Calories': 160, 'Vitamin C': 5, 'Calcium': 13, 'Vitamin A': 4, 'Total Fat': 2, 'Dietary Fiber': 8, '(gram weight/ ounce weight)': 1, 'Calories from Fat': 50, 'name': 'Tangerine', 'Potassium': 0, 'Sodium': 0, 'Serving Size': '1 medium (109 g/3.9 oz)', 'Protein': 9}, 'Banana': {'Total Carbo-hydrate': 0, 'Sugars': 0, 'Iron': 0, 'is_selected': False, 'Calories': 450, 'Vitamin C': 13, 'Calcium': 30, 'Vitamin A': 10, 'Total Fat': 3, 'Dietary Fiber': 12, '(gram weight/ ounce weight)': 1, 'Calories from Fat': 110, 'name': 'Banana', 'Potassium': 0, 'Sodium': 0, 'Serving Size': '1 medium (126 g/4.5 oz)', 'Protein': 19}, 'Lime': {'Total Carbo-hydrate': 0, 'Sugars': 0, 'Iron': 0, 'is_selected': False, 'Calories': 75, 'Vitamin C': 2, 'Calcium': 7, 'Vitamin A': 2, 'Total Fat': 2, 'Dietary Fiber': 8, '(gram weight/ ounce weight)': 0, 'Calories from Fat': 20, 'name': 'Lime', 'Potassium': 0, 'Sodium': 0, 'Serving Size': '1 medium (67 g/2.4 oz)', 'Protein': 0}}
+titles = {0: 'abc', 1: 'def', 2: 'ghi'}
+
+def get_file_data(file_name):
+	data = {0: file_name[0], 1: file_name[1], 2: file_name[2]}
+	return data
+
+data = {}
+for i in range(10):
+	data[i] = get_file_data('abc')
 
 class File_List(ListView):
 	def __init__(self, **kwargs):
 		super(File_List, self).__init__(**kwargs)
+		def args_converter(row_index, rec):
+			ret = {'size_hint_y': None, 'height': 25}
+			cls_dicts = []
+			cls_dicts.append({'cls': ListItemButton, 'kwargs': {'text': str(rec[0])}})
+			cls_dicts.append({'cls': ListItemLabel, 'kwargs': {'text': str(rec[1])}})
+			cls_dicts.append({'cls': ListItemLabel, 'kwargs': {'text': str(rec[2])}})
+			ret['cls_dicts'] = cls_dicts
+			return ret
+		#ListItemLabel.deselected_color = [.2, .5, .1, .4]
+		CompositeListItem.deselected_color = [.2, .1, .5, 1]
+		dict_adapter = DictAdapter(
+			sorted_keys=sorted(data.keys(), key=lambda x: data[x][1]),
+			data=data,
+			args_converter=args_converter,
+			selection_mode='multiple',
+			allow_empty_selection=False,
+			cls=CompositeListItem)
+		self.adapter = dict_adapter
+		self.size_hint = (.2, 1.0)
 
-
-def fun():
-	args_converter = lambda row_index, rec: {'size_hint_y': None, 'height': 25, 'cls_dicts': [{'cls': ListItemButton, 'kwargs': {'text': rec["name"]}}, {'cls': ListItemLabel, 'kwargs': {'text': str(rec["Calcium"]), 'is_representing_cls': True}}, {'cls': ListItemButton, 'kwargs': {'text': "Right"}}]}
-	dict_adapter = DictAdapter(
-		sorted_keys=sorted(data.keys()),
-		data=data,
-		args_converter=args_converter,
-		selection_mode='multiple',
-		allow_empty_selection=False,
-		cls=CompositeListItem)
-	listview = ListView(adapter=dict_adapter, size_hint=(.2, 1.0))
-	return listview
+	def on_touch_down(self, touch):
+		if self.collide_point(touch.x, touch.y) and touch.button == 'left':
+			length = len(self.adapter.data)
+			self.adapter.data[length] = get_file_data('cde')
+		super(File_List, self).on_touch_down(touch)
 
 
 class mainApp(App):
 	def build(self):
-		listview = fun()
+		listview = File_List()
 		return listview
 
 if __name__ == '__main__':
