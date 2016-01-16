@@ -10,6 +10,7 @@ from kivy.adapters.listadapter import ListAdapter
 from kivy.adapters.dictadapter import DictAdapter
 from kivy.uix.listview import ListItemLabel, ListItemButton, CompositeListItem, ListView
 from kivy.uix.gridlayout import GridLayout
+from kivy.properties import ListProperty
 
 from kivy.lang import Builder
 Builder.load_file('gui/file_list.kv')
@@ -24,9 +25,17 @@ data = {}
 for i in range(10):
 	data[i] = get_file_data('abc')
 
+#传入title和func，func根据名称获取title对应的信息
 class File_List(ListView):
+	background_color = ListProperty([1, 1, 1, 1])
+
+	selected_color = ListProperty([1., 0., 0., 1])
+	above_color = ListProperty([0., 0., 1., 1])
+	deselected_color = ListProperty([0., 1., 0., 1])
 	def __init__(self, **kwargs):
 		super(File_List, self).__init__(**kwargs)
+		self.title = kwargs['title']
+		self.converter = kwargs['converter']
 		def args_converter(row_index, rec):
 			ret = {'size_hint_y': None, 'height': 25}
 			cls_dicts = []
@@ -56,7 +65,7 @@ class File_List(ListView):
 
 class mainApp(App):
 	def build(self):
-		listview = File_List()
+		listview = File_List(title=3)
 		return listview
 
 if __name__ == '__main__':
