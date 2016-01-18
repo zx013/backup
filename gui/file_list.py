@@ -6,7 +6,6 @@ sys.path.append('.')
 
 from kivy.app import App
 
-from kivy.adapters.listadapter import ListAdapter
 from kivy.adapters.dictadapter import DictAdapter
 from kivy.uix.listview import ListItemLabel, ListItemButton, CompositeListItem, ListView
 from kivy.uix.gridlayout import GridLayout
@@ -15,23 +14,37 @@ from kivy.properties import ListProperty
 from kivy.lang import Builder
 Builder.load_file('gui/file_list.kv')
 
-titles = {0: 'abc', 1: 'def', 2: 'ghi'}
+title = ['name', 'time']
 
-def get_file_data(file_name):
-	data = {0: file_name[0], 1: file_name[1], 2: file_name[2]}
+def get_data(name):
+	data = {'name': name[0], 'data': name[1], 'time': name[2]}
 	return data
 
 data = {}
 for i in range(10):
-	data[i] = get_file_data('abc')
+	name = '%dbc' % i
+	data[name] = get_data(name)
 
-#´«ÈëtitleºÍfunc£¬func¸ù¾İÃû³Æ»ñÈ¡title¶ÔÓ¦µÄĞÅÏ¢
-class File_List(ListView):
-	background_color = ListProperty([1, 1, 1, 1])
 
+class FileLabel(ListItemLabel):
 	selected_color = ListProperty([1., 0., 0., 1])
 	above_color = ListProperty([0., 0., 1., 1])
 	deselected_color = ListProperty([0., 1., 0., 1])
+	
+	def on_touch_down(self, touch):
+		if self.collide_point(touch.x, touch.y):
+			if touch.button == 'left':
+				self.select()
+		super(FileLabel, self).on_touch_down(touch)	
+
+
+#ä¼ å…¥titleå’Œfuncï¼Œfuncæ ¹æ®åç§°è·å–titleå¯¹åº”çš„ä¿¡æ¯
+class File_List(ListView):
+	data = ''
+	#æ’åºçš„ç±»å‹
+	key = 'name'
+	#æ’åºçš„æ–¹å‘
+	reverse = True
 	def __init__(self, **kwargs):
 		super(File_List, self).__init__(**kwargs)
 		self.title = kwargs['title']
@@ -39,33 +52,59 @@ class File_List(ListView):
 		def args_converter(row_index, rec):
 			ret = {'size_hint_y': None, 'height': 25}
 			cls_dicts = []
-			cls_dicts.append({'cls': ListItemButton, 'kwargs': {'text': str(rec[0])}})
-			cls_dicts.append({'cls': ListItemLabel, 'kwargs': {'text': str(rec[1])}})
-			cls_dicts.append({'cls': ListItemLabel, 'kwargs': {'text': str(rec[2])}})
+			for i in self.title:
+				cls_dicts.append({'cls': FileLabel, 'kwargs': {'text': str(rec.get(i))}})
 			ret['cls_dicts'] = cls_dicts
 			return ret
-		#ListItemLabel.deselected_color = [.2, .5, .1, .4]
-		CompositeListItem.deselected_color = [.2, .1, .5, 1]
 		dict_adapter = DictAdapter(
-			sorted_keys=sorted(data.keys(), key=lambda x: data[x][1]),
+			sorted_keys=sorted(data.keys(), key=lambda x: data[x].get(self.key), reverse=self.reverse),
 			data=data,
 			args_converter=args_converter,
 			selection_mode='multiple',
 			allow_empty_selection=False,
 			cls=CompositeListItem)
 		self.adapter = dict_adapter
+		self.data = self.adapter.data
 		self.size_hint = (.2, 1.0)
 
+	def insert(self, name):
+		if not self.data.has_key(name):
+			self.data[name] = get_data(name)
+
+	def update(self, name):
+		self.data[name] = get_data(name)
+
+	def sort(self, key=None):
+		if not len(self.data):
+			return
+		if key is not None and self.data.values()[0].has_key(key):
+			self.key = key
+			self.reverse = True
+		else:
+			self.reverse = not self.reverse
+		self.adapter.sorted_keys = sorted(self.data.keys(), key=lambda x: self.data[x].get(self.key), reverse=self.reverse)
+
+	def delete(self, name):
+		if self.data.has_key(name):
+			del self.data[name]
+
+	def refresh(self):
+		for name in self.data:
+			self.data[name] = get_data(name)
+
 	def on_touch_down(self, touch):
-		if self.collide_point(touch.x, touch.y) and touch.button == 'left':
-			length = len(self.adapter.data)
-			self.adapter.data[length] = get_file_data('cde')
+		if self.collide_point(touch.x, touch.y):
+			if touch.button == 'left':
+				self.insert('cde')
+				self.sort(key='name') #æ’åºå˜åŒ–åæ¸…ç©ºé€‰ä¸­é¡¹
+			elif touch.button == 'right':
+				self.delete('cde')
 		super(File_List, self).on_touch_down(touch)
 
 
 class mainApp(App):
 	def build(self):
-		listview = File_List(title=3)
+		listview = File_List(title=title, converter=get_data)
 		return listview
 
 if __name__ == '__main__':
