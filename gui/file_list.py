@@ -11,6 +11,8 @@ from kivy.uix.listview import ListItemLabel, ListItemButton, CompositeListItem, 
 from kivy.uix.gridlayout import GridLayout
 from kivy.properties import ListProperty
 
+from kivy.logger import Logger
+
 from kivy.lang import Builder
 Builder.load_file('gui/file_list.kv')
 
@@ -26,7 +28,7 @@ for i in range(10):
 	data[name] = get_data(name)
 
 
-class FileLabel(ListItemLabel):
+class FileItem(ListItemLabel):
 	selected_color = ListProperty([1., 0., 0., 1])
 	above_color = ListProperty([0., 0., 1., 1])
 	deselected_color = ListProperty([0., 1., 0., 1])
@@ -34,13 +36,27 @@ class FileLabel(ListItemLabel):
 	def on_touch_down(self, touch):
 		if self.collide_point(touch.x, touch.y):
 			if touch.button == 'left':
-				self.select()
-		super(FileLabel, self).on_touch_down(touch)	
+				Logger.warning(str(map(lambda x: x.is_selected, self.parent.parent.children)))
+		super(FileItem, self).on_touch_down(touch)
 
+	def select_from_composite(self, *args):
+		self.bold = True
+	
+	def deselect_from_composite(self, *args):
+		self.bold = False
+
+class FileLabel(CompositeListItem):
+	def select(self, *args):
+		for c in self.children:
+			c.select_from_composite(*args)
+
+	def deselect(self, *args):
+		for c in self.children:
+			c.deselect_from_composite(*args)
 
 #传入title和func，func根据名称获取title对应的信息
 class File_List(ListView):
-	data = ''
+	data = {}
 	#排序的类型
 	key = 'name'
 	#排序的方向
@@ -53,7 +69,7 @@ class File_List(ListView):
 			ret = {'size_hint_y': None, 'height': 25}
 			cls_dicts = []
 			for i in self.title:
-				cls_dicts.append({'cls': FileLabel, 'kwargs': {'text': str(rec.get(i))}})
+				cls_dicts.append({'cls': FileItem, 'kwargs': {'text': str(rec.get(i))}})
 			ret['cls_dicts'] = cls_dicts
 			return ret
 		dict_adapter = DictAdapter(
@@ -62,7 +78,7 @@ class File_List(ListView):
 			args_converter=args_converter,
 			selection_mode='multiple',
 			allow_empty_selection=False,
-			cls=CompositeListItem)
+			cls=FileLabel)
 		self.adapter = dict_adapter
 		self.data = self.adapter.data
 		self.size_hint = (.2, 1.0)
@@ -95,10 +111,15 @@ class File_List(ListView):
 	def on_touch_down(self, touch):
 		if self.collide_point(touch.x, touch.y):
 			if touch.button == 'left':
-				self.insert('cde')
-				self.sort(key='name') #排序变化后清空选中项
+				#self.insert('cde')
+				self.adapter.select_list(self.children[0].children[0].children)
+				#self.sort() #排序变化后清空选中项
+				Logger.warning(str(self.adapter.selection))
+				#for sel in self.adapter.selection:
+				#	Logger.warning(str(sel.children))
 			elif touch.button == 'right':
 				self.delete('cde')
+
 		super(File_List, self).on_touch_down(touch)
 
 
