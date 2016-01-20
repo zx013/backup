@@ -2,17 +2,23 @@
 #:import ttf gui.font.ttf
 
 <FileLabel>:
-	canvas:
+	canvas.before:
 		Color:
-			rgba: 1, .3, .2, .5
+			rgba: self.background_space_color
 		Rectangle:
 			pos: self.pos
 			size: self.size
+		Color:
+			rgba: self.background_frame_color
+		Line:
+			rectangle: self.x, self.y, self.width, self.height
 
 <File_List>:
+	pos_hint: {'x': .2, 'y': .1}
+	size_hint: (.2, .6)
 	canvas.before:
 		Color:
-			rgba: 1, 1, 1, .5
+			rgba: 1, 1, 1, .8
 		Rectangle:
 			pos: self.pos
 			size: self.size

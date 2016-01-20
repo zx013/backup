@@ -1,15 +1,6 @@
 #:kivy 1.9.0
 #:import ttf gui.font.ttf
 
-<ScrollView>:
-	scroll_type: ['bars']
-	do_scroll: True, True
-	bar_width: 5
-	canvas.before:
-		Color:
-			rgba: .5, .5, .5, .5
-		Line:
-			rectangle: self.x, self.y, self.width, self.height
 
 <FileManager@GridLayout>:
 	cols: 1
@@ -19,11 +10,19 @@
 		Rectangle:
 			pos: self.pos
 			size: self.size
-	filelist: self.ids['d_filelist']
-	titlelabel: self.ids['d_titlelabel']
+	filelist: d_filelist
+	titlelabel: d_titlelabel
 	TitleLabel:
 		id: d_titlelabel
-		filelist: root.filelist
+		filelist: d_filelist
 	ScrollView:
+		scroll_type: ['bars']
+		do_scroll: True, True
+		bar_width: 5
+		canvas.before:
+			Color:
+				rgba: .5, .5, .5, .5
+			Line:
+				rectangle: self.x, self.y, self.width, self.height
 		FileList:
 			id: d_filelist

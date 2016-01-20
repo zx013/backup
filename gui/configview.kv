@@ -1,6 +1,7 @@
 #:kivy 1.9.0
 #:import ttf gui.font.ttf
 #:import config backup.config.config
+#:import FileList gui.filelist.FileList
 
 <BasicLayout@GridLayout>:
 	cols: 1
@@ -137,9 +138,13 @@
 					values: config.get('backup').keys()
 					font_name: ttf
 					size_hint: 1, .1
-				ListView:
+				ScrollView:
 					text: 'ignore'
 					size_hint: 1, .8
+					FileList:
+						cols: 1
+						size_hint: 1, None
+						height: len(self.children) * 20
 				GridLayout:
 					rows: 1
 					size_hint: 1, .1

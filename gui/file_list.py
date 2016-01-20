@@ -19,7 +19,7 @@ Builder.load_file('gui/file_list.kv')
 title = ['name', 'time']
 
 def get_data(name):
-	data = {'name': name[0], 'data': name[1], 'time': name[2]}
+	data = {'name': name, 'data': name[0], 'time': name[2]}
 	return data
 
 data = {}
@@ -29,33 +29,62 @@ for i in range(10):
 
 
 class FileItem(ListItemLabel):
-	selected_color = ListProperty([1., 0., 0., 1])
-	above_color = ListProperty([0., 0., 1., 1])
-	deselected_color = ListProperty([0., 1., 0., 1])
+	pass
+
+global a
+a = 0
+
+class FileLabel(CompositeListItem):
+	selected_space_color = ListProperty([0, .6, 1, .3])
+	selected_frame_color = ListProperty([0, .6, 1, .6])
+	above_space_color = ListProperty([0, .6, 1, .1])
+	above_frame_color = ListProperty([0, .6, 1, .4])
+	deselected_space_color = ListProperty([0, .6, 1, 0])
+	deselected_frame_color = ListProperty([0, .6, 1, 0])
 	
+	background_space_color = ListProperty([0, .6, 1, 0])
+	background_frame_color = ListProperty([0, .6, 1, 0])
+
+	def __init__(self, **kwargs):
+		super(FileLabel, self).__init__(**kwargs)
+		global a
+		self.a = a
+		a += 1
+		Logger.warning('init, %d' % self.a)
+
 	def on_touch_down(self, touch):
 		if self.collide_point(touch.x, touch.y):
 			if touch.button == 'left':
-				Logger.warning(str(map(lambda x: x.is_selected, self.parent.parent.children)))
-		super(FileItem, self).on_touch_down(touch)
+				pass
+				#if self.is_selected:
+				#	self.deselect()
+				#else:
+				#	self.select()
+				#Logger.warning(str(map(lambda x: x.is_selected, self.parent.children)))
+		super(FileLabel, self).on_touch_down(touch)
 
-	def select_from_composite(self, *args):
-		self.bold = True
-	
-	def deselect_from_composite(self, *args):
-		self.bold = False
-
-class FileLabel(CompositeListItem):
 	def select(self, *args):
+		Logger.warning('select, %d' % self.a)
+		self.is_selected = True
+		self.background_space_color = self.selected_space_color
+		self.background_frame_color = self.selected_frame_color
 		for c in self.children:
 			c.select_from_composite(*args)
 
 	def deselect(self, *args):
+		Logger.warning('deselect, %d' % self.a)
+		self.is_selected = False
+		self.background_space_color = self.deselected_space_color
+		self.background_frame_color = self.deselected_frame_color
 		for c in self.children:
 			c.deselect_from_composite(*args)
 
+
 #传入title和func，func根据名称获取title对应的信息
 class File_List(ListView):
+	container_x = 0
+	container_y = 0
+
 	data = {}
 	#排序的类型
 	key = 'name'
@@ -77,11 +106,15 @@ class File_List(ListView):
 			data=data,
 			args_converter=args_converter,
 			selection_mode='multiple',
-			allow_empty_selection=False,
+			allow_empty_selection=True,
 			cls=FileLabel)
 		self.adapter = dict_adapter
 		self.data = self.adapter.data
-		self.size_hint = (.2, 1.0)
+
+	#计算文件列表所在的坐标
+	def container_pos(self):
+		self.container_x = self.x
+		self.container_y = self.y + self.height - sum(map(lambda x: x.height, self.container.children))
 
 	def insert(self, name):
 		if not self.data.has_key(name):
@@ -112,13 +145,23 @@ class File_List(ListView):
 		if self.collide_point(touch.x, touch.y):
 			if touch.button == 'left':
 				#self.insert('cde')
-				self.adapter.select_list(self.children[0].children[0].children)
-				#self.sort() #排序变化后清空选中项
+				self.container_pos()
+				for child in self.container.children:
+					if child.collide_point(touch.x - self.container_x, touch.y - self.container_y):
+						self.adapter.handle_selection(child, hold_dispatch=True)
+						break
 				Logger.warning(str(self.adapter.selection))
-				#for sel in self.adapter.selection:
-				#	Logger.warning(str(sel.children))
 			elif touch.button == 'right':
-				self.delete('cde')
+				self.sort() #排序变化后清空选中项
+				Logger.warning(str(map(lambda x: x.is_selected, self.container.children)))
+				selected_list = filter(lambda child: child.is_selected, self.container.children)
+				Logger.warning(str(selected_list))
+				self.adapter.select_list(selected_list)
+				#self.adapter.select_list(selected_list)
+				#self.delete('cde')
+				#self.refresh()
+				#self.adapter.select_list(var)
+				Logger.warning(str(self.adapter.selection))
 
 		super(File_List, self).on_touch_down(touch)
 
