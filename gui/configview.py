@@ -13,4 +13,5 @@ class ConfigView(ModalView):
 	def get_ignore(self, spinner, ignore):
 		#Logger.info(str(ignore))
 		self.ignore.clear()
-		self.ignore.insert(text=[[val] for val in ignore])
+		if ignore:
+			self.ignore.insert(text=map(lambda x: [x], ignore))

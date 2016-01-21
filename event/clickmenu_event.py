@@ -1,5 +1,6 @@
 #-*- coding:utf-8 -*-
 from event import connect
+from gui.clickmenu import ClickMenu
 
 
 def clickmenu_1(*args, **kwargs):
@@ -23,5 +24,6 @@ clickmenu_event = [clickmenu_1, clickmenu_2, clickmenu_3, clickmenu_4, clickmenu
 
 def clickmenu_init(*args, **kwargs):
 	self = args[0]
+	self.filelist.click_menu = ClickMenu()
 	self.filelist.click_menu.insert(text=clickmenu_text, event=clickmenu_event)
 connect('clickmenu_init', clickmenu_init)
