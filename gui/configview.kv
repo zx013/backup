@@ -23,6 +23,7 @@
 
 <ConfigView>:
 	size_hint: .8, .8
+	ignore: d_ignore
 	disabled: False
 	auto_dismiss: False
 	GridLayout:
@@ -138,13 +139,14 @@
 					values: config.get('backup').keys()
 					font_name: ttf
 					size_hint: 1, .1
+					on_text: root.get_ignore(self, config.get('backup', self.text, 'ignore'))
 				ScrollView:
-					text: 'ignore'
 					size_hint: 1, .8
 					FileList:
+						id: d_ignore
 						cols: 1
-						size_hint: 1, None
-						height: len(self.children) * 20
+						#size_hint: 1, None
+						#height: len(self.children) * 20
 				GridLayout:
 					rows: 1
 					size_hint: 1, .1

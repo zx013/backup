@@ -99,6 +99,10 @@ class FileList(GridLayout):
 	def destroy(self, **kwargs):
 		pass
 
+	def clear(self, **kwargs):
+		for child in self.children[::-1]:
+			child.destroy()
+
 	click_menu = ClickMenu()
 
 	def on_touch_down(self, touch):
