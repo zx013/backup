@@ -141,21 +141,12 @@
 					size_hint: 1, .1
 					on_text: root.get_ignore(self, config.get('backup', self.text, 'ignore'))
 				ScrollView:
-					size_hint: 1, .8
+					size_hint: 1, .9
 					FileList:
 						id: d_ignore
 						cols: 1
 						#size_hint: 1, None
 						#height: len(self.children) * 20
-				GridLayout:
-					rows: 1
-					size_hint: 1, .1
-					Button:
-						text: 'add'
-					Button:
-						text: 'mod'
-					Button:
-						text: 'del'
 		GridLayout:
 			rows: 1
 			size_hint: 1, .1
