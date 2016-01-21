@@ -1,7 +1,7 @@
 #-*- coding:utf-8 -*-
 import os
 from backup.config import Config
-from event import connect
+from implevent import connect
 
 global config
 config = Config()

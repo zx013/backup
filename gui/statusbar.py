@@ -6,7 +6,7 @@ from kivy.uix.label import Label
 from kivy.uix.gridlayout import GridLayout
 
 from tools import *
-from event.event import signal, timer
+from event.implevent import signal, timer
 
 
 class AttributeStatusBar(Label):

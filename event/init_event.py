@@ -5,7 +5,7 @@ path = os.path.split(os.path.realpath(sys.argv[0]))[0]
 os.chdir(path)
 sys.path.append('.') #Ìí¼Óµ½ËÑË÷Â·¾¶
 
-from event import signal, connect
+from implevent import signal, connect
 import clickmenu_event
 import clickignore_event
 import filelist_event

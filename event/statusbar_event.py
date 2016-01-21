@@ -1,5 +1,5 @@
 #-*- coding:utf-8 -*-
-from event import connect
+from implevent import connect
 
 
 #更新方式

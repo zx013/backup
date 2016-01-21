@@ -5,7 +5,7 @@ kivy.require('1.9.0')
 from kivy.logger import Logger
 from kivy.uix.modalview import ModalView
 
-from event.event import signal
+from event.implevent import signal
 
 from kivy.lang import Builder
 Builder.load_file('gui/configview.kv')
