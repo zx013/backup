@@ -20,7 +20,7 @@ class AttributeFileLabel(Label):
 		insert_args(self, **kwargs)
 
 	def delete(self, **kwargs):
-		delete_args(self, **kwargs)
+		delete_args(self, parent=True, **kwargs)
 
 	def update(self, **kwargs):
 		insert_args(self, **kwargs)

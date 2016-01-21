@@ -80,6 +80,7 @@ def apply_destroy(func):
 			if child_func: #子控件中存在该方法
 				child_func(*args, **kwargs)
 			self.remove_widget(child)
+		self.parent.remove_widget(self)
 		return ret
 	return run
 
@@ -89,11 +90,14 @@ def insert_args(self, **kwargs):
 		setattr(self, key, value)
 
 #属性和键值相等或属性在键值中时移除该节点
-def delete_args(self, **kwargs):
+def delete_args(self, parent=False, **kwargs):
 	for key, value in kwargs.items():
 		try:
 			if getattr(self, key) == value or getattr(self, key) in value:
-				self.parent.remove_widget(self)
+				if parent:
+					self.parent.destroy()
+				else:
+					self.parent.remove_widget(self)
 				return
 		except:
 			pass

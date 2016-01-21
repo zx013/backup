@@ -24,5 +24,7 @@ def filelist_init(*args, **kwargs):
 	w = [180, 180, 60, 40]
 	#self.filelist.destroy()
 	self.filelist.insert(text=get_filelist())
+	self.filelist.insert(text=get_filelist())
 	self.filelist.update(width=[w] * len(self.filelist.children))
+	self.filelist.delete(text=[['C:/Users//Administrator/Desktop/a.doc', None]])
 connect('filelist_init', filelist_init)
