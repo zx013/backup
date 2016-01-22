@@ -1,5 +1,4 @@
 #:kivy 1.9.0
-#:import ttf gui.font.ttf
 #:import config backup.config.config
 #:import FileList gui.filelist.FileList
 
@@ -34,7 +33,6 @@
 			size_hint: 1, .1
 			Label:
 				text: '配置'
-				font_name: ttf
 		GridLayout:
 			rows: 1
 			size_hint: 1, .8
@@ -137,7 +135,6 @@
 				Spinner:
 					text: self.values[0] if len(self.values) > 0 else ''
 					values: config.get('backup').keys()
-					font_name: ttf
 					size_hint: 1, .1
 					on_text: root.get_ignore(self, config.get('backup', self.text, 'ignore'))
 				ScrollView:
@@ -154,12 +151,10 @@
 				size_hint: .8, 1
 			Button:
 				text: '确认'
-				font_name: ttf
 				size_hint: .1, 1
 				on_release: config.write_config()
 			Button:
 				text: '取消'
-				font_name: ttf
 				size_hint: .1, 1
 				on_release: root.dismiss()
 		
